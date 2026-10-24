@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 500" aria-labelledby="heroTitle" role="img">
+<title id="heroTitle">Ba ly trà sữa UTE Tea trong bộ màu xanh ngọc và vàng trà</title>
+<defs>
+<linearGradient id="glass" x1=".1" y1="0" x2=".9" y2="1"><stop stop-color="#fff9ea" stop-opacity=".98"/><stop offset="1" stop-color="#efc382" stop-opacity=".97"/></linearGradient>
+<linearGradient id="milk" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fde7b7"/><stop offset="1" stop-color="#c8874d"/></linearGradient>
+<linearGradient id="matcha" x1="0" x2=".8" y2="1"><stop stop-color="#d8edab"/><stop offset="1" stop-color="#8dbf75"/></linearGradient>
+<linearGradient id="redTea" x1="0" x2="1" y2="1"><stop stop-color="#f7d6ac"/><stop offset="1" stop-color="#e88b64"/></linearGradient>
+<filter id="shadow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="12"/></filter>
+<clipPath id="cup1"><path d="M220 161h191l-19 242c-2 16-10 26-27 26H266c-15 0-24-10-26-26z"/></clipPath>
+<clipPath id="cup2"><path d="M44 213h168l-16 170c-1 18-8 25-24 25H87c-15 0-24-9-25-25z"/></clipPath>
+<clipPath id="cup3"><path d="M401 207h159l-16 181c-1 14-8 22-24 22h-80c-14 0-22-8-23-22z"/></clipPath>
+</defs>
+<circle cx="337" cy="231" r="200" fill="#fff" opacity=".1"/><circle cx="495" cy="101" r="48" fill="#f1bd63" opacity=".58"/><circle cx="88" cy="129" r="18" fill="#c8f1d9" opacity=".7"/>
+<ellipse cx="314" cy="452" rx="265" ry="24" fill="#063f3b" opacity=".22" filter="url(#shadow)"/>
+<path d="M84 256c-41-47-42-79-22-110 26 21 41 60 34 88 9-42 36-52 59-53-3 42-22 67-71 75Z" fill="#92d8ac" opacity=".95"/>
+<path d="M526 270c13-59 31-87 68-97 1 52-26 78-52 95 32-21 54-20 76-8-25 29-55 38-92 10Z" fill="#71b990" opacity=".95"/>
+<!-- side left cup -->
+<path d="M44 213h168l-16 170c-1 18-8 25-24 25H87c-15 0-24-9-25-25Z" fill="url(#redTea)" stroke="#ffffff" stroke-opacity=".74" stroke-width="5"/>
+<g clip-path="url(#cup2)"><path d="M48 246c31-14 69 12 100 1 23-8 47-5 63 7v-46H48Z" fill="#fff2e1" opacity=".72"/><circle cx="92" cy="376" r="10" fill="#764f3e"/><circle cx="119" cy="376" r="10" fill="#764f3e"/><circle cx="146" cy="376" r="10" fill="#764f3e"/><circle cx="172" cy="375" r="10" fill="#764f3e"/></g>
+<path d="M104 154 141 289" stroke="#0f8273" stroke-width="13" stroke-linecap="round"/>
+<rect x="35" y="204" width="187" height="17" rx="8" fill="#fff9e8"/>
+<rect x="86" y="279" width="90" height="52" rx="20" fill="#fff" opacity=".92"/><text x="131" y="301" fill="#0a6556" font-size="13" text-anchor="middle" font-family="Arial,sans-serif" font-weight="bold">UTE</text><text x="131" y="318" fill="#0a6556" font-size="13" text-anchor="middle" font-family="Arial,sans-serif" font-weight="bold">TEA</text>
+<!-- right cup -->
+<path d="M401 207h159l-16 181c-1 14-8 22-24 22h-80c-14 0-22-8-23-22z" fill="url(#matcha)" stroke="#fff" stroke-width="5" stroke-opacity=".7"/>
+<g clip-path="url(#cup3)"><path d="M399 235c29 15 60-13 84-3 25 10 54 4 82-8v-28H399Z" fill="#fff6eb" opacity=".77"/><circle cx="453" cy="378" r="9" fill="#58764b"/><circle cx="477" cy="378" r="9" fill="#58764b"/><circle cx="501" cy="378" r="9" fill="#58764b"/></g>
+<path d="M509 148 481 270" stroke="#f2bd64" stroke-width="13" stroke-linecap="round"/><rect x="391" y="198" width="180" height="19" rx="9" fill="#fffbec"/>
+<rect x="432" y="281" width="93" height="52" rx="20" fill="#fff" opacity=".93"/><text x="479" y="303" fill="#0a6556" font-size="13" text-anchor="middle" font-family="Arial,sans-serif" font-weight="bold">UTE</text><text x="479" y="321" fill="#0a6556" font-size="13" text-anchor="middle" font-family="Arial,sans-serif" font-weight="bold">TEA</text>
+<!-- center cup -->
+<path d="M220 161h191l-19 242c-2 16-10 26-27 26H266c-15 0-24-10-26-26Z" fill="url(#milk)" stroke="#fffbf2" stroke-width="6"/>
+<g clip-path="url(#cup1)"><path d="M223 221c25-18 53 13 87 0 39-14 67-2 97 3v-65H221Z" fill="#fff4d9" opacity=".87"/><path d="M225 266c30 5 62-8 89 0 39 12 66-2 94-8" fill="none" stroke="#fff7e7" stroke-opacity=".65" stroke-width="22"/><g fill="#563d34"><circle cx="275" cy="395" r="12"/><circle cx="303" cy="398" r="12"/><circle cx="332" cy="395" r="12"/><circle cx="361" cy="397" r="12"/><circle cx="285" cy="365" r="10"/><circle cx="318" cy="368" r="10"/><circle cx="350" cy="365" r="10"/></g></g>
+<path d="M337 66 316 245" fill="none" stroke="#087f70" stroke-width="16" stroke-linecap="round"/>
+<rect x="207" y="151" width="218" height="20" rx="10" fill="#fff9e8"/>
+<rect x="260" y="279" width="119" height="68" rx="25" fill="#fff" opacity=".94"/><path d="M291 302c-4-9 0-17 11-21 1 10-2 17-11 21Z" fill="#70b990"/><text x="322" y="321" fill="#0a6556" font-size="21" text-anchor="middle" font-family="Arial,sans-serif" font-weight="bold" letter-spacing="1">UTE TEA</text><text x="320" y="338" fill="#3c887a" font-size="9" text-anchor="middle" font-family="Arial,sans-serif" letter-spacing="2">FRESH DAILY</text>
+<g stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"><path d="M100 50v18M91 59h18"/><path d="M560 103v22M549 114h22"/><path d="M581 360v14M574 367h14"/></g>
+</svg>

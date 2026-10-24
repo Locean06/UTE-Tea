@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="vi">
+<body>
+<nav th:fragment="navigation" class="ute-staff-switcher" aria-label="Không gian nhân viên UTE Tea">
+  <div class="ute-staff-switcher-head">
+    <i class="bi bi-cup-hot" aria-hidden="true"></i>
+    <span><strong>UTE Tea</strong><small>Vận hành cửa hàng · Trực tiếp</small></span>
+  </div>
+  <div class="ute-staff-switcher-links">
+    <a th:href="@{/cashier}" sec:authorize="hasAnyRole('ADMIN','CASHIER')"><i class="bi bi-credit-card" aria-hidden="true"></i>Thu ngân · POS</a>
+    <a th:href="@{/kitchen}" sec:authorize="hasAnyRole('ADMIN','KITCHEN')"><i class="bi bi-cup-straw" aria-hidden="true"></i>Bếp · Pha chế</a>
+    <a th:href="@{/orders}" sec:authorize="hasAnyRole('ADMIN','CASHIER')"><i class="bi bi-receipt" aria-hidden="true"></i>Đơn hàng</a>
+    <a th:href="@{/admin}" sec:authorize="hasRole('ADMIN')"><i class="bi bi-grid" aria-hidden="true"></i>Quản trị</a>
+  </div>
+</nav>
+</body></html>

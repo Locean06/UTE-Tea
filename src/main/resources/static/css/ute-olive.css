@@ -1,0 +1,180 @@
+/* UTE TEA / Olive & Ivory Brand System
+   Based on the identity supplied by the project owner.
+   Designed for real Thymeleaf data + preserved legacy JS hooks.
+ */
+:root{
+ --ute-olive:#565c45;--ute-olive-dark:#343e30;--ute-olive-soft:#7d826b;
+ --ute-parchment:#faf9f5;--ute-cream:#f4f1e9;--ute-gold:#b79e72;
+ --ute-text:#34392f;--ute-muted:#71766d;--ute-stroke:#e3e1d7;
+ --primary-color:var(--ute-olive);--primary-hover:#3f4837;
+ --primary-light:#f0f0e8;--secondary-color:#747a68;--secondary-hover:#3e4638;
+ --secondary-light:#f4f3ed;--accent-color:#c6ab80;--dark-color:var(--ute-text);
+ --light-bg:var(--ute-parchment);--border-color:var(--ute-stroke);
+ --bs-primary:#565c45;--bs-primary-rgb:86,92,69;
+ --bs-link-color:#4f593f;--bs-link-hover-color:#313b2d;
+ --bs-border-color:#e3e1d7;--bs-body-color:#34392f;
+}
+html{scroll-behavior:smooth;scroll-padding-top:96px}
+body{font-family:'Be Vietnam Pro',system-ui,sans-serif!important;background:#faf9f5!important;background-image:none!important;color:var(--ute-text)}
+h1,h2,h3,.brand-font,.ute-serif{font-family:'Playfair Display',Georgia,'Times New Roman',serif!important;letter-spacing:-.025em;font-weight:600}
+h4,h5,h6,.btn,.form-label,.navbar,.table{font-family:'Be Vietnam Pro',system-ui,sans-serif}
+::selection{background:#d9deca;color:#263124}
+:focus-visible{outline:2px solid #b79e72;outline-offset:3px}
+.ute-topbar{background:#394534;color:#f4f2e9;font-weight:600;letter-spacing:.1em;min-height:29px}
+.ute-topbar-extra{color:#ede8d6}
+.navbar-milktea{min-height:78px;background:#fffefa!important;border-bottom:1px solid #eeeae0!important;box-shadow:0 3px 15px rgba(40,47,34,.045)!important}
+.navbar-milktea .container-fluid{max-width:1360px}
+.navbar-milktea .milktea-logo-frame{background:transparent!important;width:51px!important;height:51px!important;flex-basis:51px!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important}
+.navbar-milktea .milktea-logo-frame img{object-fit:contain!important;transform:none!important;position:static!important;width:100%!important;height:100%!important;max-width:100%!important}
+.navbar-milktea .navbar-brand,.navbar-milktea .navbar-brand.admin-navbar-brand{margin-left:0!important;gap:7px!important}
+.navbar-milktea .ute-wordmark{align-items:center;justify-content:center;gap:0;text-align:center;line-height:1.1;min-width:102px}
+.navbar-milktea .navbar-shop-name{font-family:'Playfair Display',Georgia,serif!important;color:#3c4336!important;letter-spacing:.17em!important;font-size:1.04rem!important;font-weight:700!important;white-space:nowrap}
+.navbar-milktea .ute-wordmark-year{font-size:.57rem;letter-spacing:.17em;color:#8a8b7f;margin-top:5px;font-weight:600}
+.navbar-milktea .navbar-nav .nav-link{background:none!important;color:#575c50!important;border-radius:0!important;font-weight:600!important;padding:11px 13px!important;position:relative;font-size:.78rem}
+.navbar-milktea .navbar-nav .nav-link:hover,.navbar-milktea .navbar-nav .nav-link.active{color:#333e2c!important;background:transparent!important}
+.navbar-milktea .navbar-nav .nav-link:hover::after{content:"";position:absolute;bottom:4px;left:13px;right:13px;height:1px;background:#697056}
+.navbar-milktea .header-cart-btn{border:1px solid #d8d9c9!important;background:#f9f9f5!important;color:#46513c!important;border-radius:999px!important;padding:10px 13px!important}
+.navbar-milktea .header-cart-btn:hover{background:#ebece2!important}
+.navbar-milktea .header-login-btn{border-radius:999px!important;background:#565c45!important;border-color:#565c45!important;color:white!important;padding:10px 17px!important}
+.navbar-milktea .header-account-btn{border-radius:999px!important;background:#f8f8f2!important;border-color:#e3e3d9!important}
+.navbar-milktea .navbar-brand .badge.bg-danger{background:#e9ebdf!important;border-color:#d8ddc9!important;color:#4e5741!important}
+.btn-primary,.btn-primary-custom{background:#565c45!important;border-color:#565c45!important;color:#fff!important}
+.btn-primary:hover,.btn-primary-custom:hover{background:#394332!important;border-color:#394332!important}
+.btn-outline-primary{border-color:#a8ad95!important;color:#535b43!important}
+.btn-outline-primary:hover{background:#535b43!important;border-color:#535b43!important;color:white!important}
+.text-primary{color:#535b43!important}.product-price,.price-tag{color:#515c42!important}
+.form-control:focus,.form-select:focus{border-color:#858d71!important;box-shadow:0 0 0 .2rem rgba(101,116,81,.13)!important}
+.modal-content{border:1px solid #e3e2d8!important}
+.nav-pills .nav-link.active,.nav-tabs .nav-link.active{background:#565c45!important;color:white!important;border-color:#565c45!important}
+.nav-pills .nav-link:not(.active){color:#535d49!important}
+.card{box-shadow:0 7px 28px rgba(45,50,39,.04)}
+/* Actual storefront, no static fake menu values */
+.ute-olive-home{background:var(--ute-parchment);min-height:100vh;padding-bottom:0!important;max-width:100vw;overflow-x:clip}
+.ute-olive-home .ute-hero.ute-olive-hero{display:grid!important;grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr)!important;align-items:center;min-height:490px;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:linear-gradient(115deg,#fbfaf6 4%,#eeeae0 100%)!important;color:var(--ute-text)!important;overflow:hidden}
+.ute-olive-home .ute-olive-hero::after{display:none!important}
+.ute-olive-home .ute-olive-hero .ute-hero-copy{padding:45px 36px 44px max(38px,calc((100vw - 1280px)/2));z-index:2;max-width:770px}
+.ute-olive-home .ute-olive-hero .ute-eyebrow{font-size:.71rem;color:#9a855e!important;font-weight:700;letter-spacing:.2em;display:flex;gap:11px;margin-bottom:18px}
+.ute-olive-home .ute-olive-hero .ute-line{display:inline-block;width:27px;height:1px;background:#bda477}
+.ute-olive-home .ute-olive-hero h1{font-family:'Playfair Display',Georgia,serif!important;font-weight:500!important;letter-spacing:-.055em!important;line-height:1.15!important;font-size:clamp(2.5rem,4.3vw,4.35rem)!important;color:#414a36!important;max-width:750px!important}
+.ute-olive-home .ute-olive-hero h1 span{color:#414a36!important}
+.ute-olive-home .ute-olive-hero .ute-hero-desc{color:#73776e!important;line-height:1.85;font-size:.85rem;max-width:585px;margin-top:21px}
+.ute-olive-home .ute-olive-hero .ute-hero-actions{gap:12px;margin-top:24px}
+.ute-olive-home .ute-olive-hero .btn{border-radius:999px!important;font-size:.79rem!important;padding:13px 25px!important;font-weight:700!important}
+.ute-olive-home .ute-olive-hero .ute-hero-cta{background:#515a42!important;border:1px solid #515a42!important;color:#fff!important}
+.ute-olive-home .ute-olive-hero .ute-hero-cta:hover{background:#343e30!important;color:white!important}
+.ute-olive-home .ute-olive-hero .ute-hero-ghost{border:1px solid #757c6d!important;background:transparent!important;color:#444b3d!important}
+.ute-olive-home .ute-olive-hero .ute-hero-ghost:hover{background:#eeeede!important}
+.ute-olive-home .ute-hero-highlights{display:flex;align-items:center;flex-wrap:wrap;gap:25px;margin-top:43px;color:#656c5e;font-size:.71rem;font-weight:600}
+.ute-olive-home .ute-hero-highlights i{color:#626f50;font-size:1rem;margin-right:6px}
+.ute-olive-home .ute-olive-hero .ute-hero-art{height:100%;min-height:490px;width:100%;background:#d8dccb;position:relative;overflow:hidden;display:block}
+.ute-olive-home .ute-olive-hero .ute-hero-art::before{content:"";position:absolute;z-index:1;inset:0;background:linear-gradient(90deg,rgba(247,246,237,.22),transparent 24%);pointer-events:none}
+.ute-olive-home .ute-olive-hero .ute-hero-art img{width:100%!important;height:100%!important;min-height:490px;max-height:none!important;object-fit:cover!important;object-position:center center;transform:none!important;filter:none!important}
+.ute-olive-home .ute-hero-photo-caption{position:absolute;bottom:27px;right:30px;z-index:2;color:white;text-shadow:0 2px 15px #293122;font-family:'Playfair Display',Georgia,serif;font-size:1.3rem;font-style:italic}
+.ute-olive-home .ute-service-row.ute-olive-promises{max-width:1280px;margin:0 auto 14px;padding:15px 24px;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;border-bottom:1px solid #ecebe2}
+.ute-olive-home .ute-service-row .ute-service-item{background:transparent!important;box-shadow:none!important;border:0!important;padding:15px!important;border-radius:0!important;align-items:center;justify-content:center;color:#85867a;font-size:.74rem;gap:12px}
+.ute-olive-home .ute-service-item:not(:last-child){border-right:1px solid #dddcd1!important}
+.ute-olive-home .ute-service-item i{background:transparent!important;color:#515942!important;font-size:1.35rem!important;width:auto;height:auto;flex-basis:auto}
+.ute-olive-home .ute-service-item strong{color:#4b513f!important;font-weight:700;font-size:.81rem;margin-bottom:4px}
+.ute-olive-home .ute-service-item span{display:block;font-size:.68rem;color:#878b80}
+.ute-olive-home .ute-category-section,.ute-olive-home .ute-catalog-section,.ute-olive-home .ute-offer-wrap,.ute-olive-home .ute-brand-story,.ute-olive-home .ute-experience{width:min(1280px,calc(100% - 48px));margin-left:auto;margin-right:auto}
+.ute-olive-home .ute-section-label{color:#a68e69;font-size:.66rem;text-transform:uppercase;letter-spacing:.24em;font-weight:750;margin-bottom:9px}
+.ute-olive-home .ute-centered-title{font-size:clamp(1.7rem,2.7vw,2.65rem);color:#3c4536;text-align:center;margin:0 0 9px}
+.ute-olive-home .ute-section-subtitle{text-align:center;color:#84867e;font-size:.78rem;margin:0 0 26px}
+.ute-olive-home .ute-category-section{text-align:center;padding:39px 0 32px}
+.ute-olive-home .ute-category-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;text-align:left}
+.ute-olive-home .ute-category-card{display:flex;align-items:center;gap:15px;position:relative;min-height:118px;padding:18px 17px;border:1px solid #e9e5dc;border-radius:17px;background:#f5f0e8;text-align:left;transition:transform .2s,border-color .2s,box-shadow .2s;color:#535a49}
+.ute-olive-home .ute-category-card:hover,.ute-olive-home .ute-category-card:focus-visible{transform:translateY(-4px);border-color:#c5c8b5;box-shadow:0 8px 25px rgba(60,65,45,.1)}
+.ute-olive-home .ute-category-card>i:first-child{display:grid;place-items:center;flex:0 0 64px;width:64px;height:68px;font-size:2.1rem;border-radius:15px;background:#e6e1d3;color:#788063}
+.ute-olive-home .ute-cat-fruit{background:#f5ede4}.ute-olive-home .ute-cat-fruit>i:first-child{background:#f3dec6;color:#be8c5e}
+.ute-olive-home .ute-cat-coffee{background:#f1eee9}.ute-olive-home .ute-cat-coffee>i:first-child{background:#e0d2bf;color:#866d55}
+.ute-olive-home .ute-cat-more{background:#edefe6}.ute-olive-home .ute-cat-more>i:first-child{background:#d9dfce;color:#697655}
+.ute-olive-home .ute-category-card strong{display:block;color:#3f4738;font-family:'Playfair Display',Georgia,serif;font-size:1.16rem;white-space:nowrap}
+.ute-olive-home .ute-category-card small{display:block;font-size:.66rem;color:#7e8178;white-space:nowrap;margin-top:5px}
+.ute-olive-home .ute-category-card .ute-cat-arrow{position:absolute;right:13px;bottom:13px;font-size:.65rem;display:grid;place-items:center;width:23px;height:23px;border-radius:50%;background:#5a6048;color:#fff}
+.ute-olive-home .ute-catalog-section{padding:31px 0 40px;scroll-margin-top:105px}
+.ute-olive-home .ute-catalog-section>.ute-section-label{text-align:center}
+.ute-olive-home .ute-catalog-section>.d-flex.flex-column{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:0!important;animation:none!important}
+.ute-olive-home .ute-catalog-section h2{font-size:clamp(1.65rem,2.6vw,2.5rem)!important;line-height:1.32;color:#394235}
+.ute-olive-home .ute-catalog-section .ute-catalog-tools{max-width:530px;width:100%}
+.ute-olive-home .ute-catalog-section .ute-catalog-tools .form-control,.ute-olive-home .ute-catalog-section .ute-catalog-tools .form-select{border-color:#dedfd4!important;background:#fffefa!important;font-size:.78rem!important;border-radius:999px!important;box-shadow:none!important}
+.ute-olive-home .ute-catalog-section .ute-catalog-tools .input-group-text{background:#fffefa!important;border-color:#dedfd4!important;border-radius:999px 0 0 999px!important;color:#656e53}
+.ute-olive-home .ute-catalog-section .ute-catalog-tools .form-control{border-radius:0 999px 999px 0!important}
+.ute-olive-home #productsGrid{--bs-gutter-x:15px;--bs-gutter-y:19px}
+.ute-olive-home #productsGrid .product-card{background:#fffefa!important;border-radius:16px!important;border:1px solid #eeece5!important;box-shadow:0 4px 20px rgba(57,58,44,.045)!important;overflow:hidden}
+.ute-olive-home #productsGrid .product-card:hover{border-color:#c7ccbb!important;box-shadow:0 12px 30px rgba(57,58,44,.09)!important}
+.ute-olive-home #productsGrid .product-img-wrapper{background:#eae7da!important;padding-top:80%}
+.ute-olive-home #productsGrid .product-card h5{font-size:.83rem!important;line-height:1.6!important;color:#3e4737!important}
+.ute-olive-home #productsGrid .product-card p{font-size:.7rem!important;color:#86887c!important}
+.ute-olive-home #productsGrid .product-card .product-price{font-size:.9rem!important;color:#404a34!important}
+.ute-olive-home #productsGrid .product-card .border-top{border-top-color:#f0efe7!important;gap:5px!important}
+.ute-olive-home #productsGrid .product-card .btn{background:#596147!important;border-color:#596147!important;font-size:.68rem!important;border-radius:9px!important;padding:9px 10px!important;white-space:nowrap}
+.ute-olive-home #productsGrid .product-card .btn:hover{background:#3e4736!important}
+.ute-olive-home .ute-offer-wrap{padding:22px 0 10px;scroll-margin-top:105px}
+.ute-olive-home .ute-offer-banner{display:flex;justify-content:space-between;align-items:center;position:relative;overflow:hidden;border-radius:19px;background:linear-gradient(115deg,#eee9db 0%,#faf8f1 50%,#e3dfcd 100%);min-height:236px;padding:25px 35px;gap:20px}
+.ute-olive-home .ute-offer-copy{position:relative;z-index:1;flex:1 1 65%}
+.ute-olive-home .ute-offer-copy h2{font-size:clamp(1.5rem,2.65vw,2.5rem);color:#424a36;margin-bottom:10px}
+.ute-olive-home .ute-offer-copy p{font-size:.77rem;line-height:1.7;color:#71776c;max-width:530px}
+.ute-olive-home .ute-offer-banner img{width:34%;max-height:225px;object-fit:cover;object-position:center;border-radius:105px 18px 18px 105px;opacity:.93}
+.ute-olive-home .ute-link-action{display:inline-flex;gap:9px;align-items:center;color:#3a4936;font-weight:700;font-size:.75rem;text-decoration:none;border-bottom:1px solid #939c7e;padding-bottom:6px}
+.ute-olive-home .ute-link-action:hover{color:#757e5e}
+.ute-olive-home .ute-offer-wrap>.alert-warning{margin-top:16px;background:#f1f1e5!important;color:#515d46!important;border-color:#d5dcc9!important}
+.ute-olive-home .ute-brand-story{display:grid;grid-template-columns:1fr .9fr;gap:55px;align-items:center;padding:60px 0 55px;scroll-margin-top:105px}
+.ute-olive-home .ute-brand-story h2{font-size:clamp(1.6rem,2.7vw,2.6rem);line-height:1.33;color:#3e4938}
+.ute-olive-home .ute-brand-story p{font-size:.79rem;color:#71766e;max-width:575px;line-height:1.9;margin:16px 0 20px}
+.ute-olive-home .ute-story-photo{border-radius:100px 22px 100px 22px;overflow:hidden;min-height:245px;box-shadow:0 20px 40px rgba(57,65,41,.11);background:#c1c4aa}
+.ute-olive-home .ute-story-photo img{display:block;object-fit:cover;width:100%;height:300px}
+.ute-olive-home .ute-experience{padding:21px 0 60px;text-align:center}
+.ute-olive-home .ute-experience-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:24px}
+.ute-olive-home .ute-exp-item{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#4b5542;padding:23px 18px;border-right:1px solid #e6e4da}
+.ute-olive-home .ute-exp-item:last-child{border:0}
+.ute-olive-home .ute-exp-item i{font-size:1.7rem;margin-bottom:12px;color:#606952}
+.ute-olive-home .ute-exp-item strong{font-size:.79rem;margin-bottom:5px}
+.ute-olive-home .ute-exp-item span{font-size:.68rem;color:#888c7e;line-height:1.7}
+.ute-olive-home .ute-exp-item:hover{color:#8f805f}
+.ute-olive-home .floating-cart-btn{background:#4b563c!important;border-radius:999px!important;box-shadow:0 11px 28px rgba(30,40,26,.24)!important}
+/* Auth + operator dashboard, aligned with the approved olive identity */
+.ute-auth-promo{background:linear-gradient(140deg,#323c30,#65704e)!important;border-radius:20px!important}
+.ute-auth-promo h1,.ute-auth-promo h1 span{font-family:'Playfair Display',Georgia,serif!important;font-weight:500!important;letter-spacing:-.02em!important;color:#f8f6ea!important}
+.ute-auth-promo p{color:#eceee1!important}
+.ute-auth-promo>img{border-radius:22px;object-fit:cover!important;height:260px!important;width:100%!important;max-height:260px!important}
+.ute-auth-promo .ute-eyebrow{color:#d7c099!important}
+.ute-auth-page .card{border-radius:20px!important}
+.ute-auth-logo{object-fit:contain;display:block;margin:0 auto 4px}
+.ute-login-wordmark{font-family:'Playfair Display',Georgia,serif;font-weight:700;letter-spacing:.18em;display:block;font-size:.95rem;color:#3b4433}
+.ute-page-banner{background:linear-gradient(115deg,#fffefa,#f0efe6)!important;border-color:#e4e2d7!important;border-radius:17px!important}
+.ute-page-banner::before{background:radial-gradient(circle,#e5e9d6,transparent 70%)!important}
+.ute-page-banner .ute-kicker{color:#9e8e65!important}
+.ute-page-banner h1{font-family:'Playfair Display',Georgia,serif!important;color:#3b4737!important;font-weight:600!important}
+.ute-page-banner p{color:#73786f!important}
+.ute-page-banner .ute-page-icon{color:#556149!important;background:#e8eadc!important;border-color:#d7decc!important}
+.ute-page-banner.ute-ops{background:linear-gradient(110deg,#384332,#697153)!important;color:#fff!important;border-color:#4a5940!important}
+.ute-page-banner.ute-ops .ute-kicker{color:#e8d8b3!important}
+.ute-page-banner.ute-ops h1{color:#fff!important}
+.ute-page-banner.ute-ops p{color:#e5e8dc!important}
+.ute-page-banner.ute-ops .ute-page-icon{background:rgba(255,255,255,.13)!important;color:#eee2c4!important;border-color:rgba(255,255,255,.22)!important}
+.admin-nav-link.active,.admin-nav-link:hover{background:#e9eddf!important;color:#374532!important;box-shadow:inset 3px 0 #666e54}
+.admin-nav-link i{color:#667254!important}
+.admin-sidebar,.pos-workspace .pos-panel,.kitchen-page .card{border-color:#e4e5d9!important;box-shadow:0 8px 24px rgba(41,49,35,.045)!important}
+.pos-workspace .pos-categories button.active{background:#565c45!important}
+.pos-workspace .pos-table-card.selected{outline-color:#565c45!important}
+/* Footer: one semantic, consistent brand component for all roles */
+.milktea-footer.ute-olive-footer{background:#353f31!important;border-top:0!important;color:#f6f3e6!important;margin-top:auto!important;padding:44px 0 26px!important}
+.ute-olive-footer .ute-footer-brand{display:flex;align-items:center;gap:12px}
+.ute-olive-footer .ute-footer-mark{width:47px!important;height:47px!important;object-fit:contain!important}
+.ute-olive-footer .ute-footer-logo-name{font-family:'Playfair Display',Georgia,serif;font-weight:600;letter-spacing:.18em;color:#f8f6ed;font-size:1.35rem}
+.ute-olive-footer .ute-footer-year{display:block;font-size:.58rem;letter-spacing:.18em;color:#c5cab7}
+.ute-olive-footer .ute-footer-slogan{color:#d5d7ca;font-family:'Playfair Display',Georgia,serif;font-size:1.04rem;margin:12px 0 0}
+.ute-olive-footer h3{font-family:'Be Vietnam Pro',sans-serif!important;font-size:.78rem!important;font-weight:700!important;color:#f3f1e8!important;margin-bottom:14px}
+.ute-olive-footer a,.ute-olive-footer p{color:#d1d5c8!important;font-size:.73rem;line-height:1.85}
+.ute-olive-footer a{text-decoration:none;display:block;margin:5px 0}
+.ute-olive-footer a:hover{color:#fff!important;text-decoration:underline}
+.ute-olive-footer .ute-footer-bottom{border-top:1px solid rgba(255,255,255,.14);margin-top:29px;padding-top:15px;font-size:.65rem;color:#b6beaf}
+.ute-olive-footer .ute-footer-note{color:#c1cab9;max-width:320px;line-height:1.85}
+@media(min-width:1600px){.ute-olive-home .ute-hero.ute-olive-hero{min-height:535px}.ute-olive-home .ute-olive-hero .ute-hero-art{min-height:535px}.ute-olive-home .ute-olive-hero .ute-hero-art img{min-height:535px}}
+@media(max-width:1199.98px){.ute-olive-home .ute-olive-hero .ute-hero-copy{padding-left:35px}.ute-olive-home .ute-category-card{padding:15px 11px;gap:10px}.ute-olive-home .ute-category-card>i:first-child{width:45px;flex-basis:45px;height:48px;font-size:1.5rem}.ute-olive-home .ute-category-card strong{font-size:.95rem}}
+@media(max-width:991.98px){.ute-olive-home .ute-hero.ute-olive-hero{min-height:420px}.ute-olive-home .ute-olive-hero .ute-hero-copy{padding:38px 22px 32px 30px}.ute-olive-home .ute-olive-hero h1{font-size:clamp(2.05rem,4.1vw,3.1rem)!important}.ute-olive-home .ute-olive-hero .ute-hero-art,.ute-olive-home .ute-olive-hero .ute-hero-art img{min-height:420px}.ute-olive-home .ute-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ute-olive-home .ute-brand-story{gap:22px}.ute-olive-home .ute-hero-highlights{margin-top:25px}.navbar-milktea .navbar-nav .nav-link:hover::after{display:none}}
+@media(max-width:767.98px){.ute-topbar-extra{display:none}.ute-olive-home .ute-hero.ute-olive-hero{display:flex!important;flex-direction:column!important}.ute-olive-home .ute-olive-hero .ute-hero-copy{padding:43px 24px 24px;width:100%}.ute-olive-home .ute-olive-hero .ute-eyebrow{font-size:.65rem}.ute-olive-home .ute-olive-hero h1{font-size:clamp(2.3rem,8vw,3.4rem)!important}.ute-olive-home .ute-olive-hero .ute-hero-desc{font-size:.8rem}.ute-olive-home .ute-olive-hero .ute-hero-art{height:265px!important;min-height:265px!important;width:100%}.ute-olive-home .ute-olive-hero .ute-hero-art img{height:265px!important;min-height:265px!important}.ute-olive-home .ute-hero-highlights{margin-top:25px}.ute-olive-home .ute-service-row.ute-olive-promises{grid-template-columns:1fr;gap:0;padding:4px 24px}.ute-olive-home .ute-service-row .ute-service-item{justify-content:flex-start!important;padding:12px!important}.ute-olive-home .ute-service-item:not(:last-child){border-right:0!important;border-bottom:1px solid #e9e8de!important}.ute-olive-home .ute-category-section,.ute-olive-home .ute-catalog-section,.ute-olive-home .ute-offer-wrap,.ute-olive-home .ute-brand-story,.ute-olive-home .ute-experience{width:calc(100% - 32px)}.ute-olive-home .ute-category-grid{gap:10px}.ute-olive-home .ute-category-card{min-height:95px}.ute-olive-home .ute-category-card small{white-space:normal}.ute-olive-home .ute-offer-banner{flex-direction:column;align-items:stretch;padding:26px}.ute-olive-home .ute-offer-banner img{width:100%;height:145px;max-height:145px;border-radius:13px}.ute-olive-home .ute-brand-story{grid-template-columns:1fr;padding:36px 0}.ute-olive-home .ute-story-photo img{height:230px}.ute-olive-home .ute-experience-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}.ute-olive-home .ute-exp-item:nth-child(2){border:0}.ute-olive-home .ute-exp-item{padding:19px 8px}.ute-olive-home .ute-catalog-section>.d-flex.flex-column{padding:0!important}.ute-olive-home #productsGrid .product-card .product-price{font-size:.82rem!important}.ute-olive-home #productsGrid .product-card .btn{font-size:.65rem!important}.milktea-footer.ute-olive-footer{padding:35px 0 26px!important}.navbar-milktea .milktea-logo-frame{width:43px!important;height:43px!important;flex-basis:43px!important}}
+@media(max-width:390px){.ute-olive-home .ute-category-grid{grid-template-columns:1fr}.ute-olive-home .ute-olive-hero .ute-hero-actions .btn{padding:10px 16px!important}.ute-olive-home .ute-olive-hero .ute-hero-highlights{gap:10px}.ute-olive-home .ute-hero-photo-caption{font-size:1rem}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}.ute-olive-home .ute-category-card,.ute-olive-home .product-card{transition:none!important;animation:none!important}}
+
+.ute-olive-footer .ute-footer-mark{filter:brightness(0) invert(.91)!important}

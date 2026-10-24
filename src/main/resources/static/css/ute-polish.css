@@ -1,0 +1,200 @@
+/* UTE TEA / Bright storefront & clear workspaces
+   Overrides legacy per-page rules after their inline styles. No change to API hooks.
+   Brand: botanical olive + warm paper + pale sage.
+*/
+:root {
+  --ute-olive:#536b4b; --ute-olive-dark:#294b35; --ute-olive-soft:#8fa487;
+  --ute-parchment:#fffefb; --ute-cream:#f7f8f2; --ute-gold:#c89c62;
+  --ute-text:#28352c; --ute-muted:#617065; --ute-border:#e2e9df;
+  --bs-primary:#44694e; --bs-body-color:#28352c;
+}
+html { scroll-padding-top: 100px; }
+body { background:#fbfcf9 !important; color:#28352c !important; font-family:'Be Vietnam Pro',system-ui,Arial,sans-serif!important; font-size:14px; line-height:1.65; }
+body * { box-sizing:border-box; }
+body img { max-width:100%; }
+h1,h2,h3,h4,h5,h6 { overflow-wrap:break-word; }
+a,button { -webkit-tap-highlight-color:transparent; }
+.btn { line-height:1.35; white-space:normal; overflow-wrap:anywhere; }
+.btn-primary,.btn-primary-custom,.pos-submit { background:#45694e!important;border-color:#45694e!important;color:#fff!important; }
+.btn-primary:hover,.btn-primary-custom:hover,.pos-submit:hover { background:#294b35!important;border-color:#294b35!important;color:#fff!important; }
+.btn-outline-primary { color:#3b5a41!important; border-color:#98ae98!important; }
+.btn-outline-primary:hover { color:white!important; background:#45694e!important; border-color:#45694e!important; }
+.navbar-milktea { background:#fff!important;box-shadow:0 3px 19px rgba(41,75,53,.05)!important;border-color:#ecf0e9!important; }
+.navbar-milktea .navbar-shop-name { color:#314b35!important; }
+.ute-topbar { background:#355841!important; }
+.ute-page-banner { background:linear-gradient(115deg,#f3f8f0,#fbfcf8 72%)!important;border:1px solid #e1ecdf!important;color:#2d4833!important;box-shadow:0 10px 29px rgba(64,90,60,.045)!important; }
+.ute-page-banner h1,.ute-page-banner p,.ute-page-banner .ute-kicker{color:#324d38!important;text-shadow:none!important;}
+.ute-page-banner h1{font-family:'Be Vietnam Pro',sans-serif!important;font-size:clamp(1.35rem,2.1vw,1.85rem)!important;line-height:1.4!important;letter-spacing:-.035em!important;font-weight:750!important;}
+.ute-page-banner .ute-page-icon{color:#617d60!important;background:#e5efe1!important;}
+/* Storefront: airy hero and better product imagery */
+.ute-olive-home { background:#fffefb!important; }
+.ute-olive-home .ute-hero.ute-olive-hero{background:linear-gradient(110deg,#fffefa,#f2f7ec)!important;}
+.ute-olive-home .ute-olive-hero .ute-hero-copy { padding-top:56px; padding-bottom:56px; }
+.ute-olive-home .ute-olive-hero h1 { color:#314d38!important; font-size:clamp(2.5rem,4.1vw,4.4rem)!important; }
+.ute-olive-home .ute-olive-hero .ute-hero-desc { color:#526355!important;font-size:.95rem!important;max-width:590px;line-height:1.85; }
+.ute-olive-home .ute-olive-hero .ute-hero-art { background:#e9f0e2!important; }
+.ute-olive-home .ute-olive-hero .ute-hero-art img { object-fit:cover!important;object-position:50% 53%; }
+.ute-olive-home .ute-olive-hero .ute-hero-art::before { background:linear-gradient(90deg,rgba(255,254,248,.18),transparent 30%)!important; }
+.ute-olive-home .ute-category-card { background:#f8faf4!important;border-color:#e5ece1!important; }
+.ute-olive-home .ute-category-card:hover{box-shadow:0 12px 26px rgba(55,80,57,.10)!important;}
+.ute-olive-home .ute-category-card>i:first-child { background:#e9f1e4!important;color:#567751!important; }
+.ute-olive-home .product-card { background:#fff!important; border:1px solid #e7ede3!important; border-radius:16px!important;overflow:hidden;box-shadow:0 8px 20px rgba(33,60,38,.035)!important; }
+.ute-olive-home .product-card:hover { box-shadow:0 14px 28px rgba(33,60,38,.10)!important; }
+.ute-olive-home .product-card img,.milk-menu-page .product-item img { aspect-ratio:1/1; object-fit:cover!important;object-position:center!important;background:#f1f5ec; }
+.ute-olive-home .ute-olive-promises { background:#fffefb!important; }
+.ute-olive-home .ute-story-photo img { aspect-ratio:8/5;object-fit:cover; }
+.ute-olive-home .ute-section-subtitle { color:#607166!important;font-size:.85rem!important; }
+.ute-olive-footer { background:#304e3a!important; }
+/* Screens for staff roles: sans-serif for dense operational UI */
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page,.pos-workspace,.kitchen-page,.orders-page) h1,
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page,.pos-workspace,.kitchen-page,.orders-page) h2,
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page,.pos-workspace,.kitchen-page,.orders-page) h3,
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page,.pos-workspace,.kitchen-page,.orders-page) .brand-font { font-family:'Be Vietnam Pro',system-ui,sans-serif!important; letter-spacing:-.025em!important;font-weight:750!important; }
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page,.pos-workspace,.kitchen-page) { --tables-primary:#45694e;--tables-primary-hover:#2c4f37;--tables-primary-light:#edf5e9;--tables-secondary:#57705b;--tables-secondary-hover:#2c4f37;--tables-secondary-light:#eff5eb;--tables-accent:#b3c49b;--tables-border:#e1e9df;--tables-background:#fafcf9;--tables-text:#283b2f;--tables-muted:#64736a;--settings-primary:#45694e;--settings-primary-hover:#2c4f37;--settings-primary-light:#edf5e9;--settings-secondary:#57705b;--settings-secondary-hover:#2c4f37;--settings-secondary-light:#eff5eb;--settings-accent:#b3c49b;--settings-border:#e1e9df;--settings-text:#283b2f;--settings-muted:#64736a;--settings-background:#fafcf9;--pos-primary:#45694e;--pos-primary-hover:#2c4f37;--pos-primary-light:#edf5e9;--pos-secondary:#57705b;--pos-secondary-hover:#2c4f37;--pos-secondary-light:#eff5eb;--pos-accent:#b3c49b;--pos-border:#e1e9df;--pos-text:#283b2f;--pos-muted:#64736a;--pos-background:#fafcf9; }
+/* Bootstrap/admin layouts: make width calculations predictable */
+.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page,.pos-workspace { max-width:100%!important;overflow-x:clip; background:#fafcf9!important; }
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) .row > .admin-sidebar-column { flex:0 0 242px!important;width:242px!important;max-width:242px!important; }
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) .admin-content-column { min-width:0!important;max-width:100%;flex:1 1 0!important; }
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) .admin-sidebar {background:#fff!important;border:1px solid #e1e9df!important;box-shadow:0 5px 19px rgba(47,73,48,.05)!important;padding:13px!important;}
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) .admin-nav-link {display:flex!important;align-items:center!important;gap:9px!important;min-width:0!important;padding:11px 12px!important;font-size:12.5px!important;line-height:1.5!important;overflow-wrap:anywhere;white-space:normal!important;}
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) .admin-nav-link i {flex-shrink:0;}
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) .admin-nav-link.active {background:#edf5e9!important;color:#2c4f37!important;}
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) :is(.card,.modal-content) {border-color:#e0eadf!important;}
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) :is(.card-header,.card-footer) {background:#fff!important;}
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) .table-responsive {overflow-x:auto!important;-webkit-overflow-scrolling:touch;max-width:100%;}
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) .table {width:100%;font-size:12.5px!important;}
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) .table th {font-weight:750!important;white-space:normal!important;line-height:1.5!important;}
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) .table td {overflow-wrap:anywhere;vertical-align:middle;}
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) :is(.btn,.badge,.form-control,.form-select) {font-size:12.5px;line-height:1.5;}
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) .badge {white-space:normal;overflow-wrap:anywhere;}
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) :is(.d-flex,.row,.col,.card-body) {min-width:0;}
+/* Dashboard: reliable sidebar and KPI/card grids */
+.dashboard-page .admin-report-layout {display:grid!important;grid-template-columns:242px minmax(0,1fr)!important;gap:22px!important;max-width:100%!important;}
+.dashboard-page .admin-report-layout > .admin-sidebar-column {min-width:0;width:100%!important;}
+.dashboard-page .admin-report-layout > .admin-content-column {min-width:0;max-width:100%;}
+.dashboard-page .dashboard-kpi,.dashboard-page .kpi-number {min-width:0;overflow-wrap:anywhere;}
+.dashboard-page .dashboard-heading {display:flex!important;gap:16px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;}
+.ute-admin-quicklinks {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+.ute-admin-quicklinks a {display:flex;align-items:center;gap:11px;padding:16px 18px;background:white;border:1px solid #e0eadf;border-radius:14px;text-decoration:none;color:#31533c;font-weight:700;font-size:12px;transition:transform .15s,box-shadow .15s;}
+.ute-admin-quicklinks a:hover {transform:translateY(-2px);box-shadow:0 7px 21px #27443113;}
+.ute-admin-quicklinks a > i:first-child {width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:#edf5e9;font-size:16px;flex-shrink:0;}
+.ute-admin-quicklinks a span {flex:1;min-width:0;}
+/* Admin tables: useful operation instead of QR decoration */
+.admin-tables-page .ute-table-toolbar {display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding:15px;background:#fff;border:1px solid #e2e9df;border-radius:16px;}
+.admin-tables-page .ute-table-search {display:flex;align-items:center;gap:9px;flex:1 1 190px;min-width:160px;border:1px solid #dce7dc;background:#fbfdf9;border-radius:10px;padding:10px 12px;color:#537057;}
+.admin-tables-page .ute-table-search input {width:100%;min-width:0;outline:0;border:0;background:transparent;color:#263d2e;font:500 13px 'Be Vietnam Pro',sans-serif;}
+.admin-tables-page .ute-status-filters {display:flex;flex-wrap:wrap;gap:6px;}
+.admin-tables-page .ute-status-filters button {display:flex;align-items:center;gap:6px;border:1px solid #dfe8de;border-radius:9px;background:#fff;padding:9px 12px;color:#53695a;font-size:12px;font-weight:650;}
+.admin-tables-page .ute-status-filters button.active {background:#416449;color:#fff;border-color:#416449;}
+.admin-tables-page .ute-status-filters button span {opacity:.85;}
+.admin-tables-page .ute-table-meta {display:flex;align-items:center;gap:7px;background:#f4f9f2;color:#536953;font-size:12px;padding:10px 12px;border-radius:9px;}
+.admin-tables-page .ute-table-actions {display:flex;flex-wrap:wrap;gap:8px;}
+.admin-tables-page .ute-table-actions .btn {flex:1 1 110px;padding:9px!important;line-height:1.45;white-space:normal;}
+.admin-tables-page .admin-table-card {background:#fff!important;padding:18px!important;border-color:#e3ebdf!important;}
+.admin-tables-page .admin-table-card h5 {font:750 16px 'Be Vietnam Pro',sans-serif!important;}
+.admin-tables-page .admin-table-card .badge {white-space:normal!important;font-size:11px!important;line-height:1.5!important;max-width:100%;}
+/* Cashier: never squeeze three busy columns into laptop viewport */
+.pos-workspace .pos-layout {display:grid!important;grid-template-columns:minmax(300px,350px) minmax(470px,1fr) minmax(265px,300px)!important;gap:16px!important;align-items:start!important;max-width:100%;}
+.pos-workspace .pos-panel {min-width:0!important;overflow:hidden!important;background:#fff!important;border:1px solid #e0e9df!important;border-radius:16px!important;padding:19px!important;box-shadow:0 6px 20px rgba(45,80,50,.04)!important;}
+.pos-workspace .pos-panel h4 {font-family:'Be Vietnam Pro',sans-serif!important;font-size:15px!important;line-height:1.45!important;overflow-wrap:anywhere;color:#2d4a37!important;}
+.pos-workspace .pos-search {flex:1 1 160px;min-width:0;max-width:100%;}
+.pos-workspace .pos-search input {min-width:0;font-size:12px!important;}
+.pos-workspace .pos-menu > .d-flex:first-child {align-items:center;flex-wrap:wrap;}
+.pos-workspace .pos-product-grid {grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;max-width:100%;}
+.pos-workspace .pos-product {min-width:0;border-color:#e1e9df!important;}
+.pos-workspace .pos-product img {aspect-ratio:1.32!important;object-fit:cover!important;object-position:center!important;background:#f2f7ef!important;}
+.pos-workspace .pos-product-body {padding:10px!important;}
+.pos-workspace .pos-product h6 {font-size:12px!important;line-height:1.5!important;min-height:3em!important;overflow-wrap:anywhere!important;}
+.pos-workspace .pos-product-price {font-size:13px!important;}
+.pos-workspace .pos-sizes {display:flex;flex-wrap:wrap;gap:6px;}
+.pos-workspace .pos-sizes button {min-width:38px!important;flex:1 1 40px!important;white-space:normal;font-size:11px!important;padding:8px 5px!important;}
+.pos-workspace .pos-tables-grid {grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+.pos-workspace .pos-table-card {min-width:0;padding:12px 10px!important;overflow-wrap:anywhere!important;}
+.pos-workspace .pos-table-card .badge {white-space:normal!important;}
+.pos-workspace .pos-table-card .btn {white-space:normal!important;font-size:11px!important;}
+.pos-workspace .pos-cart-item {display:flex;min-width:0;flex-wrap:wrap;overflow-wrap:anywhere;}
+.pos-workspace .pos-cart-info {min-width:0;flex:1 1 140px;}
+.pos-workspace .pos-cart-list {min-height:160px;max-height:350px;overflow-y:auto;overflow-x:hidden;}
+.pos-workspace .pos-checkout-bottom .d-flex {flex-wrap:wrap;gap:7px;}
+.pos-workspace .pos-total {font-size:clamp(16px,1.6vw,22px)!important;}
+.pos-workspace .pos-submit {font-size:13px!important;line-height:1.5;padding:13px!important;}
+/* Generic form and modal fallbacks */
+.modal-dialog {max-width:min(100% - 26px,680px);margin-left:auto;margin-right:auto;}
+.modal-body {overflow-wrap:anywhere;}
+.modal-body .table-responsive {max-width:100%;overflow-x:auto;}
+.form-control,.form-select {min-width:0;max-width:100%;}
+@media(min-width:1550px){.pos-workspace .pos-product-grid {grid-template-columns:repeat(3,minmax(0,1fr))!important;}}
+@media(max-width:1499.98px){
+ .pos-workspace .pos-layout {grid-template-columns:minmax(310px,360px) minmax(0,1fr)!important;}
+ .pos-workspace .pos-tables {grid-column:1 / -1!important;}
+ .pos-workspace .pos-tables-grid {grid-template-columns:repeat(4,minmax(0,1fr))!important;}
+ .pos-workspace .pos-product-grid {grid-template-columns:repeat(3,minmax(0,1fr))!important;}
+}
+@media(max-width:1199.98px){
+ .dashboard-page .admin-report-layout {grid-template-columns:205px minmax(0,1fr)!important;gap:15px!important;}
+ :is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) .row > .admin-sidebar-column {flex-basis:205px!important;width:205px!important;max-width:205px!important;}
+ .ute-admin-quicklinks {grid-template-columns:1fr!important;gap:8px;}
+}
+@media(max-width:991.98px){
+ .dashboard-page .admin-report-layout {display:block!important;}
+ .dashboard-page .admin-report-layout > .admin-sidebar-column {margin-bottom:16px;}
+ :is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) .row > .admin-sidebar-column {width:100%!important;max-width:100%!important;flex:0 0 100%!important;}
+ :is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) .admin-sidebar {display:flex;flex-direction:row;gap:6px;align-items:center;flex-wrap:wrap;}
+ :is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) .admin-sidebar h6 {width:100%;margin:0!important;}
+ :is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) .admin-sidebar .admin-nav-link {flex:0 1 auto;max-width:calc(50% - 5px);}
+ .pos-workspace .pos-layout {grid-template-columns:minmax(0,1fr)!important;}
+ .pos-workspace .pos-menu {grid-column:auto;grid-row:1;}
+ .pos-workspace .pos-checkout {grid-column:auto;grid-row:2;}
+ .pos-workspace .pos-tables {grid-column:auto!important;grid-row:3;}
+ .pos-workspace .pos-product-grid {grid-template-columns:repeat(3,minmax(0,1fr))!important;max-height:none!important;}
+}
+@media(max-width:575.98px){
+ body {font-size:13px;}
+ .ute-olive-home .ute-olive-hero .ute-hero-copy {padding:28px 22px!important;}
+ .ute-olive-home .ute-olive-hero .ute-hero-desc {font-size:.85rem!important;}
+ .ute-olive-home .ute-olive-hero .ute-hero-art,.ute-olive-home .ute-olive-hero .ute-hero-art img {min-height:275px!important;}
+ .ute-olive-home .ute-category-grid {grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px;}
+ .ute-olive-home .ute-category-card {padding:13px!important;gap:9px!important;min-height:94px;}
+ .ute-olive-home .ute-category-card>i:first-child {width:43px!important;height:50px!important;flex-basis:43px!important;font-size:22px!important;}
+ .pos-workspace .pos-layout {display:grid!important;grid-template-columns:100%!important;}
+ .pos-workspace .pos-panel {width:100%;padding:13px!important;}
+ .pos-workspace .pos-product-grid {grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;}
+ .pos-workspace .pos-tables-grid {grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+ .pos-workspace .pos-sizes button {font-size:10px!important;}
+ .admin-tables-page .ute-table-toolbar {padding:10px;}
+ .admin-tables-page .ute-table-search {flex-basis:100%;}
+ .admin-tables-page .ute-status-filters {width:100%;}
+ .admin-tables-page .ute-status-filters button {flex:1 1 auto;justify-content:center;}
+ .admin-tables-page .ute-table-toolbar > .btn {width:100%;}
+ .ute-admin-quicklinks {grid-template-columns:1fr;}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important;}}
+
+/* 2026-10-24: final polish on product images, contrast, navigation, admin and cashier. */
+.ute-olive-home .product-card .product-img,
+.ute-olive-home .product-card img { display:block; width:100%; object-fit:cover; }
+.ute-olive-home .product-card h5 {white-space:normal!important;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;line-height:1.55;min-height:3.1em;}
+.ute-olive-home .product-card .btn{min-height:42px;}
+.ute-olive-home .ute-olive-hero .ute-hero-art img{filter:brightness(1.04) saturate(1.03)!important;}
+.navbar-milktea .nav-link, .navbar-milktea .navbar-shop-name{overflow-wrap:normal;}
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) .admin-nav-link{hyphens:none;}
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) .admin-sidebar{min-width:0;}
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) :is(input,select,textarea){max-width:100%;}
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) .table-responsive{border-radius:12px;}
+:is(.dashboard-page,.catalog-page,.admin-tables-page,.admin-orders-page,.admin-staff-page,.admin-inventory-page,.admin-documents-page,.admin-settings-page) .table td .btn{min-height:33px;}
+.pos-workspace .pos-product img {height:130px!important;aspect-ratio:auto!important;object-fit:cover!important;}
+.pos-workspace .pos-product h6 {min-height:3.2em;}
+.pos-workspace .pos-cart-item img{flex-shrink:0;object-fit:cover;background:#f4f7ef;border-radius:9px;}
+.pos-workspace .pos-checkout .form-select{max-width:100%;}
+.pos-workspace .pos-panel .text-muted{color:#647166!important;}
+.pos-workspace .pos-layout > *{min-width:0!important;}
+@media(max-width:1499.98px) and (min-width:992px){
+ .pos-workspace .pos-product img{height:118px!important;}
+ .pos-workspace .pos-product-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;}
+}
+@media(max-width:575.98px){
+ .pos-workspace .pos-product img{height:108px!important;}
+ .pos-workspace .pos-panel h4{font-size:14px!important;}
+ .pos-workspace .pos-product-body{padding:9px!important;}
+ .pos-workspace .pos-product h6{font-size:11.8px!important;}
+}

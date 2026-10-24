@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi" th:replace="~{layouts/main :: html(~{::content}, ~{::scripts})}">
+<body>
+<main th:fragment="content" class="container py-4 py-lg-5 ute-order-confirmation">
+  <section class="confirmation-shell mx-auto" th:attr="data-order=${confirmationOrderId}" id="uteOrderConfirmation">
+    <div class="confirmation-symbol"><i class="bi bi-check2-circle"></i></div>
+    <span class="confirmation-kicker">UTE TEA · ĐƠN HÀNG MỚI</span>
+    <h1>Đã tiếp nhận đơn hàng</h1>
+    <p class="confirmation-lead">Đây là xác nhận cho <strong>đơn vừa đặt</strong>, không phải lịch sử đơn hàng của toàn bộ bàn.</p>
+    <div class="alert alert-info text-start mt-3" id="confirmationLoading" role="status">Đang kiểm tra thông tin đơn hàng...</div>
+    <div class="alert alert-danger text-start d-none" id="confirmationError" role="alert"></div>
+    <div id="confirmationDetails" class="d-none">
+       <div class="confirmation-overview"><div><span>Mã đơn</span><strong id="confirmCode">—</strong></div><div><span>Trạng thái</span><strong id="confirmStatus">—</strong></div><div><span>Thanh toán</span><strong id="confirmPayment">—</strong></div><div><span>Tổng cộng</span><strong id="confirmTotal">—</strong></div></div>
+       <h2 class="confirmation-subtitle">Các món vừa đặt</h2>
+       <ul class="confirmation-items" id="confirmationItems"></ul>
+       <div class="confirmation-actions" id="confirmationPaymentActions">
+         <p>Đã chuyển khoản? Gửi thông báo để thu ngân đối soát. <strong>Thông báo không đồng nghĩa đã thanh toán thành công.</strong></p>
+         <button type="button" class="btn btn-primary" id="confirmationTransferBtn"><i class="bi bi-bank"></i> Tôi đã chuyển khoản</button>
+       </div>
+    </div>
+    <div class="confirmation-footer"><a th:href="@{/}" class="btn btn-outline-secondary">Về thực đơn</a><a th:href="@{/orders}" class="btn btn-link">Lịch sử đơn hàng (cần đăng nhập)</a></div>
+  </section>
+</main>
+<th:block th:fragment="scripts"><script th:src="@{/js/customer/order-confirmation.js}"></script></th:block>
+</body></html>

@@ -1,0 +1,24 @@
+package vn.edu.ute.milktea.repository.catalog;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import vn.edu.ute.milktea.entity.catalog.Product;
+import org.springframework.data.jpa.repository.EntityGraph;
+
+import java.util.List;
+
+@Repository
+public interface ProductRepository extends JpaRepository<Product, Long> {
+    @EntityGraph(attributePaths = {"category"})
+    List<Product> findAllByActiveTrue();
+    @EntityGraph(attributePaths = {"category"})
+    List<Product> findByCategoryIdAndActiveTrue(Long categoryId);
+    boolean existsByNameIgnoreCaseAndSizeIgnoreCase(String name, String size);
+
+    @EntityGraph(attributePaths = {"category"})
+    List<Product> findAllByOrderByIdAsc();
+
+    long countByImagePublicId(String imagePublicId);
+}
+
+

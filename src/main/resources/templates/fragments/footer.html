@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+    <footer th:fragment="footer" class="milktea-footer ute-olive-footer">
+       <div class="container">
+         <div class="row g-4">
+           <div class="col-lg-4 col-md-6">
+             <div class="ute-footer-brand">
+               <img class="ute-footer-mark" th:src="@{/images/ute-tea-olive-mark.png}" src="/images/ute-tea-olive-mark.png" width="47" height="47" alt="Biểu tượng UTE Tea">
+               <div><span class="ute-footer-logo-name">UTE TEA</span><span class="ute-footer-year">SINCE 2026</span></div>
+             </div>
+             <p class="ute-footer-slogan">Tinh vị trà, chạm vị thanh xuân.</p>
+             <p class="ute-footer-note">Một chiếc menu đủ vị, một không gian nhỏ cho những cuộc hẹn và những niềm vui mỗi ngày.</p>
+           </div>
+           <div class="col-6 col-lg-2 col-md-3">
+             <h3>Khám phá</h3>
+             <a th:href="@{/}">Trang chủ</a>
+             <a th:href="@{/#uteCatalog}">Thực đơn</a>
+             <a th:href="@{/#uteOffers}">Ưu đãi</a>
+             <a th:href="@{/#uteStory}">Về UTE Tea</a>
+           </div>
+           <div class="col-6 col-lg-2 col-md-3">
+             <h3>Tài khoản</h3>
+             <a th:href="@{/login}">Đăng nhập</a>
+             <a th:href="@{/cart}">Giỏ hàng</a>
+             <a th:href="@{/orders}" sec:authorize="hasRole('CUSTOMER')">Đơn hàng</a>
+             <a th:href="@{/profile}">Trang cá nhân</a>
+           </div>
+           <div class="col-lg-4 col-md-6">
+             <h3>Ghé thăm UTE Tea</h3>
+             <p><i class="bi bi-geo-alt me-2"></i><span th:text="${settings != null and settings.address != null and !settings.address.isEmpty() ? settings.address : 'Thông tin địa chỉ sẽ được cập nhật tại cửa hàng'}">Địa chỉ cửa hàng</span></p>
+             <p><i class="bi bi-cup-hot me-2"></i>Chọn món dễ dàng, theo dõi đơn trong tài khoản của bạn.</p>
+           </div>
+         </div>
+         <div class="ute-footer-bottom d-flex flex-wrap align-items-center justify-content-between gap-2">
+           <span>© 2026 UTE Tea. Tinh vị trà, chạm vị thanh xuân.</span>
+           <span>Thực hiện với Spring Boot · Thymeleaf · Bootstrap</span>
+         </div>
+       </div>
+    </footer>
+</body>
+</html>

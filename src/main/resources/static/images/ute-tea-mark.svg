@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-labelledby="t d">
+<title id="t">UTE Tea</title><desc id="d">Biểu tượng ly trà và lá xanh của UTE Tea</desc>
+<defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="#087f70"/><stop offset="1" stop-color="#065047"/></linearGradient></defs>
+<rect x="2" y="2" width="116" height="116" rx="34" fill="url(#g)"/>
+<circle cx="89" cy="27" r="15" fill="#f1bd63" opacity=".95"/>
+<path d="M40 39c-3-15 4-24 17-27 0 16-3 24-17 27Z" fill="#c8f1d9"/>
+<path d="M43 39c-3-13-14-19-27-17 5 14 12 20 27 17Z" fill="#8edbb8"/>
+<path d="M41 35c7 7 12 12 12 22" fill="none" stroke="#dcf8ec" stroke-width="4" stroke-linecap="round"/>
+<path d="M33 54h56l-5 33c-1 7-6 11-13 11H51c-7 0-12-4-13-11L33 54Z" fill="#fffdf7"/>
+<path d="M43 68h36l-3 19H47Z" fill="#c9ecdc"/>
+<path d="M31 52h60" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
+<path d="M65 23 56 66" stroke="#f1bd63" stroke-width="5" stroke-linecap="round"/>
+<circle cx="55" cy="91" r="3.5" fill="#087f70"/><circle cx="65" cy="91" r="3.5" fill="#087f70"/>
+</svg>

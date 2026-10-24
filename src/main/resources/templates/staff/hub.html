@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="vi"
+      th:replace="~{layouts/main :: html(~{::content}, ~{::scripts})}">
+<body>
+<main th:fragment="content" class="container py-4 py-lg-5 staff-hub">
+  <div th:replace="~{fragments/staff-navigation :: navigation}"></div>
+  <section class="staff-hub-intro">
+    <span class="staff-hub-eyebrow"><i class="bi bi-stars"></i> UTE TEA · VẬN HÀNH HẰNG NGÀY</span>
+    <h1>Trung tâm nhân viên</h1>
+    <p>Một website chung cho thu ngân và bếp pha chế. Mỗi tài khoản chỉ thấy các khu vực được cấp quyền.</p>
+  </section>
+  <div class="row g-3 mt-2">
+    <div class="col-lg-6" sec:authorize="hasAnyRole('ADMIN','CASHIER')">
+      <a th:href="@{/cashier}" class="staff-hub-card">
+        <span class="staff-hub-card-icon"><i class="bi bi-cart-check"></i></span>
+        <div><span class="staff-hub-label">BỘ PHẬN BÁN HÀNG</span><h2>Thu ngân &amp; POS</h2><p>Tạo đơn tại quầy, theo dõi thanh toán, xử lý giao dịch và bàn đang phục vụ.</p><span class="staff-hub-link">Vào màn hình thu ngân <i class="bi bi-arrow-right"></i></span></div>
+      </a>
+    </div>
+    <div class="col-lg-6" sec:authorize="hasAnyRole('ADMIN','KITCHEN')">
+      <a th:href="@{/kitchen}" class="staff-hub-card">
+        <span class="staff-hub-card-icon"><i class="bi bi-cup-straw"></i></span>
+        <div><span class="staff-hub-label">BỘ PHẬN CHẾ BIẾN</span><h2>Bếp pha chế &amp; KDS</h2><p>Nhận món, cập nhật tiến độ, kiểm tra nguyên liệu và bàn giao thành phẩm.</p><span class="staff-hub-link">Vào màn hình bếp <i class="bi bi-arrow-right"></i></span></div>
+      </a>
+    </div>
+    <div class="col-lg-6" sec:authorize="hasRole('ADMIN')">
+      <a th:href="@{/admin}" class="staff-hub-card">
+        <span class="staff-hub-card-icon"><i class="bi bi-bar-chart"></i></span>
+        <div><span class="staff-hub-label">QUẢN LÝ HỆ THỐNG</span><h2>Quản trị UTE Tea</h2><p>Quản lý sản phẩm, nhân viên, dữ liệu kinh doanh và báo cáo.</p><span class="staff-hub-link">Vào trang quản trị <i class="bi bi-arrow-right"></i></span></div>
+      </a>
+    </div>
+  </div>
+</main>
+<th:block th:fragment="scripts"><script></script></th:block>
+</body></html>

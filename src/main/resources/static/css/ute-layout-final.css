@@ -1,0 +1,72 @@
+/* UTE Tea · Last-mile production layout fixes / 2026-10-24
+ * Both roles operate directly from /cashier and /kitchen; no intermediate staff page.
+ * Scoped overrides preserve existing JS, API identifiers and native Bootstrap interactions.
+ */
+:root { --ute-ink:#2f4030; --ute-olive:#53664a; --ute-paper:#f8faf5; --ute-stroke:#dce5d9; }
+html,body { max-width:100%; margin:0; }
+body { overflow-x:clip; color:var(--ute-ink); }
+:is(.pos-workspace,.kitchen-page) { width:100%; min-width:0; max-width:100%; padding-bottom:35px!important; overflow-x:clip; background:#f9fbf7!important; font-family:'Be Vietnam Pro',system-ui,sans-serif!important; }
+:is(.pos-workspace,.kitchen-page) :is(h1,h2,h3,h4,h5,h6,p,span,small) { overflow-wrap:anywhere; }
+:is(.pos-workspace,.kitchen-page) :is(.row,.col,.card,.card-body,.input-group,.form-control,.form-select) { min-width:0; }
+:is(.pos-workspace,.kitchen-page) :is(button,.btn,.badge,.form-select,.form-label) { line-height:1.45; white-space:normal; }
+:is(.pos-workspace,.kitchen-page) :is(input,select,textarea) { max-width:100%; }
+/* Shared staff navigation: the same shell on both real working screens. */
+.ute-staff-switcher { width:100%; max-width:100%; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:11px 17px; margin:0 0 15px; background:#fff; border:1px solid var(--ute-stroke); border-radius:16px; box-shadow:0 4px 18px #243c2608; }
+.ute-staff-switcher-head { flex:1 1 190px; min-width:0; display:flex; align-items:center; gap:11px; font-size:14px; }
+.ute-staff-switcher-head > i { display:grid;place-items:center;flex:0 0 34px;height:34px;border-radius:10px;background:#eff5eb;color:#536b4b;font-size:19px; }
+.ute-staff-switcher-head span { display:grid; gap:0; }
+.ute-staff-switcher-head small { display:block;font-size:11px;color:#71806b;font-weight:500; }
+.ute-staff-switcher-links { display:flex;flex-wrap:wrap;align-items:center;gap:7px;max-width:100%; }
+.ute-staff-switcher-links a { min-height:39px;display:inline-flex;justify-content:center;align-items:center;gap:7px;padding:8px 15px;border:1px solid #dce5d9;border-radius:11px;background:#f8faf6;color:#465945;text-decoration:none;font:650 12px/1.4 'Be Vietnam Pro',system-ui,sans-serif;overflow-wrap:anywhere; }
+.ute-staff-switcher-links a:hover,.ute-staff-switcher-links a:focus-visible,.ute-staff-switcher-links a.is-active {color:#fff;background:#526749;border-color:#526749;}
+.ute-role-caption {font:600 12px/1.5 'Be Vietnam Pro',system-ui,sans-serif;color:#6a795e!important;}
+/* Stable cashier grids: three on very large screens, two below 1536, one below 1024. */
+.pos-workspace .pos-layout { display:grid!important;grid-template-columns:minmax(290px,330px) minmax(0,1fr)!important;gap:16px!important;align-items:start!important;max-width:100%!important; }
+.pos-workspace .pos-layout > * {min-width:0!important; max-width:100%;}
+.pos-workspace .pos-tables {grid-column:1/-1!important;}
+.pos-workspace .pos-panel { min-width:0; border-radius:16px!important; padding:clamp(13px,1.4vw,20px)!important; overflow:hidden; }
+.pos-workspace .pos-product-grid { display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:11px!important;max-width:100%; }
+.pos-workspace .pos-product {min-width:0;overflow:hidden;}
+.pos-workspace .pos-product-body {min-width:0;}
+.pos-workspace .pos-product h6 {overflow-wrap:anywhere;min-height:2.7em;}
+.pos-workspace .pos-tables-grid {display:grid;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:11px;}
+.pos-workspace .pos-table-card{min-width:0;overflow-wrap:anywhere;cursor:pointer;}
+.pos-workspace .pos-table-card.selected {outline:2px solid #567850;outline-offset:-2px;background:#f0f7ed!important;}
+.pos-workspace .pos-table-card .badge {max-width:100%;white-space:normal;}
+.pos-workspace .pos-cart-item {min-width:0;flex-wrap:wrap;}
+.pos-workspace .pos-cart-info {min-width:0;flex:1 1 145px;}
+.ute-pos-field-help {color:#687966;font-size:11px;line-height:1.65;display:flex;align-items:flex-start;gap:7px;margin:-5px 0 15px;overflow-wrap:anywhere;}
+.ute-pos-field-help i {flex-shrink:0;margin-top:1px;}
+.ute-pos-field-help[data-assignment='dine-in'] {background:#f0f7ed;border-radius:9px;padding:8px 10px;color:#305338;}
+/* Kitchen tabs formerly in global navbar: now a clearly grouped local task toolbar. */
+.ute-kitchen-subnav { display:flex;align-items:center;flex-wrap:wrap;gap:8px;background:#fff;border:1px solid var(--ute-stroke);border-radius:14px;padding:10px;margin:0 0 15px;max-width:100%; }
+.ute-kitchen-subnav a { display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:0;border-radius:10px;padding:10px 13px;font:650 12px/1.4 'Be Vietnam Pro',system-ui,sans-serif;text-decoration:none;color:#486148;background:#f4f7f1;border:1px solid transparent;}
+.ute-kitchen-subnav a.active,.ute-kitchen-subnav a:hover,.ute-kitchen-subnav a:focus-visible { color:#fff;background:#526749;border-color:#526749; }
+.kitchen-page .tab-content {max-width:100%;min-width:0;}
+.kitchen-page .tab-pane {min-width:0;}
+.kitchen-page .card {min-width:0;max-width:100%;}
+.kitchen-page .table-responsive {width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.kitchen-page .table-responsive table {width:100%;min-width:650px;}
+.kitchen-page #kitchenOrdersGrid > * {min-width:0;}
+.kitchen-page .kitchen-filter-toolbar {display:flex!important;flex-wrap:wrap!important;gap:10px;}
+.kitchen-page .kitchen-filter-toolbar>* {min-width:0;max-width:100%;}
+/* Receipt: never clip content and always use the final brand. */
+#milkReceiptModal .modal-dialog {max-width:min(640px,calc(100% - 22px))!important;}
+#milkReceiptModal .modal-content {max-width:100%;overflow:hidden;}
+#milkReceiptModal .milk-receipt {padding:clamp(15px,4vw,32px)!important;min-width:0;max-width:100%;background:#fff;color:#303a2d;}
+#milkReceiptModal .receipt-meta {grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 15px;}
+#milkReceiptModal .receipt-items :is(th,td) {overflow-wrap:anywhere;}
+#milkReceiptModal .receipt-grand {font-size:clamp(16px,3.6vw,21px);overflow-wrap:anywhere;}
+.ute-pickup-notice {display:flex;align-items:flex-start;gap:11px;padding:13px 16px;margin:0 0 17px;border:1px solid #dce8d8;border-radius:14px;background:#f3f8ee;color:#405e40;font-size:12px;line-height:1.7;}
+.ute-pickup-notice i {font-size:20px;flex-shrink:0;}
+@media(min-width:1536px){.pos-workspace .pos-layout {grid-template-columns:minmax(275px,320px) minmax(0,1fr) minmax(255px,300px)!important;}.pos-workspace .pos-tables {grid-column:auto!important;}.pos-workspace .pos-tables-grid {grid-template-columns:repeat(2,minmax(0,1fr))!important;}}
+@media(max-width:1199px){.pos-workspace .pos-product-grid {grid-template-columns:repeat(2,minmax(0,1fr))!important;}.pos-workspace .pos-tables-grid {grid-template-columns:repeat(3,minmax(0,1fr))!important;}}
+@media(max-width:1023px){.pos-workspace .pos-layout {grid-template-columns:minmax(0,1fr)!important;}.pos-workspace .pos-tables {grid-column:1!important;}.pos-workspace .pos-menu {grid-row:1!important;}.pos-workspace .pos-checkout {grid-row:2!important;}.pos-workspace .pos-tables {grid-row:3!important;}.pos-workspace .pos-product-grid {grid-template-columns:repeat(3,minmax(0,1fr))!important;}}
+@media(max-width:700px){.ute-staff-switcher-head {flex-basis:100%;}.ute-staff-switcher-links {width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));}.ute-staff-switcher-links a {padding:9px 8px;}.ute-kitchen-subnav {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));}.ute-kitchen-subnav a {font-size:11px;white-space:normal;}.pos-workspace .pos-product-grid {grid-template-columns:repeat(2,minmax(0,1fr))!important;}.pos-workspace .pos-tables-grid {grid-template-columns:repeat(2,minmax(0,1fr))!important;}}
+@media(max-width:480px){.pos-workspace,.kitchen-page {padding-left:11px!important;padding-right:11px!important;}.pos-workspace .pos-panel,.kitchen-page .card {padding:12px!important;}.pos-workspace .pos-product-grid {grid-template-columns:repeat(2,minmax(0,1fr))!important;}.kitchen-page .table-responsive table {min-width:580px;}.ute-kitchen-subnav a {font-size:10.5px;padding:10px 6px;}#milkReceiptModal .receipt-meta {grid-template-columns:1fr;}#milkReceiptModal .receipt-items :is(th,td){font-size:11px;padding:7px 3px;}}
+@media print{.ute-staff-switcher,.ute-kitchen-subnav,.navbar-milktea,.ute-topbar {display:none!important;}}
+
+.pos-workspace .ute-staff-switcher-links a[href='/cashier'],.kitchen-page .ute-staff-switcher-links a[href='/kitchen'] {color:#fff;background:#526749;border-color:#526749;}
+.navbar-milktea .navbar-brand {margin-left:clamp(0px,1.2vw,18px)!important;}
+.navbar-milktea .navbar-nav {min-width:0;}
+@media(max-width:575.98px){.navbar-milktea .navbar-brand {margin-left:0!important;}.navbar-milktea .milktea-logo-frame{flex-basis:45px;width:45px;height:45px;}}

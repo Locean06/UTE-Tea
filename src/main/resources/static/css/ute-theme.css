@@ -1,0 +1,163 @@
+/* UTE Tea | Emerald Commerce Design System 2026
+ * Shared across CUSTOMER, CASHIER, KITCHEN, ADMIN, and the authentication pages.
+ * Business logic, data attributes and script selectors deliberately remain untouched.
+ */
+:root {
+    --primary-color: #565c45;
+    --primary-hover: #3e4837;
+    --primary-light: #f0f0e8;
+    --secondary-color: #717763;
+    --secondary-hover: #3c4735;
+    --secondary-light: #f3f2e9;
+    --accent-color: #c6ab80;
+    --dark-color: #303a2d;
+    --light-bg: #faf9f5;
+    --border-color: #e4e4d9;
+    --text-muted: #777a6f;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --shadow-sm: 0 3px 12px rgba(13,70,58,.045);
+    --shadow-md: 0 12px 30px rgba(13,70,58,.075);
+    --shadow-lg: 0 20px 50px rgba(13,70,58,.13);
+    --bs-primary: #565c45;
+    --bs-primary-rgb: 8,127,112;
+    --bs-link-color: #565c45;
+    --bs-link-hover-color: #3e4837;
+    --bs-body-color: #303a2d;
+    --bs-secondary-color: #777a6f;
+    --bs-border-color: #e4e4d9;
+}
+html {scroll-behavior:smooth;scroll-padding-top:115px}
+body {background:#faf9f5; background-image:radial-gradient(circle at 98% 7%,rgba(152,225,190,.12),transparent 34%), radial-gradient(circle at 1% 45%,rgba(230,248,236,.42),transparent 33%); color:var(--dark-color)}
+::selection {background:#bdebd7;color:#124a41}
+a {text-underline-offset:3px}
+:focus-visible {outline:3px solid #ecbb63;outline-offset:3px}
+.ute-topbar {background:#3a4435;color:#e8fbf1;min-height:30px;display:flex;align-items:center;justify-content:center;gap:50px;padding:6px 16px;font-size:10px;font-weight:750;letter-spacing:.09em}
+.ute-topbar-extra {letter-spacing:.015em;font-weight:500;opacity:.85}
+.navbar-milktea {background:rgba(255,255,255,.97)!important;border-bottom:1px solid #e4f0e9!important;box-shadow:0 4px 24px rgba(16,86,70,.06)!important;min-height:78px}
+.navbar-milktea .container-fluid {max-width:1600px}
+.navbar-milktea .navbar-brand {margin-left:0!important;gap:10px!important}
+.navbar-milktea .milktea-logo-frame {width:51px;height:51px;flex-basis:51px;border-radius:16px!important;background:#565c45;box-shadow:0 6px 15px rgba(8,127,112,.18)}
+.navbar-milktea .milktea-logo-frame img {position:static!important;transform:none!important;object-fit:contain!important;width:100%!important;height:100%!important}
+.navbar-milktea .navbar-shop-name {color:#3c4735!important;font-family:'Be Vietnam Pro',sans-serif;font-size:1.28rem;font-weight:850;letter-spacing:-.035em}
+.navbar-milktea .navbar-nav .nav-link {border-radius:12px!important;transition:background .18s,color .18s}
+.navbar-milktea .navbar-nav .nav-link:hover,.navbar-milktea .navbar-nav .nav-link.active {background:#eaf7ef!important;color:#076b5c!important}
+.navbar-milktea .header-login-btn {background:#565c45!important;border-color:#565c45!important}
+.navbar-milktea .header-cart-btn {border-color:#a9dac8!important;color:#565c45!important;background:#fff!important}
+.navbar-milktea .header-cart-btn:hover {background:#f0f0e8!important}
+.navbar-milktea .navbar-brand .badge.bg-danger {background:#e0f4eb!important;color:#087361!important;border-color:#b4e1cc!important;font-weight:700!important}
+.navbar-milktea .table-badge {border-color:#bce1d4!important}
+.milktea-footer {background:#35402f!important;color:#e7faf2!important;border:0!important;margin-top:48px!important;padding:35px 0!important;box-shadow:none!important}
+.milktea-footer .footer-brand {color:#fff!important;font-size:1.32rem!important;letter-spacing:-.02em}
+.milktea-footer .footer-description,.milktea-footer .footer-address,.milktea-footer .footer-address span {color:#c4e6d9!important}
+.milktea-footer .footer-address i {background:#126e60!important;color:#f0bd63!important;border:0!important}
+.milktea-footer .ute-footer-mark {width:38px;height:38px;border-radius:11px}
+.milktea-footer .ute-footer-kicker {color:#afd9c9;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase}
+.btn-primary,.btn-primary-custom,.bg-primary {background-color:#565c45!important;border-color:#565c45!important;color:#fff!important}
+.btn-primary:hover,.btn-primary-custom:hover {background-color:#3e4837!important;border-color:#3e4837!important}
+.btn-outline-primary {color:#565c45;border-color:#91cbb8}
+.btn-outline-primary:hover,.btn-outline-primary:active {background:#565c45!important;border-color:#565c45!important;color:#fff!important}
+.text-primary,.text-success {color:#565c45!important}
+.btn:focus-visible,.form-control:focus,.form-select:focus,.form-check-input:focus {box-shadow:0 0 0 .22rem rgba(8,127,112,.13)!important;border-color:#72bfa5!important}
+.form-control,.form-select,.input-group-text {border-color:#d9e9e1}
+.form-control,.form-select {border-radius:12px}
+.form-label {font-weight:650;color:#33594f}
+.form-check-input:checked {background:#565c45;border-color:#565c45}
+.card,.modal-content {border-radius:20px!important}
+.modal-content {border:1px solid #e2eee8!important;box-shadow:0 28px 85px rgba(10,67,56,.2)!important}
+.card:not(.border-0) {border-color:#dfede5!important}
+.table thead th,.table-light,.table>thead {background:#eef7f2!important;color:#244b41!important;border-bottom-color:#e4e4d9!important}
+.table tbody tr:hover>* {background:rgba(222,246,235,.35)}
+.nav-pills .nav-link.active,.nav-tabs .nav-link.active {background:#565c45;color:#fff;border-color:#565c45}
+.nav-pills .nav-link:not(.active) {color:#717763}
+.product-card {border-radius:21px!important;box-shadow:0 8px 26px rgba(12,78,67,.065)!important;border:1px solid #dfebe5!important}
+.product-card:hover {transform:translateY(-5px)!important;box-shadow:0 16px 35px rgba(12,78,67,.13)!important;border-color:#b2ddcb!important}
+.product-img-wrapper {background:#e8f3eb!important;padding-top:84%}
+.product-price {color:#565c45!important}
+.product-card h5 {font-size:.99rem;line-height:1.5}
+.category-chip.active,.category-chip:hover {background:#565c45!important;border-color:#565c45!important}
+.floating-cart-btn {background:#3c4836!important;box-shadow:0 15px 36px rgba(6,82,69,.25)!important;border:1px solid rgba(255,255,255,.15)!important}
+.ute-hero {position:relative;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(290px,.95fr);align-items:center;min-height:338px;overflow:hidden;margin-bottom:22px;padding:36px 48px 30px 48px;border-radius:28px;background:linear-gradient(120deg,#3a4435 0%,#5b644e 58%,#737c5b 100%);box-shadow:0 20px 50px rgba(8,92,75,.16);color:#fff}
+.ute-hero::after {content:"";position:absolute;inset:0;background:radial-gradient(circle at 91% 20%,rgba(255,255,255,.14),transparent 31%),radial-gradient(circle at 27% 110%,rgba(152,227,190,.17),transparent 42%);pointer-events:none}
+.ute-hero-copy,.ute-hero-art {position:relative;z-index:1}
+.ute-eyebrow {display:inline-flex;align-items:center;gap:8px;color:#c6f0d6;font-size:.75rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:17px}
+.ute-hero h1 {font-weight:850;font-size:clamp(2.25rem,4.5vw,3.9rem);letter-spacing:-.055em;line-height:1.15;color:#fff;max-width:570px}
+.ute-hero h1 span {color:#dbc194}
+.ute-hero p {color:#f0f0e8;line-height:1.8;max-width:520px;font-size:.97rem}
+.ute-hero .ute-hero-actions {display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+.ute-hero .btn {font-weight:800;border-radius:13px;padding:12px 22px}
+.ute-hero .ute-hero-cta {background:#e6d7b3;border:1px solid #e6d7b3;color:#123f36}
+.ute-hero .ute-hero-cta:hover {background:#f7d89d;border-color:#f7d89d}
+.ute-hero .ute-hero-ghost {border:1px solid rgba(255,255,255,.48);color:#fff;background:rgba(255,255,255,.07)}
+.ute-hero .ute-hero-ghost:hover {background:rgba(255,255,255,.16);color:#fff}
+.ute-hero-art {display:flex;align-items:center;justify-content:center;align-self:stretch}
+.ute-hero-art img {width:min(100%,500px);max-height:370px;object-fit:contain;filter:drop-shadow(0 12px 28px rgba(0,49,43,.15));transform:scale(1.12)}
+.ute-service-row {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:24px}
+.ute-service-item {background:#fff;border:1px solid #e0ece5;padding:15px 17px;border-radius:16px;display:flex;align-items:center;gap:12px;color:#385f53;font-size:.84rem;box-shadow:0 4px 12px rgba(12,78,67,.035)}
+.ute-service-item i {display:inline-grid;place-items:center;width:39px;height:39px;flex:0 0 39px;border-radius:13px;background:#e2f4ea;color:#565c45;font-size:1.15rem}
+.ute-service-item strong {display:block;color:#134a40;font-weight:800}
+.ute-section-heading {display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 16px;padding:0 2px;color:#3c4735}
+.ute-section-heading h2 {font-size:1.45rem;font-weight:850;letter-spacing:-.035em;margin:0}
+.ute-section-heading span {font-size:.82rem;color:#777a6f}
+.ute-page-banner {display:flex;align-items:center;justify-content:space-between;gap:20px;position:relative;overflow:hidden;background:linear-gradient(120deg,#ffffff,#eef8f2);border:1px solid #dfebe5;border-radius:23px;padding:21px 25px;margin-bottom:23px;box-shadow:0 8px 25px rgba(10,70,56,.045)}
+.ute-page-banner::before {content:"";position:absolute;width:200px;height:200px;right:-80px;top:-100px;border-radius:50%;background:radial-gradient(circle,#b7e8d4,transparent 70%);opacity:.65;pointer-events:none}
+.ute-page-banner .ute-kicker {color:#636d52;letter-spacing:.12em;font-size:.68rem;font-weight:850;text-transform:uppercase;margin-bottom:6px}
+.ute-page-banner h1 {font-size:clamp(1.25rem,2.6vw,1.65rem);letter-spacing:-.035em;font-weight:850;color:#123f36;margin:0 0 6px}
+.ute-page-banner p {color:#58746c;font-size:.86rem;line-height:1.6;margin:0}
+.ute-page-icon {width:58px;height:58px;flex:0 0 58px;border-radius:18px;display:grid;place-items:center;background:#d7f2e4;border:1px solid #b7e5cf;color:#565c45;font-size:1.6rem}
+.ute-page-banner.ute-ops {background:linear-gradient(110deg,#3a4435,#5f674f);border-color:#5b644e;color:#fff}
+.ute-page-banner.ute-ops .ute-kicker {color:#e5e7d9}
+.ute-page-banner.ute-ops h1 {color:#fff}
+.ute-page-banner.ute-ops p {color:#d6f1e5}
+.ute-page-banner.ute-ops .ute-page-icon {background:rgba(255,255,255,.12);color:#dbc194;border-color:rgba(255,255,255,.14)}
+/* Admin navigation: compact management console with consistent active state. */
+.admin-sidebar {border-color:#e4e4d9!important;box-shadow:0 12px 26px rgba(9,70,59,.045)!important;border-radius:20px!important}
+.admin-sidebar h6 {color:#6b847a!important;font-size:.67rem!important;letter-spacing:.12em!important}
+.admin-nav-link {color:#3c6559!important;border-radius:12px!important;transition:background .16s ease,color .16s ease}
+.admin-nav-link i {color:#118c78!important}
+.admin-nav-link:hover,.admin-nav-link.active {background:#dcf3e8!important;color:#434e39!important;font-weight:800!important}
+.admin-nav-link.active {box-shadow:inset 3px 0 #777f65}
+.dashboard-page .dashboard-heading,.admin-content-column>div:first-child {max-width:100%}
+.dashboard-page .dashboard-kpi {border:1px solid #deeee4!important;box-shadow:0 8px 25px rgba(10,72,59,.04)}
+/* Cashier POS + kitchen: high-information density with clear focus and readable tiles. */
+.pos-workspace,.kitchen-page,.dashboard-page,.admin-orders-page {background:transparent!important}
+.pos-workspace .pos-panel {background:#fff;border:1px solid #dfebe5!important;border-radius:20px!important;box-shadow:0 7px 24px rgba(11,74,62,.055)!important}
+.pos-workspace .pos-product {border:1px solid #e4e4d9!important;box-shadow:0 3px 9px rgba(11,74,62,.035)}
+.pos-workspace .pos-product:hover {border-color:#91ccb7!important;transform:translateY(-2px)}
+.pos-workspace .pos-table-card {background:#faf9f3!important}
+.pos-workspace .pos-table-card.selected {outline-color:#565c45!important}
+.pos-workspace .pos-categories button.active {background:#565c45!important}
+.kitchen-page .card,.documents-panel,.orders-panel {border:1px solid #e4e4d9!important;border-radius:19px!important;box-shadow:0 5px 22px rgba(10,72,59,.045)!important}
+/* Login portal */
+.ute-auth-page {max-width:1300px}
+.ute-auth-promo {display:flex;flex-direction:column;justify-content:space-between;min-height:630px;background:linear-gradient(145deg,#095b50,#0c8472);border-radius:25px;padding:42px;position:relative;overflow:hidden;color:white}
+.ute-auth-promo::before {content:"";position:absolute;width:280px;height:280px;top:-100px;right:-80px;border:55px solid rgba(244,207,134,.12);border-radius:50%}
+.ute-auth-promo h1 {color:#fff;font-size:clamp(2rem,3vw,3.2rem);line-height:1.16;letter-spacing:-.04em;font-weight:850;max-width:480px}
+.ute-auth-promo h1 span {color:#f1c774}
+.ute-auth-promo p {color:#d7f0e5;max-width:380px;line-height:1.8}
+.ute-auth-promo img {width:90%;max-height:300px;align-self:center;object-fit:contain}
+.ute-auth-promo .ute-auth-perks {display:flex;flex-wrap:wrap;gap:8px;position:relative}
+.ute-auth-promo .ute-auth-perks span {border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.09);border-radius:999px;padding:8px 13px;font-size:.73rem}
+.ute-auth-page .card {border:1px solid #e4e4d9!important;box-shadow:0 14px 50px rgba(11,74,62,.09)!important}
+.ute-auth-page .card-header {padding-top:35px!important}
+.ute-auth-page .nav-pills {background:#e8f4ee!important}
+/* Customer checkout and account pages */
+.ute-cart-page .card,.milk-orders-page .card,.milk-profile-page .card {border:1px solid #dfede6!important;box-shadow:0 8px 26px rgba(10,72,59,.04)!important}
+.ute-cart-page .card-header,.milk-orders-page .orders-heading {border-color:#e4e4d9!important;background:linear-gradient(110deg,#fff,#f2f9f5)!important}
+#productsGrid {scroll-margin-top:130px}
+.ute-menu-page > .alert-warning {border-radius:16px!important}
+.ute-menu-page > .d-flex.flex-column.flex-md-row {background:#fff!important}
+@media (min-width:1600px) {.milk-menu-page.container {max-width:1340px}.ute-auth-page.container {max-width:1300px}}
+@media (max-width:991.98px) {.ute-hero {padding:26px 30px;min-height:300px;grid-template-columns:1fr .8fr}.ute-hero-art img {transform:scale(1.08)}.ute-service-row {gap:9px}.ute-service-item {padding:12px}.ute-auth-promo {padding:30px}}
+@media (max-width:767.98px) {.ute-topbar-extra {display:none}.ute-topbar {font-size:.65rem}.ute-hero {grid-template-columns:1fr;padding:29px 23px 8px;gap:0}.ute-hero h1 {font-size:2.55rem}.ute-hero p {font-size:.91rem}.ute-hero-art {height:225px}.ute-hero-art img {max-height:260px;width:270px;transform:scale(1.08)}.ute-service-row {grid-template-columns:1fr 1fr}.ute-service-item:last-child {grid-column:1/-1}.ute-page-banner {padding:17px;margin-bottom:17px}.ute-page-icon {width:45px;height:45px;flex-basis:45px;font-size:1.2rem}.navbar-milktea {min-height:68px}.navbar-milktea .milktea-logo-frame {width:44px;height:44px;flex-basis:44px}.milktea-footer {margin-top:28px!important}.ute-auth-page {padding-top:18px!important}}
+@media (max-width:420px) {.ute-hero h1 {font-size:2rem}.ute-hero-art {height:195px}.ute-service-row {grid-template-columns:1fr}.ute-service-item:last-child {grid-column:auto}.ute-page-banner h1 {font-size:1.18rem}.ute-page-banner p {font-size:.76rem}.ute-page-icon {display:none}}
+@media(prefers-reduced-motion:reduce) {html{scroll-behavior:auto}.product-card,.pos-product {transition:none!important;transform:none!important}}
+
+.ute-catalog-tools {width:min(100%,485px);align-items:center}
+.ute-catalog-tools .ute-search-field {min-width:225px;flex:1}
+.ute-catalog-tools .input-group-text {color:#565c45;border-radius:13px 0 0 13px;background:#fff!important}
+.ute-catalog-tools input {min-height:44px;box-shadow:0 4px 12px rgba(9,70,58,.04)}
+.ute-catalog-tools .menu-category-filter {min-width:160px}
+.ute-catalog-tools select {min-height:44px;border-radius:13px!important}
+.ute-catalog-empty {padding:44px 20px;text-align:center;color:#446b60;border:1px dashed #acd8c9;border-radius:21px;background:#f1faf5;margin-bottom:19px;font-weight:650}
+@media(max-width:767.98px){.ute-catalog-tools{width:100%}.ute-catalog-tools .menu-category-filter{min-width:0}.ute-catalog-tools .ute-search-field{min-width:0}}

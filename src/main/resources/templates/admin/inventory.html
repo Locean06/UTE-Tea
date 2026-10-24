@@ -1,0 +1,1857 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main :: html(~{::content}, ~{::scripts})}">
+
+<head>
+    <title>Quản Lý Kho & Chứng Từ - Admin</title>
+</head>
+
+<body>
+    <div th:fragment="content" class="container-fluid py-4 px-lg-4 admin-inventory-page">
+        <style>
+            .admin-inventory-page {
+                --inv-primary: #565c45;
+                --inv-primary-hover: #3e4837;
+                --inv-primary-light: #f0f0e8;
+                --inv-secondary: #717763;
+                --inv-secondary-hover: #3c4735;
+                --inv-secondary-light: #f3f2e9;
+                --inv-accent: #c6ab80;
+                --inv-border: #e4e4d9;
+                --inv-muted: #777a6f;
+                --inv-text: #303a2d;
+                background: #faf9f5;
+                color: var(--inv-text);
+                min-height: calc(100vh - 76px);
+                font-family: 'Be Vietnam Pro', sans-serif;
+            }
+
+            .admin-inventory-page *,
+            .admin-inventory-page *::before,
+            .admin-inventory-page *::after {
+                box-sizing: border-box;
+            }
+
+            .admin-inventory-page .admin-sidebar {
+                background: #fff;
+                border: 1px solid var(--inv-border) !important;
+                border-radius: 18px !important;
+                box-shadow: 0 4px 18px rgba(23, 77, 70, .045) !important;
+            }
+
+            .admin-inventory-page .admin-sidebar h6 {
+                color: var(--inv-muted) !important;
+                font-size: 11px;
+                letter-spacing: .07em;
+            }
+
+            .admin-inventory-page .admin-nav-link {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 12px 16px;
+                border-radius: 10px;
+                color: var(--inv-secondary);
+                font-size: 13px;
+                font-weight: 500;
+                text-decoration: none;
+            }
+
+            .admin-inventory-page .admin-nav-link i {
+                color: var(--inv-primary);
+                font-size: 16px;
+            }
+
+            .admin-inventory-page .admin-nav-link:hover,
+            .admin-inventory-page .admin-nav-link.active {
+                background: var(--inv-primary-light);
+                color: var(--inv-primary);
+            }
+
+            .admin-inventory-page .admin-nav-link.active {
+                font-weight: 700;
+            }
+
+            .admin-inventory-page .admin-content-column {
+                min-width: 0;
+            }
+
+            .admin-inventory-page .brand-font,
+            .admin-inventory-page h3,
+            .admin-inventory-page h5 {
+                color: var(--inv-secondary-hover);
+                font-weight: 700;
+            }
+
+            .admin-inventory-page h3.brand-font {
+                font-size: 25px;
+                line-height: 1.4;
+            }
+
+            .admin-inventory-page h5 {
+                font-size: 16px;
+            }
+
+            .admin-inventory-page .text-muted {
+                color: var(--inv-muted) !important;
+            }
+
+            .admin-inventory-page .text-primary {
+                color: var(--inv-primary) !important;
+            }
+
+            .admin-inventory-page .text-success {
+                color: #27865B !important;
+            }
+
+            .admin-inventory-page .admin-content-column .card {
+                background: #fff;
+                border: 1px solid var(--inv-border) !important;
+                border-radius: 18px !important;
+                box-shadow: 0 4px 18px rgba(23, 77, 70, .05) !important;
+            }
+
+            .admin-inventory-page .card-header {
+                background: #fff !important;
+                border-bottom: 1px solid var(--inv-border) !important;
+                padding: 20px !important;
+            }
+
+            .admin-inventory-page .btn {
+                border-radius: 10px;
+                font-family: inherit;
+                font-size: 12px;
+                font-weight: 600;
+                box-shadow: none !important;
+                transition: background-color .18s ease,
+                    border-color .18s ease,
+                    color .18s ease,
+                    transform .12s ease;
+            }
+
+            .admin-inventory-page .btn:active:not(:disabled) {
+                transform: scale(.97);
+            }
+
+            .admin-inventory-page .btn-primary,
+            .admin-inventory-page .btn-primary-custom {
+                background: var(--inv-primary) !important;
+                border: 1px solid var(--inv-primary) !important;
+                color: #fff !important;
+            }
+
+            .admin-inventory-page .btn-primary:hover,
+            .admin-inventory-page .btn-primary-custom:hover {
+                background: var(--inv-primary-hover) !important;
+                border-color: var(--inv-primary-hover) !important;
+            }
+
+            .admin-inventory-page .btn-outline-primary {
+                background: #fff;
+                color: var(--inv-primary);
+                border: 1px solid #c6ab80;
+            }
+
+            .admin-inventory-page .btn-outline-primary:hover {
+                background: var(--inv-primary-light);
+                border-color: var(--inv-primary);
+                color: var(--inv-primary-hover);
+            }
+
+            .admin-inventory-page .btn-outline-secondary {
+                background: #fff;
+                color: var(--inv-secondary);
+                border: 1px solid #d5e5df;
+            }
+
+            .admin-inventory-page .btn-outline-secondary:hover {
+                background: var(--inv-secondary-light);
+                border-color: #C99261;
+                color: var(--inv-secondary-hover);
+            }
+
+            .admin-inventory-page .btn-outline-danger {
+                background: #fff;
+                border: 1px solid #E8B7B2;
+                color: #B85045;
+            }
+
+            .admin-inventory-page .btn-outline-danger:hover {
+                background: #FBEDE8;
+                border-color: #B85045;
+                color: #A54239;
+            }
+
+            .admin-inventory-page .btn-outline-warning {
+                background: #fff;
+                border: 1px solid #E8CB91;
+                color: #A86A18 !important;
+            }
+
+            .admin-inventory-page .btn-outline-warning:hover {
+                background: #FFF3E3;
+                border-color: #D5A552;
+                color: #A86A18 !important;
+            }
+
+            .admin-inventory-page .btn-outline-success {
+                background: #fff;
+                border: 1px solid #B8D9C4;
+                color: #27865B;
+            }
+
+            .admin-inventory-page .btn-outline-success:hover {
+                background: #E8F5ED;
+                border-color: #27865B;
+                color: #1B6B46;
+            }
+
+            .admin-inventory-page .btn-success {
+                background: #27865B;
+                border-color: #27865B;
+                color: #fff;
+            }
+
+            .admin-inventory-page .btn-success:hover {
+                background: #1B6B46;
+                border-color: #1B6B46;
+                color: #fff;
+            }
+
+            .admin-inventory-page .btn-danger {
+                background: #B85045;
+                border-color: #B85045;
+                color: #fff;
+            }
+
+            .admin-inventory-page .btn-danger:hover {
+                background: #A54239;
+                border-color: #A54239;
+                color: #fff;
+            }
+
+            .admin-inventory-page #inventoryTabs {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px !important;
+                padding: 5px;
+                background: #faf9f3;
+                border: 1px solid var(--inv-border);
+                border-radius: 14px;
+                width: fit-content;
+                max-width: 100%;
+            }
+
+            .admin-inventory-page #inventoryTabs .nav-link {
+                min-height: 40px;
+                padding: 10px 17px !important;
+                background: transparent;
+                border: 1px solid transparent !important;
+                border-radius: 10px !important;
+                color: var(--inv-secondary);
+                font-size: 12px;
+                font-weight: 600;
+            }
+
+            .admin-inventory-page #inventoryTabs .nav-link:hover {
+                background: var(--inv-primary-light);
+                color: var(--inv-primary);
+            }
+
+            .admin-inventory-page #inventoryTabs .nav-link.active {
+                background: var(--inv-primary) !important;
+                color: #fff !important;
+                box-shadow: 0 2px 8px rgba(8, 127, 112, .14);
+            }
+
+            .admin-inventory-page #inventoryTabs .nav-link.active i {
+                color: #fff !important;
+            }
+
+            .admin-inventory-page #alertFilterGroup {
+                gap: 9px !important;
+            }
+
+            .admin-inventory-page #alertFilterGroup .btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                min-height: 34px;
+                padding: 7px 13px !important;
+                border-radius: 20px !important;
+            }
+
+            .admin-inventory-page #alertFilterGroup .btn[data-alert="ALL"].active,
+            .admin-inventory-page #alertFilterGroup .btn[data-alert="CHUA_CAU_HINH"].active {
+                background: var(--inv-secondary);
+                color: #fff;
+                border-color: var(--inv-secondary);
+            }
+
+            .admin-inventory-page #alertFilterGroup .btn[data-alert="HET_TON"].active {
+                background: #B85045;
+                color: #fff;
+                border-color: #B85045;
+            }
+
+            .admin-inventory-page #alertFilterGroup .btn[data-alert="TON_THAP"].active {
+                background: #E1AB52;
+                color: #352A19 !important;
+                border-color: #E1AB52;
+            }
+
+            .admin-inventory-page #alertFilterGroup .btn[data-alert="BINH_THUONG"].active {
+                background: #27865B;
+                color: #fff;
+                border-color: #27865B;
+            }
+
+            .admin-inventory-page #alertFilterGroup .badge {
+                padding: 4px 7px;
+                border-radius: 12px;
+                font-size: 10px;
+            }
+
+            .admin-inventory-page .form-control,
+            .admin-inventory-page .form-select,
+            .admin-inventory-page textarea {
+                background-color: #fff;
+                border: 1px solid var(--inv-border);
+                border-radius: 12px;
+                color: var(--inv-text);
+                font-family: inherit;
+                font-size: 13px;
+                box-shadow: none;
+            }
+
+            .admin-inventory-page .form-control,
+            .admin-inventory-page .form-select {
+                min-height: 42px;
+            }
+
+            .admin-inventory-page .form-control:focus,
+            .admin-inventory-page .form-select:focus,
+            .admin-inventory-page textarea:focus {
+                border-color: var(--inv-primary);
+                box-shadow: 0 0 0 3px rgba(8, 127, 112, .1);
+                outline: none;
+            }
+
+            .admin-inventory-page .form-control::placeholder,
+            .admin-inventory-page textarea::placeholder {
+                color: #A58A74;
+            }
+
+            .admin-inventory-page .input-group-text {
+                background: #faf9f3 !important;
+                border: 1px solid var(--inv-border);
+                color: var(--inv-secondary);
+                font-size: 12px;
+            }
+
+            .admin-inventory-page #stockSearch {
+                border-left: none !important;
+                border-radius: 0 12px 12px 0;
+            }
+
+            .admin-inventory-page #stockSearch:focus {
+                box-shadow: none;
+            }
+
+            .admin-inventory-page #stockSearch:focus-visible {
+                outline: none;
+            }
+
+            .admin-inventory-page .input-group:has(#stockSearch) .input-group-text {
+                background: #fff !important;
+                border-radius: 12px 0 0 12px;
+            }
+
+            .admin-inventory-page .input-group:has(#stockSearch):focus-within {
+                border-radius: 12px;
+                box-shadow: 0 0 0 3px rgba(8, 127, 112, .1);
+            }
+
+            .admin-inventory-page .input-group:has(#stockSearch):focus-within .input-group-text,
+            .admin-inventory-page .input-group:has(#stockSearch):focus-within .form-control {
+                border-color: var(--inv-primary);
+            }
+
+            .admin-inventory-page .form-label {
+                color: var(--inv-secondary-hover);
+                font-size: 12px;
+                font-weight: 600;
+            }
+
+            .admin-inventory-page .form-check-input {
+                border-color: #d5e5df;
+            }
+
+            .admin-inventory-page .form-check-input:checked {
+                background-color: var(--inv-primary);
+                border-color: var(--inv-primary);
+            }
+
+            .admin-inventory-page .form-check-input:focus {
+                box-shadow: 0 0 0 3px rgba(8, 127, 112, .1);
+                border-color: var(--inv-primary);
+            }
+
+            .admin-inventory-page .table-responsive {
+                width: 100%;
+                overflow-x: auto;
+                scrollbar-width: thin;
+                scrollbar-color: #d5e5df transparent;
+            }
+
+            .admin-inventory-page .table {
+                margin-bottom: 0;
+                --bs-table-bg: transparent;
+                --bs-table-hover-bg: #FFF8F2;
+                border-color: #F0E7DF;
+            }
+
+            .admin-inventory-page .table thead th {
+                padding: 15px 16px;
+                background: #faf9f3 !important;
+                border-bottom: 1px solid var(--inv-border);
+                color: var(--inv-secondary-hover);
+                font-size: 12px;
+                font-weight: 700;
+                white-space: nowrap;
+                vertical-align: middle;
+            }
+
+            .admin-inventory-page .table tbody td {
+                padding: 14px 16px;
+                background: #fff;
+                border-bottom: 1px solid #F0E7DF;
+                color: var(--inv-text);
+                font-size: 12px;
+                vertical-align: middle;
+                transition: background-color .18s ease;
+            }
+
+            .admin-inventory-page .table tbody tr:last-child td {
+                border-bottom: none;
+            }
+
+            .admin-inventory-page .table-hover tbody tr:hover>td {
+                background: #FFF8F2 !important;
+            }
+
+            .admin-inventory-page .table tbody tr.table-danger>td {
+                background: #FFF1EE;
+            }
+
+            .admin-inventory-page .table tbody tr.table-danger:hover>td {
+                background: #FBE1DC !important;
+            }
+
+            .admin-inventory-page .table tbody tr.table-warning>td {
+                background: #FFFAEF;
+            }
+
+            .admin-inventory-page .table tbody tr.table-warning:hover>td {
+                background: #FFF1D9 !important;
+            }
+
+            .admin-inventory-page .table tbody .text-dark {
+                color: var(--inv-text) !important;
+            }
+
+            .admin-inventory-page .table tbody .text-primary {
+                color: var(--inv-primary) !important;
+            }
+
+            .admin-inventory-page .table tbody .text-success {
+                color: #27865B !important;
+            }
+
+            .admin-inventory-page .table .badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                padding: 6px 10px;
+                border-radius: 20px;
+                font-size: 11px;
+                font-weight: 600;
+            }
+
+            .admin-inventory-page .table .badge.bg-danger {
+                background: #FBEDE8 !important;
+                border: 1px solid #EFC9C3;
+                color: #B85045 !important;
+            }
+
+            .admin-inventory-page .table .badge.bg-warning {
+                background: #FFF3E3 !important;
+                border: 1px solid #F3D5A3;
+                color: #A86A18 !important;
+            }
+
+            .admin-inventory-page .table .badge.bg-success {
+                background: #E8F5ED !important;
+                border: 1px solid #C6E8D0;
+                color: #27865B !important;
+            }
+
+            .admin-inventory-page .table .badge.bg-secondary {
+                background: #f3f2e9 !important;
+                border: 1px solid #E2D5C9;
+                color: #717763 !important;
+            }
+
+            .admin-inventory-page .table .badge.bg-light {
+                background: #FFF9F4 !important;
+                border: 1px solid var(--inv-border) !important;
+                color: var(--inv-secondary-hover) !important;
+            }
+
+            .admin-inventory-page .table .btn-sm {
+                min-height: 30px;
+                padding: 6px 11px !important;
+                border-radius: 9px !important;
+            }
+
+            .admin-inventory-page .modal-content {
+                background: #fff;
+                border: 1px solid var(--inv-border) !important;
+                border-radius: 18px !important;
+                box-shadow: 0 12px 32px rgba(23, 77, 70, .12) !important;
+                overflow: hidden;
+            }
+
+            .admin-inventory-page .modal-header {
+                background: #fff;
+                border-bottom: 1px solid var(--inv-border) !important;
+                padding: 20px 24px;
+            }
+
+            .admin-inventory-page .modal-title {
+                font-size: 17px;
+                color: var(--inv-secondary-hover);
+                font-weight: 700;
+            }
+
+            .admin-inventory-page .modal-body {
+                background: #fff;
+            }
+
+            .admin-inventory-page .modal .btn-primary-custom,
+            .admin-inventory-page .modal .btn-success,
+            .admin-inventory-page .modal .btn-danger {
+                min-height: 42px;
+                border-radius: 12px !important;
+            }
+
+            .admin-inventory-page #recipeItemsContainer {
+                background: #faf9f5 !important;
+                border: 1px solid var(--inv-border);
+                border-radius: 12px !important;
+            }
+
+            .admin-inventory-page .recipe-raw-row {
+                padding: 8px 0;
+                border-bottom: 1px solid #F0E7DF;
+            }
+
+            .admin-inventory-page .recipe-raw-row:last-child {
+                border-bottom: none;
+            }
+
+            @keyframes invStaggerSlide {
+                from {
+                    opacity: 0;
+                    transform: translateX(-20px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            @keyframes invFilterFade {
+                from {
+                    opacity: 0;
+                    transform: translateY(12px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes invTabReveal {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes invStatusHighlight {
+                0% {
+                    background-color: #F6DECA;
+                }
+
+                50% {
+                    background-color: #FFF0DF;
+                }
+
+                100% {
+                    background-color: transparent;
+                }
+            }
+
+            @keyframes invModalZoomFade {
+                from {
+                    opacity: 0;
+                    transform: translateY(12px) scale(.96);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
+            }
+
+            .admin-inventory-page #inventoryStockBody tr.inv-stagger-enter,
+            .admin-inventory-page #adminPreparationRecipesBody tr.inv-stagger-enter {
+                animation: invStaggerSlide .3s ease-out both;
+                animation-delay: var(--inv-delay, 0ms);
+            }
+
+            .admin-inventory-page #inventoryStockBody tr.inv-filter-enter,
+            .admin-inventory-page #adminPreparationRecipesBody tr.inv-filter-enter {
+                animation: invFilterFade .25s ease-out both;
+                animation-delay: var(--inv-delay, 0ms);
+            }
+
+            .admin-inventory-page #inventoryTabContent .tab-pane.inv-tab-reveal {
+                animation: invTabReveal .24s ease-out both;
+            }
+
+            .admin-inventory-page #inventoryStockBody tr.inv-status-changed>td,
+            .admin-inventory-page #adminPreparationRecipesBody tr.inv-status-changed>td {
+                animation: invStatusHighlight .65s ease-out;
+            }
+
+            .admin-inventory-page .modal.show .modal-dialog {
+                animation: invModalZoomFade .22s ease-out both;
+            }
+
+            @media (max-width: 991.98px) {
+
+                .admin-inventory-page .admin-sidebar-column,
+                .admin-inventory-page .admin-content-column {
+                    width: 100%;
+                }
+
+                .admin-inventory-page h3.brand-font {
+                    font-size: 21px;
+                }
+            }
+
+            @media (max-width: 575.98px) {
+                .admin-inventory-page {
+                    padding-left: 12px !important;
+                    padding-right: 12px !important;
+                }
+
+                .admin-inventory-page .card-header {
+                    padding: 15px !important;
+                }
+
+                .admin-inventory-page .table thead th,
+                .admin-inventory-page .table tbody td {
+                    padding: 11px 12px;
+                    font-size: 11px;
+                }
+
+                .admin-inventory-page #inventoryTabs {
+                    width: 100%;
+                }
+
+                .admin-inventory-page .modal-header {
+                    padding: 16px;
+                }
+
+                .admin-inventory-page .modal-body {
+                    padding: 16px !important;
+                }
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+
+                .admin-inventory-page *,
+                .admin-inventory-page *::before,
+                .admin-inventory-page *::after {
+                    animation: none !important;
+                    transition: none !important;
+                    scroll-behavior: auto !important;
+                }
+
+                .admin-inventory-page .btn:active {
+                    transform: none !important;
+                }
+            }
+        </style>
+        <section class="ute-page-banner" aria-label="Giới thiệu khu vực làm việc">
+          <div><div class="ute-kicker">UTE TEA / QUẢN TRỊ / NGUYÊN VẬT LIỆU</div>
+            <h1>Quản lý kho nguyên liệu</h1><p>Theo dõi nguyên liệu, nhập xuất và tồn kho.</p></div>
+          <span class="ute-page-icon" aria-hidden="true"><i class="bi bi-boxes"></i></span>
+        </section>
+
+
+        <div class="row">
+            <div class="col-lg-auto mb-4 admin-sidebar-column">
+                <div class="card border-0 shadow-sm rounded-4 p-3 admin-sidebar">
+                    <h6 class="text-muted small fw-bold px-3 mb-3 text-uppercase">Quản Trị Hệ Thống</h6>
+                    <a th:href="@{/admin/reports}" class="admin-nav-link">
+                        <i class="bi bi-graph-up-arrow"></i> Báo Cáo Doanh Thu
+                    </a>
+                    <a th:href="@{/admin/catalog}" class="admin-nav-link">
+                        <i class="bi bi-cup-hot-fill"></i> Món & Danh Mục
+                    </a>
+                    <a th:href="@{/admin/tables}" class="admin-nav-link">
+                        <i class="bi bi-grid-3x3-gap-fill"></i> Sơ đồ bàn
+                    </a>
+                    <a th:href="@{/admin/orders}" class="admin-nav-link">
+                        <i class="bi bi-receipt"></i> Quản Lý Đơn Hàng
+                    </a>
+                    <a th:href="@{/admin/staff}" class="admin-nav-link">
+                        <i class="bi bi-people-fill"></i> Tài Khoản Nhân Viên
+                    </a>
+                    <a th:href="@{/admin/inventory}" class="admin-nav-link active">
+                        <i class="bi bi-box-seam-fill"></i> Kho Hàng
+                    </a>
+                    <a th:href="@{/admin/documents}"
+                        class="admin-nav-link d-flex align-items-center justify-content-between">
+                        <span><i class="bi bi-files me-1"></i> Chứng Từ</span>
+                        <span class="admin-refund-badge badge rounded-pill bg-danger d-none">0</span>
+                    </a>
+                    <a th:href="@{/admin/settings}" class="admin-nav-link">
+                        <i class="bi bi-gear-fill"></i> Cài Đặt & Giảm Giá
+                    </a>
+                </div>
+            </div>
+
+            <div class="col admin-content-column">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                    <div>
+                        <h3 class="brand-font mb-1">Quản Lý Nguyên Liệu Kho</h3>
+                        <p class="text-muted small mb-0">
+                            Theo dõi nguyên liệu, nhập kho và quản lý hao hụt
+                        </p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-primary rounded-pill px-3" data-bs-toggle="modal"
+                            data-bs-target="#importModal">
+                            <i class="bi bi-box-arrow-in-down me-1"></i> Nhập Kho
+                        </button>
+                        <button type="button" class="btn btn-outline-danger rounded-pill px-3" data-bs-toggle="modal"
+                            data-bs-target="#wasteModal">
+                            <i class="bi bi-trash3 me-1"></i> Báo Hao Hụt
+                        </button>
+                    </div>
+                </div>
+
+                <ul class="nav nav-pills gap-2 mb-4" id="inventoryTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active rounded-pill px-3" id="tab-stock-btn" data-bs-toggle="pill"
+                            data-bs-target="#tab-stock-pane" type="button" role="tab">
+                            <i class="bi bi-box-seam me-1"></i> Tồn kho
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link rounded-pill border px-3" id="tab-recipe-btn" data-bs-toggle="pill"
+                            data-bs-target="#tab-recipe-pane" type="button" role="tab"
+                            onclick="loadPreparationRecipesAdmin()">
+                            <i class="bi bi-gear-wide-connected me-1"></i> Cấu hình định mức
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="inventoryTabContent">
+                    <div class="tab-pane fade show active" id="tab-stock-pane" role="tabpanel">
+                        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                            <div class="card-header bg-white p-3">
+                                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+                                    <h5 class="fw-bold mb-0">
+                                        <i class="bi bi-boxes text-primary me-2"></i>Tồn Kho Nguyên Liệu Thô (Kho Tổng)
+                                    </h5>
+                                </div>
+
+                                <div class="d-flex flex-wrap gap-2 mb-3" id="alertFilterGroup">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill active"
+                                        data-alert="ALL" onclick="setAlertFilter('ALL')">
+                                        Tất cả <span class="badge rounded-pill bg-secondary ms-1"
+                                            id="badgeCountTotal">0</span>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill"
+                                        data-alert="HET_TON" onclick="setAlertFilter('HET_TON')">
+                                        Hết tồn <span class="badge rounded-pill bg-danger ms-1"
+                                            id="badgeCountHetTon">0</span>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-warning text-dark rounded-pill"
+                                        data-alert="TON_THAP" onclick="setAlertFilter('TON_THAP')">
+                                        Tồn thấp <span class="badge rounded-pill bg-warning text-dark ms-1"
+                                            id="badgeCountTonThap">0</span>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-success rounded-pill"
+                                        data-alert="BINH_THUONG" onclick="setAlertFilter('BINH_THUONG')">
+                                        Bình thường <span class="badge rounded-pill bg-success ms-1"
+                                            id="badgeCountBinhThuong">0</span>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill"
+                                        data-alert="CHUA_CAU_HINH" onclick="setAlertFilter('CHUA_CAU_HINH')">
+                                        Chưa cấu hình <span class="badge rounded-pill bg-secondary ms-1"
+                                            id="badgeCountChuaCauHinh">0</span>
+                                    </button>
+                                </div>
+
+                                <div class="row g-2">
+                                    <div class="col-12">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-end-0">
+                                                <i class="bi bi-search text-muted"></i>
+                                            </span>
+                                            <input type="text" id="stockSearch" class="form-control border-start-0"
+                                                placeholder="Tìm kiếm nguyên liệu thô theo tên..."
+                                                oninput="onStockSearchInput()">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 50px;" class="text-center">STT</th>
+                                            <th>Nguyên liệu</th>
+                                            <th>Loại</th>
+                                            <th>Tồn kho</th>
+                                            <th>Giá nhập TB</th>
+                                            <th>Ngưỡng tối thiểu</th>
+                                            <th>Cảnh báo</th>
+                                            <th style="width: 120px;" class="text-center">Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="inventoryStockBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="tab-recipe-pane" role="tabpanel">
+                        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                            <div class="card-header bg-white p-3">
+                                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                                    <div>
+                                        <h5 class="fw-bold mb-1">
+                                            <i class="bi bi-gear-wide-connected text-success me-2"></i>Định Mức Sơ Chế
+                                            Nguyên Liệu
+                                        </h5>
+                                        <p class="text-muted small mb-0">
+                                            Cấu hình định mức sản xuất cố định cho các thành phẩm sơ chế. Bếp ghi mẻ sẽ
+                                            tự động tiêu hao nguyên liệu thô và tính giá vốn theo định mức đang áp dụng.
+                                        </p>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-sm btn-success rounded-pill px-3 fw-semibold"
+                                            onclick="openCreateRecipeModal()">
+                                            <i class="bi bi-plus-circle me-1"></i> Thêm Định Mức Sơ Chế
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 50px;" class="text-center">STT</th>
+                                            <th style="width: 80px;">Mã ĐM</th>
+                                            <th>Thành phẩm đầu ra</th>
+                                            <th>Tỉ lệ pha chế</th>
+                                            <th>Sản lượng chuẩn</th>
+                                            <th>Giá vốn ước tính</th>
+                                            <th style="width: 90px;" class="text-center">Phiên bản</th>
+                                            <th style="width: 130px;" class="text-center">Trạng thái</th>
+                                            <th>Ghi chú</th>
+                                            <th style="width: 110px;" class="text-center">Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="adminPreparationRecipesBody">
+                                        <tr>
+                                            <td colspan="10" class="text-center text-muted py-4">
+                                                Đang nạp danh sách định mức sơ chế...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="importModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title brand-font">Tạo Phiếu Nhập Kho (KHO)</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Nhà cung cấp:</label>
+                            <input type="text" id="importSupplier" class="form-control rounded-3"
+                                placeholder="Tên nhà cung cấp...">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Lý do nhập:</label>
+                            <input type="text" id="importReason" class="form-control rounded-3"
+                                placeholder="Nhập định kỳ...">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Nguyên liệu nhập:</label>
+                            <select id="importMaterialSelect" class="form-select rounded-3">
+                                <option th:each="m : ${materials}" th:if="${m.type != null and m.type.name() == 'THO'}"
+                                    th:value="${m.id}" th:text="${m.name + ' (' + m.unit + ')'}"></option>
+                            </select>
+                        </div>
+                        <div class="row g-2 mb-4">
+                            <div class="col-6">
+                                <label class="form-label small fw-semibold">Số lượng nhập:</label>
+                                <input type="number" step="0.01" id="importQuantity" class="form-control rounded-3"
+                                    placeholder="10">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-semibold">Đơn giá (VND):</label>
+                                <input type="number" id="importUnitPrice" class="form-control rounded-3"
+                                    placeholder="50000">
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-primary-custom rounded-pill py-2 fw-bold"
+                                onclick="submitImportForm()">
+                                Xác Nhận Nhập Kho
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="wasteModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title brand-font text-danger">Ghi Nhận Hao Hụt / Hỏng Hóc</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Vị trí ghi nhận hao hụt:</label>
+                            <div
+                                class="form-control bg-light rounded-3 d-flex align-items-center justify-content-between">
+                                <span class="fw-semibold text-primary">
+                                    <i class="bi bi-box-seam me-1"></i> Kho tổng (KHO)
+                                </span>
+                                <span class="badge bg-secondary">Cố định Kho tổng</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Nguyên liệu hao hụt:</label>
+                            <select id="wasteMaterialSelect" class="form-select rounded-3">
+                                <option th:each="m : ${materials}" th:if="${m.type != null and m.type.name() == 'THO'}"
+                                    th:value="${m.id}" th:text="${m.name + ' (' + m.unit + ')'}">Trà Đen</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Số lượng hao hụt:</label>
+                            <input type="number" step="0.01" id="wasteQuantity" class="form-control rounded-3"
+                                placeholder="1">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label small fw-semibold">Lý do chi tiết:</label>
+                            <input type="text" id="wasteReason" class="form-control rounded-3"
+                                placeholder="Bể túi, ôi thiu..." required>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-danger rounded-pill py-2 fw-bold"
+                                onclick="submitWasteForm()">
+                                Ghi Nhận Trừ Kho
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="editStockModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title brand-font text-primary" id="editStockModalTitle">
+                            <i class="bi bi-pencil-square me-1"></i> Chỉnh Sửa Nguyên Liệu Kho Tổng
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <form id="editStockForm" onsubmit="event.preventDefault(); submitAdjustStock();">
+                            <input type="hidden" id="editStockMaterialId">
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Tên nguyên liệu:</label>
+                                <input type="text" id="editStockMaterialName" class="form-control rounded-3" required>
+                            </div>
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <label class="form-label small fw-semibold">Số lượng tồn kho:</label>
+                                    <div class="input-group">
+                                        <input type="number" step="any" min="0" id="editStockQuantity"
+                                            class="form-control rounded-start-3" required>
+                                        <span class="input-group-text bg-light text-muted small"
+                                            id="editStockUnitSpan">đv</span>
+                                    </div>
+                                    <small class="text-muted d-block mt-1">
+                                        Hiện tại: <span id="currentStockQtyLabel" class="fw-semibold">0</span>
+                                    </small>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small fw-semibold">Ngưỡng tối thiểu:</label>
+                                    <div class="input-group">
+                                        <input type="number" step="any" min="0" id="editStockThreshold"
+                                            class="form-control rounded-start-3" placeholder="Chưa đặt">
+                                        <span class="input-group-text bg-light text-muted small"
+                                            id="editStockUnitSpan2">đv</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Giá nhập trung bình (đồng / đơn vị):</label>
+                                <div class="input-group">
+                                    <input type="number" step="any" min="0" id="editStockCostPrice"
+                                        class="form-control rounded-start-3" placeholder="0">
+                                    <span class="input-group-text bg-light text-muted small">VND</span>
+                                </div>
+                                <small class="text-muted d-block mt-1">
+                                    Hiện tại: <span id="currentStockPriceLabel" class="fw-semibold">0 VND</span>
+                                </small>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label small fw-semibold">Lý do điều chỉnh kho:</label>
+                                <textarea id="editStockReason" class="form-control rounded-3" rows="2"
+                                    placeholder="Bắt buộc nhập lý do nếu thay đổi số lượng tồn hoặc giá nhập..."></textarea>
+                                <small class="text-muted small">Lưu vết chứng từ điều chỉnh và audit lịch sử biến
+                                    động.</small>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" id="btnSaveStockAdjust"
+                                    class="btn btn-primary rounded-pill py-2 fw-bold">
+                                    <i class="bi bi-check2-circle me-1"></i> Lưu Thay Đổi
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="recipeModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title brand-font text-success" id="recipeModalTitle">
+                            <i class="bi bi-gear-wide-connected me-1"></i> Cấu Hình Định Mức Sơ Chế
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <form id="recipeForm" onsubmit="event.preventDefault(); savePreparationRecipe();">
+                            <input type="hidden" id="recipeId" value="">
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-7">
+                                    <label class="form-label small fw-semibold">Thành phẩm sơ chế đầu ra
+                                        (SOCHE):</label>
+                                    <select id="recipeOutputMaterialSelect" class="form-select rounded-3"
+                                        onchange="onRecipeOutputChange()" required>
+                                        <option value="">-- Chọn thành phẩm sơ chế --</option>
+                                        <option th:each="m : ${materials}"
+                                            th:if="${m.type != null and m.type.name() == 'SOCHE'}" th:value="${m.id}"
+                                            th:attr="data-unit=${m.unit}" th:text="${m.name + ' (' + m.unit + ')'}">
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label small fw-semibold">Sản lượng đầu ra chuẩn:</label>
+                                    <div class="input-group">
+                                        <input type="number" step="any" min="0.000001" id="recipeOutputQuantity"
+                                            class="form-control rounded-start-3" placeholder="Ví dụ: 5000" required>
+                                        <span class="input-group-text bg-light text-muted fw-semibold"
+                                            id="recipeOutputUnitLabel">đơn vị</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label small fw-semibold mb-0">Nguyên liệu thô đầu vào
+                                        (THO):</label>
+                                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill"
+                                        onclick="addRecipeItemRow()">
+                                        <i class="bi bi-plus-circle me-1"></i> Thêm nguyên liệu thô
+                                    </button>
+                                </div>
+                                <div id="recipeItemsContainer" class="p-3 bg-light rounded-3"></div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-8">
+                                    <label class="form-label small fw-semibold">Ghi chú định mức:</label>
+                                    <input type="text" id="recipeNote" class="form-control rounded-3"
+                                        placeholder="Ví dụ: Định mức 1 kg trà thô pha 5000 ml cốt trà...">
+                                </div>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <div class="form-check form-switch mb-2">
+                                        <input class="form-check-input" type="checkbox" id="recipeActive" checked>
+                                        <label class="form-check-label small fw-semibold" for="recipeActive">Đang áp
+                                            dụng (kích hoạt)</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 pt-2 border-top">
+                                <button type="submit" id="btnSaveRecipe"
+                                    class="btn btn-success rounded-pill py-2 fw-bold">
+                                    <i class="bi bi-check2-circle me-1"></i> Lưu Định Mức Sơ Chế
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block th:fragment="scripts">
+        <script th:src="@{/js/admin/admin.js}"></script>
+        <script>
+            let adminMaterialsList = [];
+            let adminRecipesList = [];
+            let currentAlertFilter = 'ALL';
+            let currentStockSummary = null;
+            let currentEditingStockItem = null;
+
+            document.addEventListener('DOMContentLoaded', async () => {
+                AdminApp.init();
+                await loadStockData();
+                await loadAdminMaterials();
+
+                MilkTeaRealtime.on('STOCK_CHANGED', async () => {
+                    await loadStockData();
+                });
+
+                MilkTeaRealtime.on('MATERIAL_CHANGED', async () => {
+                    await loadAdminMaterials();
+                    await loadStockData();
+                    await loadPreparationRecipesAdmin();
+                });
+
+                MilkTeaRealtime.on('RECIPE_CHANGED', async () => {
+                    await loadPreparationRecipesAdmin();
+                });
+
+                MilkTeaRealtime.onReconnect(async () => {
+                    await loadAdminMaterials();
+                    await loadStockData();
+                    if (document.getElementById('tab-recipe-pane')?.classList.contains('active')) {
+                        await loadPreparationRecipesAdmin();
+                    }
+                });
+            });
+
+            async function loadAdminMaterials() {
+                try {
+                    const mats = await MilkTeaApi.get('/api/v1/admin/materials');
+                    adminMaterialsList = mats || [];
+                } catch (e) {
+                    console.warn('Lỗi tải danh mục nguyên liệu:', e);
+                }
+            }
+
+            async function loadPreparationRecipesAdmin() {
+                const tbody = document.getElementById('adminPreparationRecipesBody');
+                if (!tbody) return;
+                tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>Đang tải danh sách định mức...</td></tr>';
+
+                try {
+                    const recipes = await MilkTeaApi.get('/api/v1/admin/preparation-recipes');
+                    adminRecipesList = recipes || [];
+                    renderPreparationRecipesAdmin();
+                } catch (e) {
+                    tbody.innerHTML = `<tr><td colspan="10" class="text-center text-danger py-4">Lỗi: ${MilkTeaReceipts.esc(e.message)}</td></tr>`;
+                }
+            }
+
+            function renderPreparationRecipesAdmin() {
+                const tbody = document.getElementById('adminPreparationRecipesBody');
+                if (!tbody) return;
+
+                if (adminRecipesList.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-4">Chưa có định mức sơ chế nào được cấu hình</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = adminRecipesList.map((r, idx) => {
+                    const ratioBadge = r.ratioText
+                        ? `<span class="badge bg-light text-primary border fw-bold fs-6">${MilkTeaReceipts.esc(r.ratioText)}</span>`
+                        : `<span class="text-muted">-</span>`;
+
+                    const costFormatted = r.estimatedUnitCost != null && Number(r.estimatedUnitCost) > 0
+                        ? `${MilkTeaApi.formatVND(r.estimatedUnitCost)} / ${MilkTeaReceipts.esc(r.outputUnit || '')}`
+                        : `<span class="text-muted fst-italic">Chưa có giá vốn</span>`;
+
+                    const activeBadge = r.active
+                        ? '<span class="badge bg-success">Đang áp dụng</span>'
+                        : '<span class="badge bg-secondary">Ngừng áp dụng</span>';
+
+                    return `
+                    <tr>
+                        <td class="text-center fw-bold text-muted">${idx + 1}</td>
+                        <td class="fw-bold text-primary">#${r.id}</td>
+                        <td class="fw-semibold">${MilkTeaReceipts.esc(r.outputMaterialName || r.name)}</td>
+                        <td>${ratioBadge}</td>
+                        <td class="fw-bold">${r.standardOutputQuantity} <small class="text-muted">${MilkTeaReceipts.esc(r.outputUnit || '')}</small></td>
+                        <td class="fw-semibold text-success">${costFormatted}</td>
+                        <td class="text-center"><span class="badge bg-light text-dark border">v${r.version || 1}</span></td>
+                        <td class="text-center">${activeBadge}</td>
+                        <td class="small text-muted">${MilkTeaReceipts.esc(r.note || '-')}</td>
+                        <td class="text-center">
+                            <div class="d-inline-flex gap-1">
+                                <button class="btn btn-sm btn-outline-primary rounded-pill px-2"
+                                        title="Chỉnh sửa định mức"
+                                        onclick="openEditRecipeModal(${r.id})">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                                <button class="btn btn-sm ${r.active ? 'btn-outline-warning' : 'btn-outline-success'} rounded-pill px-2"
+                                        title="${r.active ? 'Tắt áp dụng' : 'Bật áp dụng'}"
+                                        onclick="toggleRecipeActive(${r.id}, ${r.active})">
+                                    <i class="bi ${r.active ? 'bi-pause-circle' : 'bi-play-circle'}"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                }).join('');
+            }
+
+            function onRecipeOutputChange() {
+                const select = document.getElementById('recipeOutputMaterialSelect');
+                const opt = select.options[select.selectedIndex];
+                const unit = opt ? opt.getAttribute('data-unit') : '';
+                const label = document.getElementById('recipeOutputUnitLabel');
+                if (label) label.textContent = unit || 'đơn vị';
+            }
+
+            async function openCreateRecipeModal() {
+                if (!adminMaterialsList || adminMaterialsList.length === 0) {
+                    await loadAdminMaterials();
+                }
+
+                document.getElementById('recipeId').value = '';
+                document.getElementById('recipeModalTitle').innerHTML = '<i class="bi bi-plus-circle me-1"></i> Thêm Định Mức Sơ Chế';
+                document.getElementById('recipeOutputMaterialSelect').value = '';
+                document.getElementById('recipeOutputMaterialSelect').disabled = false;
+                document.getElementById('recipeOutputQuantity').value = '';
+                document.getElementById('recipeOutputUnitLabel').textContent = 'đơn vị';
+                document.getElementById('recipeNote').value = '';
+                document.getElementById('recipeActive').checked = true;
+
+                const container = document.getElementById('recipeItemsContainer');
+                container.innerHTML = '';
+                addRecipeItemRow();
+
+                const modal = new bootstrap.Modal(document.getElementById('recipeModal'));
+                modal.show();
+            }
+
+            async function openEditRecipeModal(recipeId) {
+                if (!adminMaterialsList || adminMaterialsList.length === 0) {
+                    await loadAdminMaterials();
+                }
+
+                const recipe = adminRecipesList.find(r => r.id === recipeId);
+                if (!recipe) return;
+
+                document.getElementById('recipeId').value = recipe.id;
+                document.getElementById('recipeModalTitle').innerHTML = `<i class="bi bi-pencil-square me-1"></i> Chỉnh Sửa Định Mức #${recipe.id} (v${recipe.version || 1})`;
+                const outputSel = document.getElementById('recipeOutputMaterialSelect');
+                outputSel.value = recipe.outputMaterialId;
+                outputSel.disabled = true;
+                onRecipeOutputChange();
+
+                document.getElementById('recipeOutputQuantity').value = recipe.standardOutputQuantity;
+                document.getElementById('recipeNote').value = recipe.note || '';
+                document.getElementById('recipeActive').checked = Boolean(recipe.active);
+
+                const container = document.getElementById('recipeItemsContainer');
+                container.innerHTML = '';
+                if (recipe.inputItems && recipe.inputItems.length > 0) {
+                    recipe.inputItems.forEach(it => {
+                        addRecipeItemRow(it.inputMaterialId, it.standardQuantity, it.unit);
+                    });
+                } else {
+                    addRecipeItemRow();
+                }
+
+                const modal = new bootstrap.Modal(document.getElementById('recipeModal'));
+                modal.show();
+            }
+
+            function addRecipeItemRow(matId, qty, unit) {
+                const container = document.getElementById('recipeItemsContainer');
+                const rowId = 'rawRow_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+
+                const thoOptions = adminMaterialsList
+                    .filter(m => m.type === 'THO')
+                    .map(m => `<option value="${m.id}" data-unit="${MilkTeaReceipts.esc(m.unit)}" ${matId == m.id ? 'selected' : ''}>${MilkTeaReceipts.esc(m.name)} (${MilkTeaReceipts.esc(m.unit)})</option>`)
+                    .join('');
+
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'row g-2 align-items-center mb-2 recipe-raw-row';
+                rowDiv.id = rowId;
+                rowDiv.innerHTML = `
+                <div class="col-md-6">
+                    <select class="form-select form-select-sm raw-mat-select rounded-3" onchange="onRawMatSelectChange('${rowId}')" required>
+                        <option value="">-- Chọn nguyên liệu thô --</option>
+                        ${thoOptions}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <div class="input-group input-group-sm">
+                        <input type="number" step="any" min="0.000001" class="form-control raw-mat-qty rounded-start-3"
+                               placeholder="Lượng đầu vào" value="${qty != null ? qty : ''}" required>
+                        <span class="input-group-text bg-white raw-mat-unit text-muted small">${unit || 'đv'}</span>
+                    </div>
+                </div>
+                <div class="col-md-2 text-end">
+                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2" onclick="removeRecipeItemRow('${rowId}')">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            `;
+                container.appendChild(rowDiv);
+                onRawMatSelectChange(rowId);
+            }
+
+            function onRawMatSelectChange(rowId) {
+                const row = document.getElementById(rowId);
+                if (!row) return;
+                const sel = row.querySelector('.raw-mat-select');
+                const opt = sel.options[sel.selectedIndex];
+                const unit = opt ? opt.getAttribute('data-unit') : '';
+                const unitSpan = row.querySelector('.raw-mat-unit');
+                if (unitSpan) unitSpan.textContent = unit || 'đv';
+            }
+
+            function removeRecipeItemRow(rowId) {
+                const container = document.getElementById('recipeItemsContainer');
+                if (container.querySelectorAll('.recipe-raw-row').length <= 1) {
+                    MilkTeaApi.showToast('Định mức phải có ít nhất một nguyên liệu thô đầu vào', 'warning');
+                    return;
+                }
+                const row = document.getElementById(rowId);
+                if (row) row.remove();
+            }
+
+            async function savePreparationRecipe() {
+                const recipeId = document.getElementById('recipeId').value;
+                const outputMaterialId = parseInt(document.getElementById('recipeOutputMaterialSelect').value);
+                const outputQuantity = parseFloat(document.getElementById('recipeOutputQuantity').value);
+                const note = document.getElementById('recipeNote').value.trim();
+                const active = document.getElementById('recipeActive').checked;
+
+                if (!outputMaterialId || isNaN(outputQuantity) || outputQuantity <= 0) {
+                    MilkTeaApi.showToast('Vui lòng chọn thành phẩm và nhập sản lượng chuẩn đầu ra hợp lệ (> 0)', 'warning');
+                    return;
+                }
+
+                const rawRows = document.querySelectorAll('.recipe-raw-row');
+                const inputItems = [];
+                let hasInvalid = false;
+
+                rawRows.forEach(row => {
+                    const matId = parseInt(row.querySelector('.raw-mat-select').value);
+                    const qty = parseFloat(row.querySelector('.raw-mat-qty').value);
+                    if (!matId || isNaN(qty) || qty <= 0) {
+                        hasInvalid = true;
+                    } else {
+                        inputItems.push({
+                            inputMaterialId: matId,
+                            standardQuantity: qty
+                        });
+                    }
+                });
+
+                if (hasInvalid || inputItems.length === 0) {
+                    MilkTeaApi.showToast('Vui lòng chọn nguyên liệu thô và nhập lượng đầu vào hợp lệ (> 0) cho tất cả các dòng', 'warning');
+                    return;
+                }
+
+                const payload = {
+                    outputMaterialId: outputMaterialId,
+                    standardOutputQuantity: outputQuantity,
+                    note: note || undefined,
+                    active: active,
+                    items: inputItems,
+                    inputItems: inputItems
+                };
+
+                const btn = document.getElementById('btnSaveRecipe');
+                if (btn) btn.disabled = true;
+
+                try {
+                    if (recipeId) {
+                        await MilkTeaApi.put(`/api/v1/admin/preparation-recipes/${recipeId}`, payload);
+                        MilkTeaApi.showToast(`Cập nhật định mức #${recipeId} thành công (phiên bản mới)!`, 'success');
+                    } else {
+                        await MilkTeaApi.post('/api/v1/admin/preparation-recipes', payload);
+                        MilkTeaApi.showToast('Tạo định mức sơ chế mới thành công!', 'success');
+                    }
+
+                    const modalEl = document.getElementById('recipeModal');
+                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) modal.hide();
+
+                    await loadPreparationRecipesAdmin();
+                } catch (e) {
+                    MilkTeaApi.showToast(e.message || 'Lỗi lưu định mức sơ chế', 'error');
+                } finally {
+                    if (btn) btn.disabled = false;
+                }
+            }
+
+            async function toggleRecipeActive(recipeId, currentActive) {
+                const recipe = adminRecipesList.find(r => r.id === recipeId);
+                if (!recipe) return;
+
+                const newActive = !currentActive;
+                const actionText = newActive ? 'kích hoạt áp dụng' : 'ngừng áp dụng';
+
+                if (!confirm(`Bạn có chắc muốn ${actionText} định mức #${recipeId} cho thành phẩm [${recipe.outputMaterialName}]?`)) {
+                    return;
+                }
+
+                try {
+                    const payload = {
+                        outputMaterialId: recipe.outputMaterialId,
+                        standardOutputQuantity: recipe.standardOutputQuantity,
+                        note: recipe.note,
+                        active: newActive,
+                        items: (recipe.inputItems || []).map(it => ({
+                            inputMaterialId: it.inputMaterialId,
+                            standardQuantity: it.standardQuantity
+                        })),
+                        inputItems: (recipe.inputItems || []).map(it => ({
+                            inputMaterialId: it.inputMaterialId,
+                            standardQuantity: it.standardQuantity
+                        }))
+                    };
+                    await MilkTeaApi.put(`/api/v1/admin/preparation-recipes/${recipeId}`, payload);
+                    MilkTeaApi.showToast(`Đã ${actionText} định mức thành công!`, 'success');
+                    await loadPreparationRecipesAdmin();
+                } catch (e) {
+                    MilkTeaApi.showToast(e.message || 'Lỗi cập nhật trạng thái định mức', 'error');
+                }
+            }
+
+            function setAlertFilter(alertKey) {
+                currentAlertFilter = alertKey;
+                document.querySelectorAll('#alertFilterGroup button').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.alert === alertKey);
+                });
+                loadStockData();
+            }
+
+            function onStockSearchInput() {
+                loadStockData();
+            }
+
+            async function loadStockData() {
+                const query = document.getElementById('stockSearch')?.value?.trim() || '';
+                const alertFilter = currentAlertFilter;
+
+                let url = `/api/v1/inventory/stocks/summary?location=KHO&type=THO&alertFilter=${encodeURIComponent(alertFilter)}`;
+                if (query) url += `&query=${encodeURIComponent(query)}`;
+
+                try {
+                    const summary = await MilkTeaApi.get(url);
+                    currentStockSummary = summary;
+
+                    if (summary) {
+                        document.getElementById('badgeCountTotal').textContent = summary.totalCount || 0;
+                        document.getElementById('badgeCountHetTon').textContent = summary.hetTonCount || 0;
+                        document.getElementById('badgeCountTonThap').textContent = summary.tonThapCount || 0;
+                        document.getElementById('badgeCountBinhThuong').textContent = summary.binhThuongCount || 0;
+                        document.getElementById('badgeCountChuaCauHinh').textContent = summary.chuaCauHinhCount || 0;
+                    }
+
+                    renderStockTable(summary ? summary.items || [] : []);
+                } catch (e) {
+                    console.error('Lỗi tải tồn kho:', e);
+                    MilkTeaApi.showToast(e.message || 'Không thể tải dữ liệu kho', 'error');
+                }
+            }
+
+            function renderStockTable(items) {
+                const tbody = document.getElementById('inventoryStockBody');
+                if (!items || items.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">Không tìm thấy nguyên liệu thô phù hợp tại Kho tổng.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = items.map((s, idx) => {
+                    const avgPrice = s.averageImportPrice != null ? s.averageImportPrice : s.averagePrice;
+                    const avgPriceFormatted = (avgPrice != null && Number(avgPrice) >= 0)
+                        ? `<span class="fw-bold">${MilkTeaApi.formatVND(avgPrice)}</span> <small class="text-muted">/ ${MilkTeaReceipts.esc(s.unit || '')}</small>`
+                        : `<span class="text-muted fst-italic">-</span>`;
+
+                    let alertBadge = '<span class="badge bg-secondary">Chưa cấu hình</span>';
+                    let rowClass = '';
+                    if (s.alertStatus === 'HET_TON') {
+                        alertBadge = '<span class="badge bg-danger">Hết tồn</span>';
+                        rowClass = 'table-danger';
+                    } else if (s.alertStatus === 'TON_THAP') {
+                        alertBadge = '<span class="badge bg-warning text-dark">Tồn thấp</span>';
+                        rowClass = 'table-warning';
+                    } else if (s.alertStatus === 'BINH_THUONG') {
+                        alertBadge = '<span class="badge bg-success">Bình thường</span>';
+                    }
+
+                    const thVal = s.threshold != null ? s.threshold : s.minThreshold;
+                    const thresholdText = (thVal != null && Number(thVal) >= 0)
+                        ? `<b>${thVal}</b> <small class="text-muted">${MilkTeaReceipts.esc(s.unit || '')}</small>`
+                        : `<span class="text-muted fst-italic">Chưa đặt</span>`;
+
+                    return `
+                    <tr class="${rowClass}">
+                        <td class="text-center fw-bold text-muted">${idx + 1}</td>
+                        <td class="fw-semibold">${MilkTeaReceipts.esc(s.materialName)}</td>
+                        <td><span class="badge bg-secondary">THÔ</span></td>
+                        <td class="fw-bold text-dark">${s.quantity} <small class="text-muted">${MilkTeaReceipts.esc(s.unit || '')}</small></td>
+                        <td class="text-primary">${avgPriceFormatted}</td>
+                        <td>${thresholdText}</td>
+                        <td>${alertBadge}</td>
+                        <td class="text-center">
+                            <div class="d-inline-flex gap-1">
+                                <button class="btn btn-sm btn-outline-primary rounded-pill px-2"
+                                        title="Chỉnh sửa nguyên liệu (Tên, Tồn kho, Giá nhập TB, Ngưỡng)"
+                                        onclick="openEditStockModal(${s.materialId})">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger rounded-pill px-2"
+                                        title="Ngừng sử dụng"
+                                        onclick="deleteMaterial(${s.materialId}, '${MilkTeaReceipts.esc(s.materialName)}')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                }).join('');
+            }
+
+            function openEditStockModal(materialId) {
+                const item = (currentStockSummary?.items || []).find(it => it.materialId === materialId);
+                if (!item) return;
+
+                currentEditingStockItem = item;
+                document.getElementById('editStockMaterialId').value = item.materialId;
+                document.getElementById('editStockMaterialName').value = item.materialName || '';
+                document.getElementById('editStockUnitSpan').textContent = item.unit || 'đv';
+                document.getElementById('editStockUnitSpan2').textContent = item.unit || 'đv';
+
+                document.getElementById('editStockQuantity').value = item.quantity != null ? item.quantity : 0;
+                document.getElementById('currentStockQtyLabel').textContent = `${item.quantity != null ? item.quantity : 0} ${item.unit || ''}`;
+
+                const avgPrice = item.averageImportPrice != null ? item.averageImportPrice : item.averagePrice;
+                document.getElementById('editStockCostPrice').value = avgPrice != null ? avgPrice : '';
+                document.getElementById('currentStockPriceLabel').textContent = avgPrice != null ? `${MilkTeaApi.formatVND(avgPrice)} / ${item.unit || ''}` : 'Chưa có';
+
+                const thVal = item.threshold != null ? item.threshold : item.minThreshold;
+                document.getElementById('editStockThreshold').value = thVal != null ? thVal : '';
+
+                document.getElementById('editStockReason').value = '';
+
+                const modal = new bootstrap.Modal(document.getElementById('editStockModal'));
+                modal.show();
+            }
+
+            async function submitAdjustStock() {
+                if (!currentEditingStockItem) return;
+
+                const materialId = parseInt(document.getElementById('editStockMaterialId').value);
+                const name = document.getElementById('editStockMaterialName').value.trim();
+                const quantityVal = document.getElementById('editStockQuantity').value;
+                const costPriceVal = document.getElementById('editStockCostPrice').value;
+                const thresholdVal = document.getElementById('editStockThreshold').value;
+                const reason = document.getElementById('editStockReason').value.trim();
+
+                if (!name) {
+                    MilkTeaApi.showToast('Tên nguyên liệu không được để trống', 'warning');
+                    return;
+                }
+
+                const quantity = quantityVal !== '' ? parseFloat(quantityVal) : null;
+                const costPrice = costPriceVal !== '' ? parseFloat(costPriceVal) : null;
+                const threshold = thresholdVal !== '' ? parseFloat(thresholdVal) : null;
+
+                if (quantity !== null && (isNaN(quantity) || quantity < 0)) {
+                    MilkTeaApi.showToast('Số lượng tồn không được âm', 'warning');
+                    return;
+                }
+                if (costPrice !== null && (isNaN(costPrice) || costPrice < 0)) {
+                    MilkTeaApi.showToast('Giá nhập trung bình không được âm', 'warning');
+                    return;
+                }
+                if (threshold !== null && (isNaN(threshold) || threshold < 0)) {
+                    MilkTeaApi.showToast('Ngưỡng tối thiểu không được âm', 'warning');
+                    return;
+                }
+
+                const currentQty = currentEditingStockItem.quantity != null ? Number(currentEditingStockItem.quantity) : 0;
+                const currentPrice = currentEditingStockItem.averageImportPrice != null
+                    ? Number(currentEditingStockItem.averageImportPrice)
+                    : (currentEditingStockItem.averagePrice != null ? Number(currentEditingStockItem.averagePrice) : null);
+
+                const qtyChanged = quantity !== null && Math.abs(quantity - currentQty) > 0.0001;
+                const priceChanged = costPrice !== null && (currentPrice === null || Math.abs(costPrice - currentPrice) > 0.0001);
+
+                if ((qtyChanged || priceChanged) && !reason) {
+                    MilkTeaApi.showToast('Vui lòng nhập lý do điều chỉnh khi thay đổi số lượng tồn hoặc giá nhập trung bình', 'warning');
+                    document.getElementById('editStockReason').focus();
+                    return;
+                }
+
+                const btn = document.getElementById('btnSaveStockAdjust');
+                if (btn) btn.disabled = true;
+
+                try {
+                    await AdminApp.adjustRawMaterial(materialId, name, quantity, costPrice, threshold, reason);
+                } finally {
+                    if (btn) btn.disabled = false;
+                }
+            }
+
+            async function deleteMaterial(id, name) {
+                if (!confirm(`Bạn có chắc muốn ngừng sử dụng nguyên liệu "${name}"?`)) return;
+                try {
+                    await MilkTeaApi.delete(`/api/v1/admin/materials/${id}`);
+                    MilkTeaApi.showToast('Đã ngừng sử dụng nguyên liệu thành công', 'success');
+                    await loadStockData();
+                } catch (e) {
+                    MilkTeaApi.showToast(e.message || 'Không thể xóa nguyên liệu', 'error');
+                }
+            }
+
+            function submitImportForm() {
+                const sup = document.getElementById('importSupplier').value.trim();
+                const reas = document.getElementById('importReason').value.trim();
+                const matId = parseInt(document.getElementById('importMaterialSelect').value);
+                const qty = parseFloat(document.getElementById('importQuantity').value);
+                const price = parseFloat(document.getElementById('importUnitPrice').value);
+
+                if (!matId) {
+                    MilkTeaApi.showToast('Vui lòng chọn nguyên liệu nhập', 'warning');
+                    return;
+                }
+                if (isNaN(qty) || qty <= 0) {
+                    MilkTeaApi.showToast('Số lượng nhập phải lớn hơn 0', 'warning');
+                    return;
+                }
+                if (isNaN(price) || price < 0) {
+                    MilkTeaApi.showToast('Đơn giá nhập không được âm', 'warning');
+                    return;
+                }
+
+                AdminApp.submitImport(sup, reas, [{ materialId: matId, quantity: qty, unitPrice: price }]);
+            }
+
+            function submitWasteForm() {
+                const reas = document.getElementById('wasteReason').value.trim();
+                const matId = parseInt(document.getElementById('wasteMaterialSelect').value);
+                const qty = parseFloat(document.getElementById('wasteQuantity').value);
+
+                if (!matId) {
+                    MilkTeaApi.showToast('Vui lòng chọn nguyên liệu hao hụt', 'warning');
+                    return;
+                }
+                if (isNaN(qty) || qty <= 0) {
+                    MilkTeaApi.showToast('Số lượng hao hụt phải lớn hơn 0', 'warning');
+                    return;
+                }
+                if (!reas) {
+                    MilkTeaApi.showToast('Vui lòng nhập lý do hao hụt chi tiết', 'warning');
+                    return;
+                }
+
+                AdminApp.submitWaste('KHO', reas, [{ materialId: matId, quantity: qty }]);
+            }
+        </script>
+
+        <script>
+            (() => {
+                const page = document.querySelector('.admin-inventory-page');
+                if (!page) return;
+
+                const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+                const stockBody = document.getElementById('inventoryStockBody');
+                const recipeBody = document.getElementById('adminPreparationRecipesBody');
+
+                const bodies = [stockBody, recipeBody].filter(Boolean);
+                const previousRows = new Map();
+                const initialized = new WeakSet();
+                const pendingFilters = new WeakSet();
+
+                const rowIdentity = (row, index) => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length < 3) return null;
+                    return cells[1]?.textContent.trim() || String(index);
+                };
+
+                const rowSignature = row => {
+                    return Array.from(row.cells || [])
+                        .slice(1, -1)
+                        .map(cell => cell.textContent.trim())
+                        .join('|');
+                };
+
+                const animateTable = tbody => {
+                    if (!tbody) return;
+
+                    const rows = Array.from(tbody.querySelectorAll(':scope > tr'));
+                    const oldStates = previousRows.get(tbody) || new Map();
+                    const nextStates = new Map();
+
+                    rows.forEach((row, index) => {
+                        const id = rowIdentity(row, index);
+                        if (id !== null) {
+                            nextStates.set(id, rowSignature(row));
+                        }
+                    });
+
+                    const firstLoad = !initialized.has(tbody);
+                    const filterMode = pendingFilters.has(tbody);
+
+                    if (!reducedMotion.matches) {
+                        rows.forEach((row, index) => {
+                            const id = rowIdentity(row, index);
+
+                            row.classList.remove(
+                                'inv-stagger-enter',
+                                'inv-filter-enter',
+                                'inv-status-changed'
+                            );
+
+                            row.style.setProperty(
+                                '--inv-delay',
+                                `${Math.min(index, 12) * 40}ms`
+                            );
+
+                            if (row.cells.length < 3 || index >= 15) return;
+
+                            if (firstLoad) {
+                                row.classList.add('inv-stagger-enter');
+                            } else if (filterMode) {
+                                row.classList.add('inv-filter-enter');
+                            } else if (
+                                id !== null &&
+                                oldStates.has(id) &&
+                                oldStates.get(id) !== nextStates.get(id)
+                            ) {
+                                row.classList.add('inv-status-changed');
+                            }
+                        });
+                    }
+
+                    initialized.add(tbody);
+                    pendingFilters.delete(tbody);
+                    previousRows.set(tbody, nextStates);
+                };
+
+                bodies.forEach(tbody => {
+                    const observer = new MutationObserver(mutations => {
+                        const replaced = mutations.some(mutation =>
+                            mutation.type === 'childList' &&
+                            (mutation.addedNodes.length > 0 ||
+                                mutation.removedNodes.length > 0)
+                        );
+
+                        if (replaced) {
+                            animateTable(tbody);
+                        }
+                    });
+
+                    observer.observe(tbody, {
+                        childList: true
+                    });
+
+                    if (tbody.children.length > 0) {
+                        animateTable(tbody);
+                    }
+                });
+
+                const markStockFilter = () => {
+                    if (stockBody) pendingFilters.add(stockBody);
+                };
+
+                document.getElementById('stockSearch')?.addEventListener(
+                    'input',
+                    markStockFilter,
+                    true
+                );
+
+                document.getElementById('alertFilterGroup')?.addEventListener(
+                    'click',
+                    event => {
+                        if (event.target.closest('button[data-alert]')) {
+                            markStockFilter();
+                        }
+                    },
+                    true
+                );
+
+                document.querySelectorAll('#inventoryTabs button[data-bs-toggle="pill"]')
+                    .forEach(button => {
+                        button.addEventListener('shown.bs.tab', event => {
+                            if (reducedMotion.matches) return;
+
+                            const targetSelector = event.target.getAttribute('data-bs-target');
+                            const pane = targetSelector
+                                ? document.querySelector(targetSelector)
+                                : null;
+
+                            if (!pane) return;
+
+                            pane.classList.remove('inv-tab-reveal');
+                            void pane.offsetWidth;
+                            pane.classList.add('inv-tab-reveal');
+                        });
+                    });
+            })();
+        </script>
+    </th:block>
+</body>
+
+</html>

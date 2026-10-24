@@ -1,0 +1,1314 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/main :: html(~{::content}, ~{::scripts})}">
+<head>
+    <title>Thực Đơn - UTE Tea</title>
+</head>
+<body>
+    <div th:fragment="content" class="container-fluid px-0 milk-menu-page ute-menu-page ute-olive-home">
+        <style>
+            .milk-menu-page {
+                --menu-primary: #565c45;
+                --menu-primary-hover: #3e4837;
+                --menu-primary-light: #f0f0e8;
+                --menu-secondary: #717763;
+                --menu-secondary-hover: #3c4735;
+                --menu-secondary-light: #f3f2e9;
+                --menu-accent: #c6ab80;
+                --menu-cream: #faf9f3;
+                --menu-ink: #303a2d;
+                --menu-muted: #777a6f;
+                --menu-border: #e4e4d9;
+                --menu-card: #ffffff;
+                color: var(--menu-ink);
+            }
+
+            @keyframes menuFadeUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(18px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes menuCartBounce {
+                0%, 100% {
+                    transform: translateY(0) scale(1);
+                }
+                25% {
+                    transform: translateY(-7px) scale(1.045);
+                }
+                50% {
+                    transform: translateY(0) scale(0.97);
+                }
+                75% {
+                    transform: translateY(-3px) scale(1.025);
+                }
+            }
+
+            @keyframes menuCartIconBounce {
+                0%, 100% {
+                    transform: rotate(0) scale(1);
+                }
+                30% {
+                    transform: rotate(-12deg) scale(1.2);
+                }
+                65% {
+                    transform: rotate(9deg) scale(1.08);
+                }
+            }
+
+            @keyframes menuModalEnter {
+                from {
+                    opacity: 0;
+                    transform: translateY(12px) scale(.96);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
+            }
+
+            .milk-menu-page .brand-font {
+                color: var(--menu-secondary-hover);
+                letter-spacing: -0.025em;
+            }
+
+            .milk-menu-page > .d-flex.flex-column.flex-md-row {
+                padding: 22px 26px;
+                background: linear-gradient(115deg, #fff, #faf9f3);
+                border: 1px solid var(--menu-border);
+                border-radius: 22px;
+                box-shadow: 0 4px 18px rgba(23, 77, 70, .05);
+                animation: menuFadeUp .7s ease-out both;
+            }
+
+            .milk-menu-page > .d-flex.flex-column.flex-md-row h2 {
+                font-size: 1.9rem;
+                font-weight: 800;
+                line-height: 1.25;
+                margin-bottom: 8px !important;
+            }
+
+            .milk-menu-page > .d-flex.flex-column.flex-md-row p {
+                color: var(--menu-muted) !important;
+                font-size: 13px;
+                line-height: 1.6;
+            }
+
+            .milk-menu-page .alert-warning {
+                background: linear-gradient(110deg,#f1f8df, #d8f5df);
+                color: var(--menu-secondary-hover);
+                border: 1px solid #d9e9da !important;
+                border-left: 4px solid var(--menu-primary) !important;
+                border-radius: 18px !important;
+                box-shadow: 0 4px 16px rgba(23, 77, 70, .06) !important;
+                animation: menuFadeUp .5s ease-out both;
+            }
+
+            .milk-menu-page .alert-warning > .bi {
+                color: var(--menu-primary) !important;
+            }
+
+            .milk-menu-page .alert-warning strong {
+                color: var(--menu-secondary-hover) !important;
+            }
+
+            .milk-menu-page .alert-warning .text-muted {
+                color: var(--menu-muted) !important;
+            }
+
+            .milk-menu-page .alert-warning .badge {
+                background: var(--menu-primary) !important;
+                color: #fff;
+                border-radius: 999px !important;
+                font-weight: 700;
+            }
+
+            .milk-menu-page .menu-category-filter {
+                position: relative;
+                width: 270px;
+                min-width: 250px;
+            }
+
+            .milk-menu-page .menu-category-filter .form-select {
+                width: 100%;
+                min-height: 46px;
+                padding: 10px 44px 10px 20px;
+                border: 1px solid #c8e2d7;
+                border-radius: 999px !important;
+                background-color: #fff;
+                color: var(--menu-secondary-hover);
+                font-size: 14px;
+                font-weight: 650;
+                box-shadow: 0 3px 12px rgba(23, 77, 70, .06) !important;
+                cursor: pointer;
+                transition:
+                    border-color .22s ease,
+                    box-shadow .22s ease,
+                    background-color .22s ease,
+                    transform .18s ease;
+            }
+
+            .milk-menu-page .menu-category-filter .form-select:hover {
+                border-color: var(--menu-primary);
+                background-color: #faf9f5;
+                box-shadow: 0 4px 15px rgba(8, 127, 112, .10) !important;
+            }
+
+            .milk-menu-page .menu-category-filter .form-select:focus {
+                border-color: var(--menu-primary);
+                background-color: #faf9f5;
+                box-shadow:
+                    0 0 0 4px rgba(8, 127, 112, .15),
+                    0 5px 18px rgba(8, 127, 112, .09) !important;
+                outline: none;
+            }
+
+            .milk-menu-page .menu-category-filter .form-select:active {
+                transform: scale(.99);
+            }
+
+            .milk-menu-page #productsGrid {
+                --bs-gutter-x: 22px;
+                --bs-gutter-y: 24px;
+            }
+
+            .milk-menu-page #productsGrid .product-item {
+                animation: menuFadeUp .48s cubic-bezier(.22, 1, .36, 1) both;
+                animation-delay: calc((var(--menu-item-index, 0)) * 70ms);
+            }
+
+            .milk-menu-page .product-card {
+                background: var(--menu-card);
+                border: 1px solid var(--menu-border);
+                border-radius: 20px;
+                box-shadow: 0 4px 16px rgba(23, 77, 70, .055);
+                overflow: hidden;
+                transition:
+                    transform .24s cubic-bezier(.22, 1, .36, 1),
+                    box-shadow .24s ease,
+                    border-color .24s ease;
+                will-change: transform;
+            }
+
+            .milk-menu-page .product-card:hover {
+                transform: translateY(-5px);
+                border-color: #c6ab80;
+                box-shadow: 0 14px 30px rgba(23, 77, 70, .13);
+            }
+
+            .milk-menu-page .product-card:focus-within {
+                border-color: var(--menu-primary);
+                box-shadow: 0 0 0 3px rgba(8, 127, 112, .10);
+            }
+
+            .milk-menu-page .product-img-wrapper {
+                position: relative;
+                background: #f3f2e9;
+                overflow: hidden;
+            }
+
+            .milk-menu-page .product-img {
+                transition: transform .35s cubic-bezier(.22, 1, .36, 1);
+            }
+
+            .milk-menu-page .product-card:hover .product-img {
+                transform: scale(1.045);
+            }
+
+            .milk-menu-page .product-img-wrapper .badge {
+                background: rgba(23, 77, 70, .88) !important;
+                color: #fff;
+                border: 1px solid rgba(255, 255, 255, .22);
+                border-radius: 999px !important;
+                padding: 6px 11px !important;
+                font-size: 11px;
+                font-weight: 700;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+            }
+
+            .milk-menu-page .product-card > .p-3 {
+                padding: 17px !important;
+            }
+
+            .milk-menu-page .product-card h5 {
+                color: var(--menu-secondary-hover);
+                font-size: 16px;
+                font-weight: 750;
+                line-height: 1.4;
+                margin-bottom: 7px !important;
+            }
+
+            .milk-menu-page .product-card p {
+                color: var(--menu-muted) !important;
+                font-size: 12px;
+                line-height: 1.55;
+                min-height: 38px;
+            }
+
+            .milk-menu-page .product-card .border-top {
+                border-color: #F0E6DC !important;
+                padding-top: 13px !important;
+                gap: 8px;
+            }
+
+            .milk-menu-page .product-price {
+                color: var(--menu-primary);
+                font-weight: 800;
+                letter-spacing: -.015em;
+            }
+
+            .milk-menu-page .product-card .product-price {
+                font-size: 17px;
+            }
+
+            .milk-menu-page .btn-primary-custom {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                background: var(--menu-primary);
+                border: 1px solid var(--menu-primary);
+                color: #fff;
+                border-radius: 999px !important;
+                font-size: 12px;
+                font-weight: 700;
+                min-height: 34px;
+                padding: 7px 14px !important;
+                box-shadow: 0 3px 9px rgba(8, 127, 112, .15);
+                white-space: nowrap;
+                transition:
+                    background-color .2s ease,
+                    border-color .2s ease,
+                    box-shadow .2s ease,
+                    transform .15s ease;
+            }
+
+            .milk-menu-page .btn-primary-custom:hover {
+                background: var(--menu-primary-hover);
+                border-color: var(--menu-primary-hover);
+                color: #fff;
+                box-shadow: 0 5px 13px rgba(6, 102, 89, .22);
+            }
+
+            .milk-menu-page .btn-primary-custom:active {
+                transform: scale(.97);
+                box-shadow: 0 2px 6px rgba(6, 102, 89, .12);
+            }
+
+            .milk-menu-page .btn-primary-custom:focus-visible {
+                outline: 3px solid #EAC4A4;
+                outline-offset: 2px;
+            }
+
+            .milk-menu-page .floating-cart-btn {
+                background: linear-gradient(125deg, #565c45, #3e4837);
+                border: 1px solid #3e4837;
+                color: #fff;
+                border-radius: 999px !important;
+                box-shadow: 0 8px 25px rgba(6, 102, 89, .26);
+                padding: 13px 23px;
+                font-size: 14px;
+                font-weight: 750;
+                transition:
+                    transform .2s ease,
+                    box-shadow .2s ease,
+                    background .2s ease;
+            }
+
+            .milk-menu-page .floating-cart-btn:hover {
+                background: linear-gradient(125deg, #3e4837, #81502D);
+                color: #fff;
+                transform: translateY(-2px);
+                box-shadow: 0 11px 28px rgba(6, 102, 89, .33);
+            }
+
+            .milk-menu-page .floating-cart-btn:active {
+                transform: scale(.97);
+            }
+
+            .milk-menu-page .floating-cart-btn.cart-bounce {
+                animation: menuCartBounce .48s ease-in-out;
+            }
+
+            .milk-menu-page .floating-cart-btn.cart-bounce .bi {
+                animation: menuCartIconBounce .48s ease-in-out;
+            }
+
+            #customizeModal {
+                --bs-modal-width: 490px;
+                --menu-primary: #565c45;
+                --menu-primary-hover: #3e4837;
+                --menu-primary-light: #f0f0e8;
+                --menu-secondary: #717763;
+                --menu-secondary-hover: #3c4735;
+                --menu-secondary-light: #f3f2e9;
+                --menu-border: #e4e4d9;
+                --menu-muted: #777a6f;
+            }
+
+            #customizeModal .modal-dialog {
+                max-width: 490px;
+                margin: 12px auto;
+                transition:
+                    transform .24s cubic-bezier(.22, 1, .36, 1),
+                    opacity .24s ease;
+            }
+
+            #customizeModal.fade .modal-dialog {
+                transform: translateY(12px) scale(.96);
+                opacity: 0;
+            }
+
+            #customizeModal.show .modal-dialog {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+
+            #customizeModal.show .modal-content {
+                animation: menuModalEnter .25s cubic-bezier(.22, 1, .36, 1) both;
+            }
+
+            #customizeModal .modal-content {
+                max-height: calc(100dvh - 24px);
+                background: #fff;
+                border: 1px solid var(--menu-border) !important;
+                border-radius: 20px !important;
+                box-shadow: 0 18px 55px rgba(60, 42, 28, .18) !important;
+            }
+
+            #customizeModal .modal-header {
+                padding: 14px 18px 9px;
+                flex-shrink: 0;
+                background: linear-gradient(110deg, #fff, #FBF5EF);
+                border-bottom: 1px solid #F0E6DC !important;
+            }
+
+            #customizeModal .modal-title {
+                color: var(--menu-secondary-hover);
+                font-size: 18px;
+                font-weight: 800;
+            }
+
+            #customizeModal .btn-close {
+                transition: transform .18s ease, opacity .18s ease;
+            }
+
+            #customizeModal .btn-close:hover {
+                transform: rotate(90deg);
+            }
+
+            #customizeModal .btn-close:active {
+                transform: rotate(90deg) scale(.9);
+            }
+
+            #customizeModal .btn-close:focus {
+                box-shadow: 0 0 0 3px rgba(8, 127, 112, .16);
+            }
+
+            #customizeModal .modal-body {
+                padding: 12px 18px;
+                overflow-y: auto;
+                min-height: 0;
+                background: #fff;
+            }
+
+            #customizeModal .modal-body > .d-flex:first-child {
+                margin-bottom: 12px !important;
+                padding-bottom: 12px !important;
+                border-color: #e3eee8 !important;
+            }
+
+            #customizeModal #modalProductImg {
+                width: 60px !important;
+                height: 60px !important;
+                flex-shrink: 0;
+                border-radius: 12px !important;
+                border: 1px solid var(--menu-border);
+            }
+
+            #customizeModal .product-price {
+                color: var(--menu-primary) !important;
+                font-weight: 800;
+            }
+
+            #customizeModal #modalProductCategory {
+                background: var(--menu-secondary-light) !important;
+                color: var(--menu-secondary) !important;
+                border: 1px solid #d6e7df !important;
+                border-radius: 999px;
+                font-weight: 650;
+            }
+
+            #customizeModal #sizeSelectionSection,
+            #customizeModal #toppingSelectionSection,
+            #customizeModal .modal-body > .mb-3 {
+                margin-bottom: 12px !important;
+            }
+
+            #customizeModal .form-label {
+                color: var(--menu-secondary-hover) !important;
+                font-weight: 700 !important;
+                margin-bottom: 6px;
+            }
+
+            #customizeModal #modalSizeContainer .btn {
+                border-radius: 999px !important;
+                padding: 7px 13px !important;
+                font-size: 12px;
+                font-weight: 700;
+                transition:
+                    transform .15s ease,
+                    background-color .2s ease,
+                    border-color .2s ease,
+                    box-shadow .2s ease;
+            }
+
+            #customizeModal #modalSizeContainer .btn:active {
+                transform: scale(.96);
+            }
+
+            #customizeModal .btn-primary-custom {
+                background: var(--menu-primary);
+                color: #fff;
+                border: 1px solid var(--menu-primary);
+                border-radius: 999px !important;
+                box-shadow: none;
+                transition:
+                    transform .15s ease,
+                    background-color .2s ease,
+                    border-color .2s ease,
+                    box-shadow .2s ease;
+            }
+
+            #customizeModal .btn-primary-custom:hover {
+                background: var(--menu-primary-hover);
+                border-color: var(--menu-primary-hover);
+                color: #fff;
+                box-shadow: 0 4px 12px rgba(8, 127, 112, .16);
+            }
+
+            #customizeModal .btn-primary-custom:active {
+                transform: scale(.97);
+            }
+
+            #customizeModal .btn-outline-secondary {
+                background: #fff;
+                color: var(--menu-secondary);
+                border-color: #DCCBBE;
+                border-radius: 999px;
+                transition:
+                    transform .15s ease,
+                    background-color .2s ease,
+                    border-color .2s ease,
+                    color .2s ease;
+            }
+
+            #customizeModal .btn-outline-secondary:hover {
+                background: var(--menu-secondary-light);
+                border-color: var(--menu-secondary);
+                color: var(--menu-secondary-hover);
+            }
+
+            #customizeModal .btn-outline-secondary:active {
+                transform: scale(.97);
+            }
+
+            #customizeModal #toppingSelectionSection p {
+                color: var(--menu-muted) !important;
+                margin-bottom: 6px !important;
+            }
+
+            #customizeModal #modalToppingList {
+                width: 100%;
+                max-height: 160px;
+                overflow-y: auto;
+                overflow-x: hidden;
+                padding: 4px 8px !important;
+                box-sizing: border-box;
+                background: #FCF9F6 !important;
+                border: 1px solid var(--menu-border) !important;
+                border-radius: 12px !important;
+            }
+
+            #customizeModal #modalToppingList .form-check {
+                display: flex !important;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                padding: 6px 4px !important;
+                margin: 0 !important;
+                min-height: 35px;
+                gap: 12px;
+                box-sizing: border-box;
+                transition: background-color .2s ease;
+            }
+
+            #customizeModal #modalToppingList .form-check:hover {
+                background: #F5ECE3;
+                border-radius: 7px;
+            }
+
+            #customizeModal #modalToppingList .form-check > div {
+                display: flex;
+                align-items: center;
+                flex: 1 1 auto;
+                min-width: 0;
+                gap: 9px;
+            }
+
+            #customizeModal #modalToppingList .form-check-input {
+                position: static;
+                float: none;
+                margin: 0 !important;
+                flex: 0 0 16px;
+                width: 16px;
+                height: 16px;
+                cursor: pointer;
+                border-color: #abcfc3;
+                transition:
+                    background-color .15s ease,
+                    border-color .15s ease,
+                    box-shadow .15s ease;
+            }
+
+            #customizeModal .form-check-input:checked {
+                background-color: var(--menu-primary);
+                border-color: var(--menu-primary);
+            }
+
+            #customizeModal .form-check-input:focus {
+                border-color: var(--menu-primary);
+                box-shadow: 0 0 0 3px rgba(8, 127, 112, .14);
+            }
+
+            #customizeModal #modalToppingList .form-check-label {
+                flex: 1 1 auto;
+                min-width: 0;
+                margin: 0 !important;
+                line-height: 1.35;
+                white-space: normal;
+                overflow-wrap: anywhere;
+                color: var(--menu-secondary-hover);
+                cursor: pointer;
+            }
+
+            #customizeModal #modalToppingList .form-check > span {
+                flex: 0 0 auto;
+                margin-left: auto;
+                white-space: nowrap;
+                text-align: right;
+                font-size: 12px;
+                color: var(--menu-primary) !important;
+            }
+
+            #customizeModal .form-control {
+                border-color: #d3e6dc;
+                color: var(--menu-secondary-hover);
+                border-radius: 11px !important;
+                transition:
+                    border-color .2s ease,
+                    box-shadow .2s ease;
+            }
+
+            #customizeModal .form-control:focus {
+                border-color: var(--menu-primary);
+                box-shadow: 0 0 0 3px rgba(8, 127, 112, .14);
+            }
+
+            #customizeModal #modalProductNote {
+                padding: 8px 12px;
+            }
+
+            #customizeModal #modalProductNote::placeholder {
+                color: #7d958d;
+            }
+
+            #customizeModal .input-group .btn {
+                min-width: 33px;
+            }
+
+            #customizeModal .input-group .form-control {
+                border-radius: 0 !important;
+                background: #ffffff;
+            }
+
+            #customizeModal .modal-body > .bg-light {
+                background: #faf9f3 !important;
+                border: 1px solid #e4e4d9 !important;
+                border-radius: 14px !important;
+                padding: 12px 14px !important;
+                margin-bottom: 6px !important;
+            }
+
+            #customizeModal .modal-body > .bg-light .text-muted {
+                color: var(--menu-muted) !important;
+            }
+
+            #customizeModal .modal-body > .bg-light .border-top {
+                border-color: #d3e6dc !important;
+            }
+
+            #customizeModal .text-primary {
+                color: var(--menu-primary) !important;
+            }
+
+            #customizeModal .modal-footer {
+                padding: 12px 18px;
+                flex-shrink: 0;
+                background: #faf9f5;
+                border-color: #e3eee8 !important;
+            }
+
+            #customizeModal .modal-footer .btn {
+                min-height: 38px;
+            }
+
+            #customizeModal .modal-footer .btn-primary-custom {
+                font-size: 13px;
+                font-weight: 750;
+                padding: 9px 12px;
+            }
+
+            @media (max-width: 767.98px) {
+                .milk-menu-page > .d-flex.flex-column.flex-md-row {
+                    padding: 18px;
+                    border-radius: 18px;
+                }
+
+                .milk-menu-page > .d-flex.flex-column.flex-md-row h2 {
+                    font-size: 1.65rem;
+                }
+
+                .milk-menu-page .menu-category-filter {
+                    width: 100%;
+                    min-width: 0;
+                }
+
+                .milk-menu-page .menu-category-filter .form-select {
+                    width: 100%;
+                }
+            }
+
+            @media (max-width: 575.98px) {
+                .milk-menu-page .alert-warning {
+                    border-radius: 16px !important;
+                    padding: 12px 15px !important;
+                }
+
+                .milk-menu-page .product-card {
+                    border-radius: 16px;
+                }
+
+                .milk-menu-page .product-card:hover {
+                    transform: translateY(-2px);
+                }
+
+                .milk-menu-page #productsGrid {
+                    --bs-gutter-x: 12px;
+                    --bs-gutter-y: 14px;
+                }
+
+                .milk-menu-page .product-card > .p-3 {
+                    padding: 10px !important;
+                }
+
+                .milk-menu-page .product-card h5 {
+                    font-size: 13px;
+                    line-height: 1.35;
+                    min-height: 36px;
+                    margin-bottom: 5px !important;
+                }
+
+                .milk-menu-page .product-card p {
+                    font-size: 11px;
+                    line-height: 1.4;
+                    min-height: 47px;
+                }
+
+                .milk-menu-page .product-card .border-top {
+                    gap: 7px;
+                    padding-top: 9px !important;
+                }
+
+                .milk-menu-page .product-card .product-price {
+                    font-size: 14px;
+                }
+
+                .milk-menu-page .product-card .btn-primary-custom {
+                    min-height: 34px;
+                    font-size: 12px;
+                    width: 100%;
+                }
+
+                .milk-menu-page .floating-cart-btn {
+                    bottom: 16px;
+                    right: 16px;
+                    padding: 11px 16px;
+                    font-size: 12px;
+                }
+
+                #customizeModal .modal-dialog {
+                    max-width: calc(100% - 20px);
+                    margin: 10px auto;
+                }
+
+                #customizeModal .modal-content {
+                    max-height: calc(100dvh - 20px);
+                }
+
+                #customizeModal .modal-header {
+                    padding: 11px 14px 8px;
+                }
+
+                #customizeModal .modal-body {
+                    padding: 10px 14px;
+                }
+
+                #customizeModal .modal-footer {
+                    padding: 9px 14px;
+                }
+
+                #customizeModal #modalToppingList .form-check {
+                    gap: 8px;
+                }
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                .milk-menu-page *,
+                .milk-menu-page *::before,
+                .milk-menu-page *::after,
+                #customizeModal *,
+                #customizeModal *::before,
+                #customizeModal *::after {
+                    animation-duration: .01ms !important;
+                    animation-delay: 0ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: .01ms !important;
+                    scroll-behavior: auto !important;
+                }
+
+                .milk-menu-page .product-card:hover,
+                .milk-menu-page .product-card:hover .product-img,
+                .milk-menu-page .floating-cart-btn:hover {
+                    transform: none;
+                }
+            }
+        </style>
+        <!-- UTE Tea | Customer storefront (server-rendered Thymeleaf, original cart flow intact) -->
+        <section class="ute-hero ute-olive-hero" aria-label="Giới thiệu UTE Tea">
+            <div class="ute-hero-copy">
+                <p class="ute-eyebrow"><span class="ute-line"></span> UTE TEA · SINCE 2026</p>
+                <h1>Tinh vị trà,<br><span>chạm vị thanh xuân</span></h1>
+                <p class="ute-hero-desc">Mỗi ly trà là một khoảng lặng dịu dàng giữa ngày bận rộn. Tận hưởng nguyên liệu chọn lọc, hương vị hài hòa và những khoảnh khắc đáng nhớ cùng UTE Tea.</p>
+                <div class="ute-hero-actions">
+                    <a class="btn ute-hero-cta" href="#uteCatalog">Khám phá thực đơn <i class="bi bi-arrow-right ms-2"></i></a>
+                    <a class="btn ute-hero-ghost" th:href="@{/cart}"><i class="bi bi-bag me-2"></i>Đặt món ngay</a>
+                </div>
+                <div class="ute-hero-highlights" aria-label="Điểm đặc biệt của UTE Tea">
+                    <span><i class="bi bi-flower1"></i> Vị trà nguyên bản</span>
+                    <span><i class="bi bi-heart"></i> Pha chế theo gu</span>
+                </div>
+            </div>
+            <div class="ute-hero-art">
+                <img th:src="@{/images/ute-tea-bright-hero.webp}" src="/images/ute-tea-bright-hero.webp" width="1200" height="690" loading="eager" alt="Các thức uống trà sữa và trà trái cây mang phong cách UTE Tea">
+                <span class="ute-hero-photo-caption">Một ngụm trà. Một niềm vui.</span>
+            </div>
+        </section>
+
+        <section class="ute-service-row ute-olive-promises" aria-label="Trải nghiệm tại UTE Tea">
+            <div class="ute-service-item"><i class="bi bi-flower2"></i><div><strong>Nguyên liệu chọn lọc</strong><span>Trọn vị trà trong từng ngụm</span></div></div>
+            <div class="ute-service-item"><i class="bi bi-stars"></i><div><strong>Chạm vị theo gu</strong><span>Tùy chọn size, topping và ghi chú</span></div></div>
+            <div class="ute-service-item"><i class="bi bi-bag-heart"></i><div><strong>Đặt món tiện lợi</strong><span>Theo dõi đơn hàng dễ dàng</span></div></div>
+        </section>
+
+        <section class="ute-category-section" id="uteCategories" aria-labelledby="uteCategoryTitle">
+            <div class="ute-section-label">KHÁM PHÁ HƯƠNG VỊ</div>
+            <h2 class="ute-serif ute-centered-title" id="uteCategoryTitle">Chọn thức uống dành cho bạn</h2>
+            <p class="ute-section-subtitle">Một chút ngọt ngào, một chút tươi mát — chọn điều bạn yêu thích.</p>
+            <div class="ute-category-grid">
+                <button class="ute-category-card ute-cat-milk" type="button" onclick="selectFeaturedCategory('tra sua')"><i class="bi bi-cup-straw"></i><span><strong>Trà sữa</strong><small>Béo thơm, đậm vị</small></span><i class="bi bi-arrow-up-right ute-cat-arrow"></i></button>
+                <button class="ute-category-card ute-cat-fruit" type="button" onclick="selectFeaturedCategory('tra trai cay')"><i class="bi bi-cup-hot"></i><span><strong>Trà trái cây</strong><small>Tươi mát, thanh lành</small></span><i class="bi bi-arrow-up-right ute-cat-arrow"></i></button>
+                <button class="ute-category-card ute-cat-coffee" type="button" onclick="selectFeaturedCategory('ca phe')"><i class="bi bi-cup"></i><span><strong>Cà phê</strong><small>Đậm đà, tỉnh táo</small></span><i class="bi bi-arrow-up-right ute-cat-arrow"></i></button>
+                <button class="ute-category-card ute-cat-more" type="button" onclick="selectFeaturedCategory('')"><i class="bi bi-grid-3x3-gap"></i><span><strong>Khám phá tất cả</strong><small>Đủ vị, đủ phong cách</small></span><i class="bi bi-arrow-up-right ute-cat-arrow"></i></button>
+            </div>
+        </section>
+        <section id="uteCatalog" class="ute-catalog-section" aria-label="Thực đơn UTE Tea">
+        <div class="ute-section-label">HƯƠNG VỊ TỪ UTE TEA</div>
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <h2 class="brand-font mb-1 ute-serif">Thực đơn UTE Tea</h2>
+                <p class="text-muted small mb-0">Chọn món yêu thích từ thực đơn đang được phục vụ tại cửa hàng</p>
+            </div>
+
+            <div class="ute-catalog-tools d-flex flex-column flex-sm-row align-items-stretch gap-2">
+                <div class="input-group ute-search-field">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search" aria-hidden="true"></i></span>
+                    <input id="uteProductSearch" type="search" class="form-control border-start-0"
+                           placeholder="Tìm trà sữa, topping..." aria-label="Tìm món uống theo tên"
+                           oninput="filterCatalog()">
+                </div>
+                <div class="menu-category-filter">
+                <select class="form-select rounded-pill fw-semibold shadow-sm"
+                        id="categoryFilterSelect"
+                        onchange="filterCategory(this.value)">
+                    <option value="ALL">Tất Cả</option>
+                    <option th:each="cat : ${categories}"
+                            th:value="${cat.id}"
+                            th:text="${cat.name}">
+                        Danh mục
+                    </option>
+                </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="uteCatalogEmpty" class="ute-catalog-empty d-none" role="status" aria-live="polite">
+            <i class="bi bi-search-heart fs-2 d-block mb-2"></i>
+            Chưa tìm thấy món phù hợp. Hãy thử tên khác nhé!
+        </div>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xxl-5 g-4" id="productsGrid">
+            <div th:each="p : ${products}"
+                 class="col product-item"
+                 th:attr="data-category=${p.category.id}, data-category-name=${p.category.name}, data-category-allow-topping=${p.category.allowTopping}, data-id=${p.id}, data-name=${p.name}, data-price=${p.price}, data-size=${p.size}, data-img=${p.imageUrl}">
+                <div class="product-card">
+                    <div class="product-img-wrapper">
+                        <img th:src="${p.imageUrl != null and !p.imageUrl.isEmpty() ? p.imageUrl : '/images/ute-tea-product-fallback.svg'}"
+                             class="product-img" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/images/ute-tea-product-fallback.svg'"
+                             alt="Ảnh món">
+                        <span class="position-absolute top-0 end-0 m-2 badge bg-dark bg-opacity-75 rounded-pill px-2 py-1 small"
+                              th:text="'Size ' + ${p.size}">
+                            Size M
+                        </span>
+                    </div>
+
+                    <div class="p-3 d-flex flex-column flex-grow-1">
+                        <h5 class="fw-bold mb-1 text-truncate" th:text="${p.name}">Trà Sữa Truyền Thống</h5>
+                        <p class="text-muted small flex-grow-1 mb-2 text-truncate-2"
+                           th:text="${p.description != null ? p.description : 'Đậm vị trà thơm ngậy sữa'}">
+                            Mô tả món
+                        </p>
+
+                        <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top">
+                            <span class="product-price"
+                                  th:text="${#numbers.formatDecimal(p.price, 0, 'POINT', 0, 'COMMA') + ' ₫'}">
+                                25.000 ₫
+                            </span>
+                            <a sec:authorize="hasRole('CASHIER')"
+                               href="/cashier"
+                               class="btn btn-sm btn-primary-custom rounded-pill px-3">Tạo đơn tại POS</a>
+                            <button sec:authorize="!hasRole('CASHIER')"
+                                    type="button"
+                                    class="btn btn-sm btn-primary-custom rounded-pill px-3"
+                                    th:attr="onclick=|openCustomizeModal(${p.id})|">
+                                <i class="bi bi-bag-plus me-1"></i> Thêm
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        </section>
+        <section id="uteOffers" class="ute-offer-wrap" aria-label="Ưu đãi tại UTE Tea">
+            <div class="ute-offer-banner">
+                <div class="ute-offer-copy"><div class="ute-section-label">DÀNH CHO NGÀY CỦA BẠN</div>
+                  <h2 class="ute-serif">Thêm một ly trà,<br>thêm một niềm vui.</h2>
+                  <p>Đừng bỏ lỡ ưu đãi đang được áp dụng tại cửa hàng. Xem thực đơn để chọn món hợp gu nhé!</p>
+                  <a href="#uteCatalog" class="ute-link-action">Chọn món ngay <i class="bi bi-arrow-up-right"></i></a>
+                </div>
+                <img th:src="@{/images/ute-tea-bright-hero.webp}" src="/images/ute-tea-bright-hero.webp" loading="lazy" width="450" height="270" alt="Những món trà tại UTE Tea">
+            </div>
+        <div th:if="${settings != null and ((settings.discountType == 'FIXED_AMOUNT' and settings.discountValue != null and settings.discountValue > 0) or (settings.discountType != 'FIXED_AMOUNT' and settings.discountPercent != null and settings.discountPercent > 0))}"
+             class="alert alert-warning border-0 shadow-sm rounded-4 d-flex align-items-center mb-4 py-3 px-4">
+            <i class="bi bi-tag-fill fs-3 text-danger me-3"></i>
+            <div>
+                <strong class="d-block text-dark">Ưu Đãi Đặc Biệt Hôm Nay!</strong>
+                <span class="text-muted small">
+                    Quán đang áp dụng giảm giá
+                    <span th:if="${settings.discountType == 'FIXED_AMOUNT'}"
+                          class="badge bg-danger rounded-pill fs-6"
+                          th:text="${#numbers.formatDecimal(settings.discountValue, 0, 'COMMA', 0, 'POINT') + ' ₫'}">20,000 ₫</span>
+                    <span th:if="${settings.discountType != 'FIXED_AMOUNT'}"
+                          class="badge bg-danger rounded-pill fs-6"
+                          th:text="${#numbers.formatDecimal(settings.discountPercent, 0, 0) + '%'}">10%</span>
+                    trên mọi đơn hàng!
+                </span>
+            </div>
+        </div>
+
+        </section>
+
+        <section id="uteStory" class="ute-brand-story" aria-labelledby="uteStoryTitle">
+            <div class="ute-story-text"><div class="ute-section-label">CÂU CHUYỆN UTE TEA</div>
+              <h2 class="ute-serif" id="uteStoryTitle">Từ những lá trà tốt nhất<br>đến những khoảnh khắc đẹp nhất</h2>
+              <p>Chúng mình tin rằng một thức uống ngon không chỉ nằm ở công thức, mà còn ở cảm giác khi thưởng thức. UTE Tea mang đến những lựa chọn trà thân quen, được pha chế theo sở thích của bạn.</p>
+              <a href="#uteCatalog" class="ute-link-action">Tìm hương vị của bạn <i class="bi bi-arrow-right"></i></a>
+            </div>
+            <div class="ute-story-photo"><img th:src="@{/images/ute-tea-bright-leaves.webp}" src="/images/ute-tea-bright-leaves.webp" loading="lazy" alt="Lá trà và nguyên liệu tự nhiên" width="800" height="470"></div>
+        </section>
+        <section class="ute-experience" aria-label="Tiện ích của UTE Tea">
+            <div class="ute-section-label">TRẢI NGHIỆM CÙNG UTE TEA</div>
+            <h2 class="ute-serif ute-centered-title">Thưởng thức theo cách của bạn</h2>
+            <div class="ute-experience-grid">
+                <a href="#uteCatalog" class="ute-exp-item"><i class="bi bi-bag-check"></i><strong>Đặt món trực tuyến</strong><span>Chọn thức uống và tùy chỉnh dễ dàng</span></a>
+                <a th:href="@{/cart}" class="ute-exp-item"><i class="bi bi-cart3"></i><strong>Giỏ hàng cá nhân</strong><span>Kiểm tra món trước khi đặt</span></a>
+                <a th:href="@{/orders}" class="ute-exp-item"><i class="bi bi-receipt-cutoff"></i><strong>Lịch sử đơn hàng</strong><span>Đăng nhập để xem các đơn đã đặt</span></a>
+                <a th:href="@{/profile}" class="ute-exp-item"><i class="bi bi-person-heart"></i><strong>Tài khoản của bạn</strong><span>Quản lý thông tin cá nhân</span></a>
+            </div>
+        </section>
+
+        <a th:href="@{/cart}"
+           class="floating-cart-btn">
+            <i class="bi bi-cart-fill fs-5"></i>
+            <span>Xem Giỏ Hàng</span>
+        </a>
+
+        <div class="modal fade" id="customizeModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title brand-font" id="modalProductName">Tên Món</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="d-flex gap-3 mb-3 pb-3 border-bottom">
+                            <img id="modalProductImg" onerror="this.onerror=null;this.src='/images/ute-tea-product-fallback.svg'"
+                                 src=""
+                                 class="rounded-3"
+                                 style="width: 80px; height: 80px; object-fit: cover;"
+                                 alt="">
+                            <div>
+                                <h4 class="product-price mb-1" id="modalProductPrice">25.000 ₫</h4>
+                                <span class="badge bg-light text-secondary border" id="modalProductCategory">Trà sữa</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3" id="sizeSelectionSection">
+                            <label class="form-label small fw-semibold text-dark">Kích cỡ (Size):</label>
+                            <div class="d-flex flex-wrap gap-2" id="modalSizeContainer"></div>
+                        </div>
+
+                        <div class="mb-3" id="toppingSelectionSection">
+                            <label class="form-label small fw-semibold text-dark mb-1">Thêm Topping (áp dụng theo ly):</label>
+                            <p class="text-muted small mb-2" style="font-size: 0.8rem;">Topping đã chọn được tính trên mỗi ly trong cùng dòng</p>
+                            <div class="border rounded-3 p-2 bg-light-subtle" id="modalToppingList"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-dark">Ghi chú ly</label>
+                            <input type="text"
+                                   id="modalProductNote"
+                                   class="form-control rounded-3"
+                                   placeholder="Ví dụ: 50% đường, 70% đá, ít ngọt...">
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="small fw-semibold text-dark">Số lượng ly:</span>
+                            <div class="input-group" style="width: 130px;">
+                                <button class="btn btn-outline-secondary btn-sm"
+                                        type="button"
+                                        onclick="adjustModalQty(-1)">-</button>
+                                <input type="number"
+                                       id="modalProductQty"
+                                       class="form-control form-control-sm text-center fw-bold"
+                                       value="1"
+                                       min="1"
+                                       readonly>
+                                <button class="btn btn-outline-secondary btn-sm"
+                                        type="button"
+                                        onclick="adjustModalQty(1)">+</button>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-light rounded-3 mb-3 border">
+                            <div class="d-flex justify-content-between text-muted small mb-1">
+                                <span>Giá size (<span id="calcSizeLabel">Size M</span>):</span>
+                                <span id="calcBasePrice">25.000 ₫</span>
+                            </div>
+                            <div class="d-flex justify-content-between text-muted small mb-1">
+                                <span>Topping mỗi ly:</span>
+                                <span id="calcToppingPerCup">0 ₫</span>
+                            </div>
+                            <div class="d-flex justify-content-between text-muted small mb-1">
+                                <span>Số lượng:</span>
+                                <span>× <span id="calcQty">1</span></span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top mt-2">
+                                <span class="fw-bold text-dark">Thành tiền ước tính:</span>
+                                <h4 class="product-price mb-0 text-primary" id="calcLineTotal">25.000 ₫</h4>
+                            </div>
+                            <div class="text-muted small mt-1 fst-italic text-end"
+                                 id="calcFormulaText"
+                                 style="font-size: 0.78rem;">
+                                1 × (25.000 ₫ + 0 ₫) = 25.000 ₫
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer border-top">
+                        <div class="d-flex gap-2 w-100">
+                            <button type="button"
+                                    class="btn btn-outline-secondary rounded-pill w-25"
+                                    data-bs-dismiss="modal">Đóng</button>
+                            <button type="button"
+                                    class="btn btn-primary-custom flex-grow-1 py-2 rounded-pill fw-bold"
+                                    onclick="confirmAddToCart()">
+                                <i class="bi bi-bag-plus-fill me-1"></i> Thêm Vào Giỏ Hàng
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block th:fragment="scripts">
+        <script th:src="@{/js/customer/customer.js}"></script>
+        <script th:inline="javascript">
+            let catalog = [];
+            let currentProductVariants = [];
+            let selectedVariant = null;
+
+            document.addEventListener('DOMContentLoaded', () => {
+                CustomerApp.initContext();
+                buildCatalog();
+                initializeMenuAnimations();
+            });
+
+            function initializeMenuAnimations() {
+                const items = document.querySelectorAll('#productsGrid .product-item');
+
+                items.forEach((item, index) => {
+                    item.style.setProperty('--menu-item-index', Math.min(index, 8));
+                });
+            }
+
+            function triggerCartBounce() {
+                const cartBtn = document.querySelector('.milk-menu-page .floating-cart-btn');
+
+                if (!cartBtn) return;
+
+                cartBtn.classList.remove('cart-bounce');
+                void cartBtn.offsetWidth;
+                cartBtn.classList.add('cart-bounce');
+            }
+
+            function isToppingProduct(p) {
+                if (!p) return false;
+                const catName = (p.categoryName || '').toLowerCase();
+                return catName.includes('topping');
+            }
+
+            function buildCatalog() {
+                const items = document.querySelectorAll('.product-item');
+                catalog = Array.from(items).map(el => ({
+                    id: Number(el.getAttribute('data-id')),
+                    name: el.getAttribute('data-name'),
+                    size: el.getAttribute('data-size'),
+                    price: Number(el.getAttribute('data-price')),
+                    img: el.getAttribute('data-img'),
+                    categoryId: el.getAttribute('data-category'),
+                    categoryName: el.getAttribute('data-category-name') || '',
+                    allowTopping: el.getAttribute('data-category-allow-topping') !== 'false'
+                }));
+            }
+
+            // Search and category filters share one predicate; existing category calls still work.
+            function filterCatalog() {
+                const selected = document.getElementById('categoryFilterSelect')?.value || 'ALL';
+                const term = (document.getElementById('uteProductSearch')?.value || '')
+                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('vi').trim();
+                let visible = 0;
+                document.querySelectorAll('#productsGrid .product-item').forEach(it => {
+                    const matchesCategory = selected === 'ALL' || it.getAttribute('data-category') === selected;
+                    const name = (it.getAttribute('data-name') || '')
+                        .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('vi');
+                    const show = matchesCategory && name.includes(term);
+                    it.style.display = show ? '' : 'none';
+                    if (show) visible++;
+                });
+                document.getElementById('uteCatalogEmpty')?.classList.toggle('d-none',visible > 0);
+            }
+            function filterCategory(catId) { filterCatalog(); }
+
+            // Hero category shortcuts reuse the existing category filter and cart flow.
+            function selectFeaturedCategory(keyword) {
+                const selector = document.getElementById('categoryFilterSelect');
+                if (!selector) return;
+                const normalize = (text) => (text || '').normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D')
+                    .toLowerCase().trim();
+                const key = normalize(keyword);
+                const option = Array.from(selector.options).find(op => key && normalize(op.textContent).includes(key));
+                selector.value = option ? option.value : 'ALL';
+                const search = document.getElementById('uteProductSearch');
+                if (search) search.value = '';
+                filterCatalog();
+                document.getElementById('uteCatalog')?.scrollIntoView({behavior:'smooth'});
+            }
+
+            function openCustomizeModal(productId) {
+                if (!catalog || catalog.length === 0) buildCatalog();
+                const baseItem = catalog.find(p => p.id === productId);
+                if (!baseItem) return;
+
+                const isToppingItem = isToppingProduct(baseItem);
+                const allowTopping = baseItem.allowTopping !== false && !isToppingItem;
+
+                document.getElementById('modalProductName').textContent = baseItem.name;
+                document.getElementById('modalProductImg').src = baseItem.img && baseItem.img.length > 5 ? baseItem.img : '/images/ute-tea-product-fallback.svg';
+                document.getElementById('modalProductCategory').textContent = baseItem.categoryName || 'Món uống';
+                document.getElementById('modalProductNote').value = '';
+                document.getElementById('modalProductQty').value = 1;
+
+                if (isToppingItem) {
+                    currentProductVariants = [baseItem];
+                    selectedVariant = baseItem;
+                    document.getElementById('sizeSelectionSection').style.display = 'none';
+                    document.getElementById('toppingSelectionSection').style.display = 'none';
+                } else {
+                    currentProductVariants = catalog.filter(p => p.name === baseItem.name);
+                    if (currentProductVariants.length === 0) currentProductVariants = [baseItem];
+                    selectedVariant = currentProductVariants.find(p => p.id === productId) || currentProductVariants[0];
+
+                    document.getElementById('sizeSelectionSection').style.display = 'block';
+                    renderSizeOptions();
+
+                    if (allowTopping) {
+                        document.getElementById('toppingSelectionSection').style.display = 'block';
+                        renderToppingOptions();
+                    } else {
+                        document.getElementById('toppingSelectionSection').style.display = 'none';
+                    }
+                }
+
+                updateModalCalculation();
+                const modal = new bootstrap.Modal(document.getElementById('customizeModal'));
+                modal.show();
+            }
+
+            function renderSizeOptions() {
+                const container = document.getElementById('modalSizeContainer');
+                container.innerHTML = '';
+
+                currentProductVariants.forEach(variant => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    const isSelected = variant.id === selectedVariant.id;
+
+                    btn.className = `btn btn-sm rounded-pill px-3 py-1 fw-semibold ${isSelected ? 'btn-primary-custom shadow-sm' : 'btn-outline-secondary'}`;
+                    btn.textContent = `Size ${variant.size} · ${MilkTeaApi.formatVND(variant.price)}`;
+
+                    btn.onclick = () => {
+                        selectedVariant = variant;
+                        renderSizeOptions();
+                        updateModalCalculation();
+                    };
+
+                    container.appendChild(btn);
+                });
+            }
+
+            function renderToppingOptions() {
+                const list = document.getElementById('modalToppingList');
+                const seen = new Set();
+                const toppings = [];
+
+                catalog.forEach(p => {
+                    if (isToppingProduct(p) && !seen.has(p.name)) {
+                        seen.add(p.name);
+                        toppings.push(p);
+                    }
+                });
+
+                if (toppings.length === 0) {
+                    list.innerHTML = '<div class="text-muted small py-2 text-center">Không có topping khả dụng</div>';
+                    return;
+                }
+
+                let html = '';
+
+                toppings.forEach(t => {
+                    html += `
+                        <div class="form-check d-flex justify-content-between align-items-center py-1 px-2 mb-1 border-bottom border-light">
+                            <div>
+                                <input class="form-check-input modal-topping-cb" type="checkbox" value="${t.id}" data-name="${t.name}" data-price="${t.price}" id="cb_topping_${t.id}" onchange="updateModalCalculation()">
+                                <label class="form-check-label small ms-2 cursor-pointer" for="cb_topping_${t.id}">${t.name}</label>
+                            </div>
+                            <span class="small text-muted fw-semibold">+${MilkTeaApi.formatVND(t.price)}</span>
+                        </div>
+                    `;
+                });
+
+                list.innerHTML = html;
+            }
+
+            function getSelectedToppings() {
+                const cbs = document.querySelectorAll('.modal-topping-cb:checked');
+
+                return Array.from(cbs).map(cb => ({
+                    id: Number(cb.value),
+                    name: cb.dataset.name,
+                    price: Number(cb.dataset.price)
+                }));
+            }
+
+            function updateModalCalculation() {
+                if (!selectedVariant) return;
+
+                const qty = parseInt(document.getElementById('modalProductQty').value) || 1;
+                const basePrice = selectedVariant.price || 0;
+                const toppings = getSelectedToppings();
+                const toppingPerCup = toppings.reduce((acc, t) => acc + (t.price || 0), 0);
+
+                const unitPriceWithTopping = basePrice + toppingPerCup;
+                const lineTotal = unitPriceWithTopping * qty;
+
+                document.getElementById('modalProductPrice').textContent = MilkTeaApi.formatVND(unitPriceWithTopping);
+                document.getElementById('calcSizeLabel').textContent = 'Size ' + selectedVariant.size;
+                document.getElementById('calcBasePrice').textContent = MilkTeaApi.formatVND(basePrice);
+                document.getElementById('calcToppingPerCup').textContent = MilkTeaApi.formatVND(toppingPerCup);
+                document.getElementById('calcQty').textContent = qty;
+                document.getElementById('calcLineTotal').textContent = MilkTeaApi.formatVND(lineTotal);
+                document.getElementById('calcFormulaText').textContent =
+                    `${qty} ly × (${MilkTeaApi.formatVND(basePrice)} + ${MilkTeaApi.formatVND(toppingPerCup)}) = ${MilkTeaApi.formatVND(lineTotal)}`;
+            }
+
+            function adjustModalQty(delta) {
+                const input = document.getElementById('modalProductQty');
+                let val = parseInt(input.value) + delta;
+
+                if (val < 1) val = 1;
+
+                input.value = val;
+                updateModalCalculation();
+            }
+
+            function confirmAddToCart() {
+                if (!selectedVariant) return;
+
+                const qty = parseInt(document.getElementById('modalProductQty').value) || 1;
+                const note = document.getElementById('modalProductNote').value.trim();
+                const toppings = getSelectedToppings();
+
+                CustomerApp.addToCart(selectedVariant, qty, note, toppings);
+
+                const modalEl = document.getElementById('customizeModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+
+                if (modal) modal.hide();
+
+                triggerCartBounce();
+            }
+        </script>
+    </th:block>
+</body>
+</html>
