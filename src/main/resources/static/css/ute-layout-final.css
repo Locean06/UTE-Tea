@@ -70,3 +70,127 @@ body { overflow-x:clip; color:var(--ute-ink); }
 .navbar-milktea .navbar-brand {margin-left:clamp(0px,1.2vw,18px)!important;}
 .navbar-milktea .navbar-nav {min-width:0;}
 @media(max-width:575.98px){.navbar-milktea .navbar-brand {margin-left:0!important;}.navbar-milktea .milktea-logo-frame{flex-basis:45px;width:45px;height:45px;}}
+
+/* Customer mobile navigation keeps shortcuts and authentication on one row. */
+.ute-mobile-primary,.ute-mobile-account-label,.ute-mobile-orders { display:none; }
+@media (max-width:767.98px) {
+    .navbar-milktea:has(.ute-mobile-primary) > .container-fluid {
+        display:grid;
+        grid-template-columns:auto minmax(0,1fr) auto;
+        gap:3px;
+        padding-inline:8px;
+    }
+    .navbar-milktea:has(.ute-mobile-primary) .navbar-brand {
+        margin:0!important;
+        padding:0;
+    }
+    .navbar-milktea:has(.ute-mobile-primary) .ute-wordmark { display:none!important; }
+    .navbar-milktea .ute-mobile-primary {
+        display:flex;
+        align-items:center;
+        justify-content:space-evenly;
+        min-width:0;
+        gap:2px;
+    }
+    .ute-mobile-primary a {
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-height:44px;
+        padding:4px;
+        color:var(--ute-ink);
+        font-size:clamp(10px,2.7vw,13px);
+        font-weight:650;
+        text-decoration:none;
+        white-space:nowrap;
+    }
+    .ute-mobile-primary a:focus-visible {
+        outline:2px solid var(--ute-olive);
+        outline-offset:1px;
+        border-radius:6px;
+    }
+    .ute-mobile-cart-count {
+        position:absolute;
+        top:0;
+        right:0;
+        border-radius:999px;
+        padding:1px 4px;
+        background:var(--ute-olive);
+        color:#fff;
+        font-size:9px;
+    }
+    .navbar-milktea:has(.ute-mobile-primary) .navbar-toggler {
+        display:none;
+    }
+    .navbar-milktea:has(.ute-mobile-primary) #navbarContent {
+        display:block!important;
+        min-width:0;
+        padding:0;
+    }
+    .navbar-milktea:has(.ute-mobile-primary) #navbarContent > .navbar-nav { display:none; }
+    .navbar-milktea:has(.ute-mobile-primary) #navbarContent > .d-flex {
+        padding:0;
+        flex-wrap:nowrap;
+        gap:0!important;
+    }
+    .navbar-milktea .ute-desktop-primary { display:none!important; }
+    .navbar-milktea:has(.ute-mobile-primary) :is(.header-account-btn,.header-login-btn) {
+        min-height:44px;
+        padding:8px 6px!important;
+        font-size:clamp(10px,2.7vw,12px);
+        gap:3px!important;
+        white-space:nowrap;
+    }
+    .navbar-milktea:has(.ute-mobile-primary) :is(.header-login-btn,.header-account-btn) > i,
+    .navbar-milktea:has(.ute-mobile-primary) .ute-account-email { display:none; }
+    .navbar-milktea .ute-mobile-account-label { display:inline; }
+    .navbar-milktea .ute-mobile-orders { display:block; }
+    .navbar-milktea:has(.ute-mobile-primary) #navbarContent > .d-flex > .dropdown {
+        min-width:0;
+        max-width:100%;
+        margin-left:0!important;
+    }
+    .ute-olive-home .ute-olive-hero .ute-hero-copy {
+        min-width:0;
+        max-width:100%;
+        padding:28px 20px!important;
+    }
+    .ute-olive-home .ute-olive-hero h1 {
+        font-size:clamp(1.9rem,7.5vw,3.2rem)!important;
+        line-height:1.2!important;
+    }
+    .ute-olive-home .ute-olive-hero .ute-hero-desc {
+        font-size:clamp(.82rem,2.3vw,.95rem)!important;
+    }
+    .ute-olive-home .ute-olive-hero .ute-hero-actions { gap:10px; }
+    .ute-olive-home .ute-olive-hero .ute-hero-actions .btn {
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-height:44px;
+        max-width:100%;
+        padding:11px 16px!important;
+    }
+    .ute-olive-home .ute-olive-hero .ute-hero-art {
+        height:auto!important;
+        min-height:0!important;
+        aspect-ratio:16/10;
+    }
+    .ute-olive-home .ute-olive-hero .ute-hero-art img {
+        display:block;
+        height:100%!important;
+        min-height:0!important;
+    }
+    .ute-olive-home .ute-hero-photo-caption {
+        right:16px;
+        bottom:16px;
+        left:16px;
+        text-align:right;
+        font-size:clamp(1rem,3.6vw,1.3rem);
+    }
+    /* The sticky header provides cart access without covering page content. */
+    .ute-olive-home .floating-cart-btn { display:none!important; }
+}
+@media (max-width:390px) {
+    .ute-olive-home .ute-category-grid { grid-template-columns:minmax(0,1fr)!important; }
+}

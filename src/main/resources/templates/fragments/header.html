@@ -458,10 +458,23 @@
                     </span>
                 </a>
 
+                <div class="ute-mobile-primary"
+                     sec:authorize="!hasAnyRole('ADMIN', 'CASHIER', 'KITCHEN', 'CHEF')">
+                    <a th:href="@{/}">Trang chủ</a>
+                    <a th:href="@{/#uteCatalog}">Thực đơn</a>
+                    <a th:href="@{/cart}" class="position-relative">
+                        Giỏ hàng
+                        <span data-cart-count class="ute-mobile-cart-count" style="display: none;">0</span>
+                    </a>
+                </div>
+
                 <button class="navbar-toggler border-0"
                         type="button"
                         data-bs-toggle="collapse"
-                        data-bs-target="#navbarContent">
+                        data-bs-target="#navbarContent"
+                        aria-controls="navbarContent"
+                        aria-expanded="false"
+                        aria-label="Mở menu bổ sung">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
@@ -475,12 +488,12 @@
                     <ul sec:authorize="!hasAnyRole('ADMIN', 'CASHIER', 'KITCHEN', 'CHEF')"
                         class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3 gap-1">
                         <li class="nav-item">
-                            <a class="nav-link fw-semibold" th:href="@{/}">
+                            <a class="nav-link fw-semibold ute-desktop-primary" th:href="@{/}">
                                 Trang chủ
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link fw-semibold" th:href="@{/#uteCatalog}">
+                            <a class="nav-link fw-semibold ute-desktop-primary" th:href="@{/#uteCatalog}">
                                 Thực đơn
                             </a>
                         </li>
@@ -494,7 +507,7 @@
                     <div class="d-flex align-items-center gap-2">
                         <a sec:authorize="!hasAnyRole('CASHIER', 'ADMIN', 'CHEF', 'KITCHEN')"
                            th:href="@{/cart}"
-                           class="btn btn-outline-secondary position-relative header-cart-btn">
+                           class="btn btn-outline-secondary position-relative header-cart-btn ute-desktop-primary">
                             <i class="bi bi-bag-heart-fill me-1"></i>
                             Giỏ Hàng
                             <span id="cartCountBadge"
@@ -507,13 +520,19 @@
                                     type="button"
                                     data-bs-toggle="dropdown">
                                 <i class="bi bi-person-circle fs-5 text-muted"></i>
+                                <span class="ute-mobile-account-label">Tài khoản</span>
                                 <span sec:authentication="principal.email"
-                                      class="fw-semibold small">Tài khoản</span>
+                                      class="fw-semibold small ute-account-email">Tài khoản</span>
                             </button>
 
                             <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 header-account-dropdown">
                                 <li>
                                     <h6 class="dropdown-header">Tài khoản</h6>
+                                </li>
+                                <li class="ute-mobile-orders" sec:authorize="hasRole('CUSTOMER')">
+                                    <a class="dropdown-item" th:href="@{/orders}">
+                                        <i class="bi bi-receipt me-2"></i> Đơn hàng
+                                    </a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item" th:href="@{/profile}">

@@ -282,16 +282,13 @@ const CustomerApp = (() => {
     }
 
     function updateCartBadge() {
-        const badge = document.getElementById('cartCountBadge');
-        if (!badge) return;
+        const badges = document.querySelectorAll('#cartCountBadge, [data-cart-count]');
         const currentItems = window.MilkTeaContext.sessionId ? serverCart : localCart;
         const count = currentItems.reduce((acc, it) => acc + it.quantity, 0);
-        if (count > 0) {
+        badges.forEach(badge => {
             badge.textContent = count;
-            badge.style.display = 'inline-block';
-        } else {
-            badge.style.display = 'none';
-        }
+            badge.style.display = count > 0 ? 'inline-block' : 'none';
+        });
     }
 
     // Đặt đơn hàng
