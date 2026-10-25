@@ -48,8 +48,21 @@ public class CustomerDataService {
             throw BusinessException.conflict(ErrorCode.CART_VERSION_CONFLICT,"Giỏ hàng đã thay đổi. Vui lòng tải lại trước khi sửa.");
         if(input==null||input.getItems()==null||input.getItems().size()>100) throw invalid("Giỏ tối đa 100 dòng");
         // Validate and reprice before storing only IDs, quantity and note.
-        input.getItems().forEach(this::lineView);
-        try {cart.setItemsJson(mapper.writeValueAsString(input.getItems()));}
+        var candidates=products.findAllByActiveTrue();
+        Map<String,CartDto.CartItemRequest> normalized=new LinkedHashMap<>();
+        for(var line:input.getItems()) {
+            lineView(line,false);
+            Long productId=canonical(line.getProductId(),candidates);
+            var toppingIds=(line.getToppingIds()==null?List.<Long>of():line.getToppingIds()).stream().map(t->canonical(t,candidates)).sorted().toList();
+            String note=line.getNote()==null?"":line.getNote();
+            String identity=available(productId,false).menuVariantIdentity();
+            if(!toppingIds.isEmpty()&&candidates.stream().noneMatch(p->p.menuVariantIdentity().equals(identity)&&Boolean.TRUE.equals(p.getCategory().getAllowTopping())))throw invalid("Món không cho phép topping");
+            String key=productId+"|"+toppingIds+"|"+note;
+            var previous=normalized.get(key);
+            if(previous==null)normalized.put(key,CartDto.CartItemRequest.builder().productId(productId).quantity(line.getQuantity()).note(note).toppingIds(toppingIds).build());
+            else {previous.setQuantity(previous.getQuantity()+line.getQuantity());if(previous.getQuantity()>99)throw invalid("Mỗi lựa chọn món tối đa 99 ly");}
+        }
+        try {cart.setItemsJson(mapper.writeValueAsString(normalized.values()));}
         catch(Exception e){throw invalid("Dữ liệu giỏ không hợp lệ");}
         cart.setRevision(cart.getRevision()+1);
         carts.save(cart);
@@ -65,6 +78,10 @@ public class CustomerDataService {
     }
     private Product available(Long id) {
         return available(id,true);
+    }
+    private Long canonical(Long id,List<Product> candidates) {
+        var source=available(id,false);String identity=source.menuVariantIdentity();
+        return candidates.stream().filter(p->p.menuVariantIdentity().equals(identity)).map(Product::getId).min(Long::compare).orElseThrow(()->invalid(source.getName()+": món đã ngừng bán"));
     }
     private Product available(Long id,boolean strict) {
         if(id==null)throw invalid("Thiếu mã món");
@@ -89,7 +106,8 @@ public class CustomerDataService {
         }).toList();
         var total=p.getPrice().add(toppings.stream().map(CartDto.ToppingItemResponse::getPrice).reduce(BigDecimal.ZERO,BigDecimal::add))
             .multiply(BigDecimal.valueOf(line.getQuantity()));
-        return CartDto.CartItemResponse.builder().shopId(p.getShop()==null?null:p.getShop().getId()).shopName(p.getShop()==null?null:p.getShop().getName()).productId(p.getId()).productName(p.getName()).size(p.getSize()).unitPrice(p.getPrice())
+        // The reference identifies a menu variant, not the branch that will fulfil it.
+        return CartDto.CartItemResponse.builder().productId(p.getId()).productName(p.getName()).size(p.getSize()).unitPrice(p.getPrice())
             .quantity(line.getQuantity()).note(line.getNote()).lineTotal(total).toppingIds(ids).toppings(toppings).build();
     }
     @Transactional(readOnly=true)
@@ -106,6 +124,7 @@ public class CustomerDataService {
         if(makeDefault){existing.forEach(a->a.setDefaultAddress(false));addresses.flush();}
         address.setAccount(account);address.setRecipient(input.recipient().trim());address.setPhone(input.phone().trim());
         address.setAddressLine(input.addressLine().trim());address.setDefaultAddress(makeDefault);
+        address.setArea(input.area()==null?null:input.area().trim());address.setLatitude(input.latitude());address.setLongitude(input.longitude());
         return addressView(addresses.save(address));
     }
     @Transactional
@@ -115,7 +134,7 @@ public class CustomerDataService {
         boolean wasDefault=address.isDefaultAddress();addresses.delete(address);addresses.flush();
         if(wasDefault)addresses.findByAccountIdOrderByIdAsc(account.getId()).stream().findFirst().ifPresent(a->a.setDefaultAddress(true));
     }
-    private CustomerDataDto.AddressView addressView(DeliveryAddress a) {return new CustomerDataDto.AddressView(a.getId(),a.getRecipient(),a.getPhone(),a.getAddressLine(),a.isDefaultAddress());}
+    private CustomerDataDto.AddressView addressView(DeliveryAddress a) {return new CustomerDataDto.AddressView(a.getId(),a.getRecipient(),a.getPhone(),a.getAddressLine(),a.isDefaultAddress(),a.getArea(),a.getLatitude(),a.getLongitude());}
     @Transactional
     public void interest(CurrentActor actor,Long productId,Boolean favorite,boolean viewed) {
         Account account=lock(actor);Product p=available(productId);

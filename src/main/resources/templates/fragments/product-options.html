@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"><body>
+<th:block th:fragment="modal">
+        <div class="modal fade" id="customizeModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title brand-font" id="modalProductName">Tên Món</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div id="selectionError" class="alert alert-danger d-none" role="alert"></div>
+                        <div class="d-flex gap-3 mb-3 pb-3 border-bottom">
+                            <img id="modalProductImg" onerror="this.onerror=null;this.src='/images/ute-tea-product-fallback.svg'"
+                                 src=""
+                                 class="rounded-3"
+                                 style="width: 80px; height: 80px; object-fit: cover;"
+                                 alt="">
+                            <div>
+                                <h4 class="product-price mb-1" id="modalProductPrice">25.000 ₫</h4>
+                                <span class="badge bg-light text-secondary border" id="modalProductCategory">Trà sữa</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3" id="sizeSelectionSection">
+                            <label class="form-label small fw-semibold text-dark">Kích cỡ (Size):</label>
+                            <div class="d-flex flex-wrap gap-2" id="modalSizeContainer"></div>
+                        </div>
+
+                        <div class="mb-3" id="toppingSelectionSection">
+                            <label class="form-label small fw-semibold text-dark mb-1">Thêm Topping (áp dụng theo ly):</label>
+                            <p class="text-muted small mb-2" style="font-size: 0.8rem;">Topping đã chọn được tính trên mỗi ly trong cùng dòng</p>
+                            <div class="border rounded-3 p-2 bg-light-subtle" id="modalToppingList"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-dark">Ghi chú ly</label>
+                            <input type="text"
+                                   id="modalProductNote" maxlength="500"
+                                   class="form-control rounded-3"
+                                   placeholder="Ví dụ: 50% đường, 70% đá, ít ngọt...">
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="small fw-semibold text-dark">Số lượng ly:</span>
+                            <div class="input-group" style="width: 130px;">
+                                <button class="btn btn-outline-secondary btn-sm"
+                                        type="button"
+                                        onclick="adjustModalQty(-1)">-</button>
+                                <input type="number"
+                                       id="modalProductQty"
+                                       class="form-control form-control-sm text-center fw-bold"
+                                       value="1"
+                                       min="1" max="99"
+                                       readonly>
+                                <button class="btn btn-outline-secondary btn-sm"
+                                        type="button"
+                                        onclick="adjustModalQty(1)">+</button>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-light rounded-3 mb-3 border">
+                            <div class="d-flex justify-content-between text-muted small mb-1">
+                                <span>Giá size (<span id="calcSizeLabel">Size M</span>):</span>
+                                <span id="calcBasePrice">25.000 ₫</span>
+                            </div>
+                            <div class="d-flex justify-content-between text-muted small mb-1">
+                                <span>Topping mỗi ly:</span>
+                                <span id="calcToppingPerCup">0 ₫</span>
+                            </div>
+                            <div class="d-flex justify-content-between text-muted small mb-1">
+                                <span>Số lượng:</span>
+                                <span>× <span id="calcQty">1</span></span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top mt-2">
+                                <span class="fw-bold text-dark">Thành tiền ước tính:</span>
+                                <h4 class="product-price mb-0 text-primary" id="calcLineTotal">25.000 ₫</h4>
+                            </div>
+                            <div class="text-muted small mt-1 fst-italic text-end"
+                                 id="calcFormulaText"
+                                 style="font-size: 0.78rem;">
+                                1 × (25.000 ₫ + 0 ₫) = 25.000 ₫
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer border-top">
+                        <div class="d-flex gap-2 w-100">
+                            <button type="button"
+                                    class="btn btn-outline-secondary rounded-pill w-25"
+                                    data-bs-dismiss="modal">Đóng</button>
+                            <button type="button"
+                                    class="btn btn-primary-custom flex-grow-1 py-2 rounded-pill fw-bold"
+                                    id="confirmCartSelection" onclick="confirmAddToCart()">
+                                <i class="bi bi-bag-plus-fill me-1"></i> Thêm Vào Giỏ Hàng
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</th:block>
+</body></html>

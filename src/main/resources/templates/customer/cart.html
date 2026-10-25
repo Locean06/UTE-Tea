@@ -501,7 +501,7 @@
                 </div>
 
                 <aside class="ute-pickup-notice" role="note"><i class="bi bi-bag-check"></i>
-                  <span><strong>Đơn website: nhận tại quầy / mang về.</strong> Dùng tại bàn? Vui lòng báo nhân viên để thu ngân chọn đúng số bàn trên POS.</span>
+                  <span><strong>Chọn món trước, chọn cơ sở sau.</strong> Giá trong giỏ là tạm tính; tổng tiền được kiểm tra theo cơ sở trước khi bạn xác nhận. Dùng tại bàn vẫn theo phiên bàn của thu ngân.</span>
                 </aside>
 
                 <div class="card border-0 shadow-sm rounded-4 mb-4 cart-zoom-fade">
@@ -541,23 +541,30 @@
                         <span class="fs-4 fw-bold product-price" id="totalVal">0 ₫</span>
                     </div>
 
-                    <button type="button" id="checkoutBtn" class="btn btn-primary-custom w-100 py-3 rounded-pill fw-bold fs-6" onclick="CustomerApp.submitOrder()">
-                        <i class="bi bi-send-fill me-2"></i> Gửi Đơn Hàng
-                    </button>
-                    <p class="text-center text-muted small mt-2 mb-0">Đơn hàng sẽ được chuyển tới Bếp ngay sau khi Thu ngân xác nhận.</p>
+
                 </div>
             </div>
         </div>
+        <th:block th:replace="~{fragments/delivery-checkout :: panel}"></th:block>
+        <th:block th:replace="~{fragments/product-options :: modal}"></th:block>
     </div>
 
     <th:block th:fragment="scripts">
         <script th:src="@{/js/customer/customer.js}"></script>
+        <script th:src="@{/js/customer/menu-selection.js}"></script>
+        <script th:src="@{/js/customer/delivery-checkout.js}"></script>
         <script th:inline="javascript">
             const discountType = /*[[${settings != null && settings.discountType != null ? settings.discountType : 'PERCENT'}]]*/ 'PERCENT';
             const discountValue = /*[[${settings != null && settings.discountValue != null ? settings.discountValue : (settings != null && settings.discountPercent != null ? settings.discountPercent : 0)}]]*/ 0;
 
             let cartEntranceShown = false;
             let previousCartQuantities = null;
+
+            document.addEventListener('ute:cart-changed',event=>{
+                const items=event.detail.items;
+                const total=items.reduce((sum,item)=>sum+Number(item.lineTotal||0),0);
+                renderCartItems(items,total);
+            });
 
             document.addEventListener('DOMContentLoaded', async () => {
                 await CustomerApp.initContext();
@@ -587,7 +594,7 @@
                 if (list) list.classList.remove('d-none');
                 if (summary) summary.style.display = 'block';
                 const checkoutButton = document.getElementById('checkoutBtn');
-                if (checkoutButton) checkoutButton.textContent = items.some(item => item.shopId) ? 'Tiếp tục đặt giao hàng' : 'Gửi Đơn Hàng';
+                if (checkoutButton) checkoutButton.textContent = 'Xác nhận đặt nhận tại quầy';
 
                 const playEntrance = !cartEntranceShown;
                 const currentQuantities = items.map(it => ({
@@ -618,7 +625,7 @@
                         && previousItem.quantity !== it.quantity;
 
                     html += `
-                        <div class="d-flex align-items-center justify-content-between py-3 ${idx > 0 ? 'border-top' : ''} ${playEntrance ? 'cart-stagger-slide' : ''}" ${playEntrance ? `style="--cart-item-index: ${Math.min(idx, 12)}"` : ''}>
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 py-3 ${idx > 0 ? 'border-top' : ''} ${playEntrance ? 'cart-stagger-slide' : ''}" ${playEntrance ? `style="--cart-item-index: ${Math.min(idx, 12)}"` : ''}>
                             <div class="flex-grow-1 me-3">
                                 <h6 class="fw-bold mb-1">${MilkTeaApi.escapeHtml(it.productName)}</h6>
                                 <div class="d-flex align-items-center gap-2 mb-1">
@@ -636,6 +643,7 @@
                                     <button class="btn btn-outline-secondary" type="button" onclick="CustomerApp.updateQuantity(${idx}, 1)">+</button>
                                 </div>
                                 <span class="fw-bold product-price ms-2" style="min-width: 85px; text-align: right;">${MilkTeaApi.formatVND(lineTotal)}</span>
+                                <button class="btn btn-sm btn-outline-secondary" type="button" onclick="MenuSelection.open(${it.productId}, ${idx}).catch(e => MilkTeaApi.showToast(e.message, 'error'))">Sửa</button>
                                 <button class="btn btn-sm btn-outline-danger border-0 p-1 ms-1" title="Xóa món" onclick="CustomerApp.removeItem(${idx})">
                                     <i class="bi bi-trash"></i>
                                 </button>

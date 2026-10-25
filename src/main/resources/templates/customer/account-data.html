@@ -12,6 +12,8 @@
     <label class="form-label" for="recipient">Người nhận</label><input id="recipient" name="recipient" class="form-control mb-2" required maxlength="120" autocomplete="name">
     <label class="form-label" for="addressPhone">Điện thoại</label><input id="addressPhone" name="phone" class="form-control mb-2" type="tel" required minlength="8" maxlength="20" autocomplete="tel">
     <label class="form-label" for="addressLine">Địa chỉ đầy đủ</label><textarea id="addressLine" name="addressLine" class="form-control mb-2" required maxlength="500" autocomplete="street-address"></textarea>
+    <label class="form-label" for="addressArea">Khu vực / quận</label><input id="addressArea" name="area" class="form-control mb-2" maxlength="120">
+    <div class="row g-2 mb-2"><div class="col-6"><label class="form-label" for="addressLatitude">Vĩ độ (nếu có)</label><input id="addressLatitude" name="latitude" type="number" step="any" min="-90" max="90" class="form-control"></div><div class="col-6"><label class="form-label" for="addressLongitude">Kinh độ (nếu có)</label><input id="addressLongitude" name="longitude" type="number" step="any" min="-180" max="180" class="form-control"></div></div>
     <label class="d-flex gap-2 mb-3"><input type="checkbox" name="defaultAddress"> Địa chỉ mặc định</label>
     <button class="btn btn-primary-custom" type="submit">Lưu địa chỉ</button><button class="btn btn-outline-secondary ms-2" type="reset">Nhập mới</button>
    </form>

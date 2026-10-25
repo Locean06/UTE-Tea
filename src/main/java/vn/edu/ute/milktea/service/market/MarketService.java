@@ -34,6 +34,8 @@ public class MarketService {
  private final VnpayService gateway;
  private final ShopCustomerAccessRepository customers;
  private final vn.edu.ute.milktea.service.media.ProductImageService images;
+ private final BranchSelectionService branches;
+ private final CustomerDataService customerData;
 
  private Long id(CurrentActor a){return CustomerDataService.accountId(a);}
  private boolean admin(CurrentActor a){return a!=null&&a.hasRole(Role.ADMIN);}
@@ -48,11 +50,12 @@ public class MarketService {
  public ShopView createShop(CurrentActor a,ShopInput input){
   var owner=account(a);
   if(!Set.of(Role.CUSTOMER,Role.VENDOR,Role.ADMIN).contains(owner.getRole()))throw denied();
-  Shop s=new Shop();s.setOwner(owner);s.setName(input.name().trim());s.setAddress(input.address().trim());
+  Shop s=new Shop();s.setOwner(owner);s.setName(input.name().trim());s.setAddress(input.address().trim());location(s,input);
   if(owner.getRole()==Role.CUSTOMER)owner.setRole(Role.VENDOR);
   return shopView(shops.save(s));
  }
- public ShopView editShop(CurrentActor a,Long shopId,ShopInput input){var s=scope(a,shopId);s.setName(input.name().trim());s.setAddress(input.address().trim());return shopView(s);}
+ public ShopView editShop(CurrentActor a,Long shopId,ShopInput input){var s=scope(a,shopId);s.setName(input.name().trim());s.setAddress(input.address().trim());location(s,input);return shopView(s);}
+ private void location(Shop s,ShopInput input){s.setArea(input.area()==null?null:input.area().trim());s.setLatitude(input.latitude());s.setLongitude(input.longitude());}
  public ShopView configureShop(CurrentActor a,Long shopId,ShopConfig input){
   var s=scope(a,shopId);
   if(admin(a)){s.setActive(input.active());s.setManagerCommissionEnabled(input.managerCommissionEnabled());}
@@ -68,15 +71,15 @@ public class MarketService {
   var all=publicOnly?shops.findAll():admin(a)?shops.findAll():shops.findAccessible(id(a));
   return all.stream().filter(s->!publicOnly||s.isActive()).map(this::shopView).toList();
  }
- private ShopView shopView(Shop s){return new ShopView(s.getId(),s.getName(),s.getAddress(),s.isActive(),s.getCommissionPercent(),s.getOwner().getId(),s.isManagerCommissionEnabled());}
+ private ShopView shopView(Shop s){return new ShopView(s.getId(),s.getName(),s.getAddress(),s.isActive(),s.getCommissionPercent(),s.getOwner().getId(),s.isManagerCommissionEnabled(),s.getArea(),s.getLatitude(),s.getLongitude());}
  public CategoryView saveCategory(CurrentActor a,Long shopId,Long categoryId,CategoryInput input){
   var shop=scope(a,shopId);Category c=categoryId==null?new Category():categories.findById(categoryId).orElseThrow(this::denied);
   if(categoryId!=null&&(c.getShop()==null||!shopId.equals(c.getShop().getId())))throw denied();
-  c.setShop(shop);c.setName(input.name().trim());c.setActive(input.active());c.setAllowTopping(false);categories.save(c);
-  return new CategoryView(c.getId(),c.getName(),shopId,c.getActive());
+  c.setShop(shop);c.setName(input.name().trim());c.setActive(input.active());if(input.allowTopping()!=null)c.setAllowTopping(input.allowTopping());categories.save(c);
+  return new CategoryView(c.getId(),c.getName(),shopId,c.getActive(),Boolean.TRUE.equals(c.getAllowTopping()));
  }
  @Transactional(readOnly=true) public List<CategoryView> shopCategories(CurrentActor a,Long shopId){
-  scope(a,shopId);return categories.findAll().stream().filter(c->c.getShop()!=null&&shopId.equals(c.getShop().getId())).map(c->new CategoryView(c.getId(),c.getName(),shopId,c.getActive())).toList();
+  scope(a,shopId);return categories.findAll().stream().filter(c->c.getShop()!=null&&shopId.equals(c.getShop().getId())).map(c->new CategoryView(c.getId(),c.getName(),shopId,c.getActive(),Boolean.TRUE.equals(c.getAllowTopping()))).toList();
  }
  public ProductView saveProduct(CurrentActor a,Long shopId,Long productId,ProductInput input){
   var shop=scope(a,shopId);Product p=productId==null?new Product():products.findByIdWithLock(productId).orElseThrow(this::denied);
@@ -85,6 +88,10 @@ public class MarketService {
   var cat=categories.findById(input.categoryId()).orElseThrow(()->invalid("Danh mục không tồn tại"));
   if(cat.getShop()==null||!shopId.equals(cat.getShop().getId()))throw denied();
   p.setShop(shop);p.setCategory(cat);p.setName(input.name().trim());p.setSize(input.size().trim());p.setDescription(input.description());p.setPrice(input.price());p.setDeliveryStock(input.stock());p.setActive(input.active());
+  if(input.menuCode()!=null&&!input.menuCode().isBlank()) {
+   if(!admin(a)&&!Product.normalizeSearch(input.menuCode()).equals(p.menuIdentity())&&!Product.normalizeSearch(input.menuCode()).equals(Product.normalizeSearch(p.getName())+"|"+Product.normalizeSearch(p.getSize())))throw denied();
+   p.setMenuCode(Product.normalizeSearch(input.menuCode()));
+  }
   return productView(products.saveAndFlush(p));
  }
  public vn.edu.ute.milktea.dto.AdminDto.ProductImageView productImage(CurrentActor a,Long shopId,Long productId,org.springframework.web.multipart.MultipartFile file){scope(a,shopId);var p=products.findByIdWithLock(productId).orElseThrow(this::denied);if(p.getShop()==null||!shopId.equals(p.getShop().getId()))throw denied();return images.uploadProductImage(productId,file);}
@@ -118,33 +125,50 @@ public class MarketService {
   String hash=hash(input.toString());
   var duplicate=orders.findByAccountIdAndIdempotencyKey(buyer.getId(),key);
   if(duplicate.isPresent()){if(!duplicate.get().getRequestHash().equals(hash))throw BusinessException.conflict(ErrorCode.IDEMPOTENCY_CONFLICT,"Mã yêu cầu đã dùng cho nội dung khác");return orderView(duplicate.get());}
-  var shop=shops.findById(input.shopId()).filter(Shop::isActive).orElseThrow(()->invalid("Shop chưa hoạt động"));
+  if(input.cartVersion()!=null) {
+   var cart=customerData.cart(a);
+   if(!cart.getVersion().equals(input.cartVersion())||!selectionSignature(input.items()).equals(selectionSignature(branches.cartItems(a))))throw BusinessException.conflict(ErrorCode.CART_VERSION_CONFLICT,"Giỏ đã thay đổi hoặc chưa gửi đủ món. Vui lòng kiểm tra lại toàn bộ giỏ.");
+  }
+  var plan=branches.resolve(a,input.shopId(),input.addressId(),input.items(),true);
+  if(!plan.issues().isEmpty())throw BusinessException.conflict(ErrorCode.INVENTORY_INSUFFICIENT,String.join("; ",plan.issues()));
+  var shop=plan.shop();
   var access=customers.findByShopIdAndAccountId(shop.getId(),buyer.getId()).orElseGet(()->{var c=new ShopCustomerAccess();c.setShop(shop);c.setAccount(buyer);return c;});
   if(access.isBlocked())throw BusinessException.forbidden(ErrorCode.ACCESS_DENIED,"Tài khoản bị hạn chế mua tại cửa hàng này");
   customers.save(access);
-  var address=addresses.findByIdAndAccountId(input.addressId(),buyer.getId()).orElseThrow(this::denied);
+  var address=plan.address();
   var carrier=carriers.findById(input.carrierId()).filter(Carrier::isActive).orElseThrow(()->invalid("Đơn vị vận chuyển không khả dụng"));
   if(carrier.getShop()!=null&&!shop.getId().equals(carrier.getShop().getId()))throw denied();
   DeliveryOrder o=new DeliveryOrder();o.setAccount(buyer);o.setShop(shop);o.setCarrier(carrier);o.setRecipient(address.getRecipient());o.setPhone(address.getPhone());o.setAddressLine(address.getAddressLine());o.setPaymentMethod(input.paymentMethod());o.setIdempotencyKey(key);o.setRequestHash(hash);o.setCommissionPercent(shop.getCommissionPercent());o.setShippingFee(carrier.getFee());
-  Set<Long> seen=new HashSet<>();BigDecimal subtotal=BigDecimal.ZERO;
-  for(var request:input.items().stream().sorted(Comparator.comparing(BuyLine::productId)).toList()){
-   if(!seen.add(request.productId()))throw invalid("Mỗi biến thể món chỉ xuất hiện một lần");
-   var p=products.findByIdWithLock(request.productId()).orElseThrow(()->invalid("Món không tồn tại"));
-   if(p.getShop()==null||!p.getShop().getId().equals(shop.getId()))throw invalid("Một đơn giao hàng chỉ thuộc một shop");
-   if(!Boolean.TRUE.equals(p.getActive())||!Boolean.TRUE.equals(p.getCategory().getActive())||p.getDeliveryStock()==null||p.getDeliveryStock()<request.quantity())throw BusinessException.conflict(ErrorCode.INVENTORY_INSUFFICIENT,"Món ngừng bán hoặc không đủ tồn: "+p.getName());
-   p.setDeliveryStock(p.getDeliveryStock()-request.quantity());
-   var l=new DeliveryLine();l.setOrder(o);l.setProduct(p);l.setProductName(p.getName());l.setQuantity(request.quantity());l.setUnitPrice(p.getPrice());o.getLines().add(l);
-   subtotal=subtotal.add(p.getPrice().multiply(BigDecimal.valueOf(request.quantity())));
+  BigDecimal subtotal=plan.subtotal();
+  for(var selection:plan.selections()) {
+   var p=selection.product();var l=new DeliveryLine();l.setOrder(o);l.setProduct(p);l.setProductName(p.getName());l.setQuantity(selection.quantity());l.setUnitPrice(p.getPrice());l.setSnapshotSize(p.getSize());l.setNote(selection.note());l.setTopping(selection.topping());o.getLines().add(l);
   }
   o.setSubtotal(subtotal);
   if(input.voucherCode()!=null&&!input.voucherCode().isBlank()){
-   var v=vouchers.lockCode(input.voucherCode().trim().toUpperCase(Locale.ROOT)).orElseThrow(()->invalid("Mã giảm giá không tồn tại"));
-   Instant now=Instant.now();
-   if(!v.isActive()||now.isBefore(v.getStartsAt())||!now.isBefore(v.getEndsAt())||subtotal.compareTo(v.getMinimumAmount())<0||v.getUsedCount()>=v.getUsageLimit()||orders.countByAccountIdAndVoucherId(buyer.getId(),v.getId())>=v.getPerAccountLimit()||(v.getShop()!=null&&!shop.getId().equals(v.getShop().getId())))throw invalid("Mã hết hạn, hết lượt hoặc không đủ điều kiện áp dụng");
+   var v=voucher(input.voucherCode(),buyer.getId(),shop.getId(),subtotal,true);
    v.setUsedCount(v.getUsedCount()+1);o.setVoucher(v);o.setDiscountAmount(v.getDiscountAmount().min(subtotal));
   }
   o.setTotalAmount(subtotal.subtract(o.getDiscountAmount()).add(o.getShippingFee()));
+  if(input.expectedTotal()!=null&&input.expectedTotal().compareTo(o.getTotalAmount())!=0)throw BusinessException.conflict(ErrorCode.ORDER_STATE_CONFLICT,"Giá, phí hoặc ưu đãi đã thay đổi. Vui lòng xem lại tổng tiền và xác nhận lại.");
+  plan.quantities().forEach((productId,quantity)->{var p=products.findById(productId).orElseThrow(this::denied);p.setDeliveryStock(p.getDeliveryStock()-quantity);});
   return orderView(orders.saveAndFlush(o));
+ }
+ private Map<String,Integer> selectionSignature(List<BuyLine> lines){
+  Map<String,Integer> result=new TreeMap<>();for(var l:lines){var ids=l.toppingIds()==null?List.<Long>of():l.toppingIds().stream().sorted().toList();result.merge(l.productId()+"|"+ids+"|"+Objects.toString(l.note(),""),l.quantity(),Integer::sum);}return result;
+ }
+ private Voucher voucher(String code,Long accountId,Long shopId,BigDecimal subtotal,boolean lock){
+  var v=(lock?vouchers.lockCode(code.trim().toUpperCase(Locale.ROOT)):vouchers.findByCode(code.trim().toUpperCase(Locale.ROOT))).orElseThrow(()->invalid("Mã giảm giá không tồn tại"));
+  Instant now=Instant.now();
+  if(!v.isActive()||now.isBefore(v.getStartsAt())||!now.isBefore(v.getEndsAt())||subtotal.compareTo(v.getMinimumAmount())<0||v.getUsedCount()>=v.getUsageLimit()||orders.countByAccountIdAndVoucherId(accountId,v.getId())>=v.getPerAccountLimit()||(v.getShop()!=null&&!shopId.equals(v.getShop().getId())))throw invalid("Mã hết hạn, hết lượt hoặc không đủ điều kiện áp dụng");
+  return v;
+ }
+ @Transactional(readOnly=true) public CartQuote quote(CurrentActor a,QuoteInput input){
+  var cart=customerData.cart(a);var plan=branches.resolve(a,input.shopId(),input.addressId(),branches.cartItems(a),false);
+  if(!plan.issues().isEmpty())throw BusinessException.conflict(ErrorCode.INVENTORY_INSUFFICIENT,String.join("; ",plan.issues()));
+  var carrier=carriers.findById(input.carrierId()).filter(Carrier::isActive).orElseThrow(()->invalid("Đơn vị vận chuyển không khả dụng"));
+  if(carrier.getShop()!=null&&!input.shopId().equals(carrier.getShop().getId()))throw denied();
+  var discount=input.voucherCode()==null||input.voucherCode().isBlank()?BigDecimal.ZERO:voucher(input.voucherCode(),id(a),input.shopId(),plan.subtotal(),false).getDiscountAmount().min(plan.subtotal());
+  return new CartQuote(input.shopId(),cart.getVersion(),plan.subtotal(),carrier.getFee(),discount,plan.subtotal().subtract(discount).add(carrier.getFee()),plan.selections().stream().map(s->new LineView(s.product().getId(),s.product().getName(),s.quantity(),s.product().getPrice(),s.product().getSize(),s.note(),s.topping())).toList());
  }
  private String hash(String text){try{return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(text.getBytes(StandardCharsets.UTF_8)));}catch(Exception e){throw new IllegalStateException(e);}}
  private DeliveryOrder ownedOrder(CurrentActor a,Long orderId){
@@ -196,7 +220,7 @@ public class MarketService {
   o.setStatus(next);orders.flush();return orderView(o);
  }
  private void version(DeliveryOrder o,Long expected){if(!Objects.equals(o.getVersion(),expected))throw BusinessException.conflict(ErrorCode.ORDER_STATE_CONFLICT,"Đơn đã thay đổi; vui lòng tải lại");}
- public OrderView orderView(DeliveryOrder o){return new OrderView(o.getId(),o.getShop().getId(),o.getShop().getName(),o.getAccount().getId(),o.getShipper()==null?null:o.getShipper().getId(),o.getStatus(),o.getPaymentMethod(),o.isPaid(),o.getRecipient(),o.getPhone(),o.getAddressLine(),o.getSubtotal(),o.getShippingFee(),o.getDiscountAmount(),o.getTotalAmount(),o.getCommissionPercent(),o.getCreatedAt(),o.isDeliveryFailed(),o.getVersion(),o.getLines().stream().map(l->new LineView(l.getProduct().getId(),l.getProductName(),l.getQuantity(),l.getUnitPrice())).toList());}
+ public OrderView orderView(DeliveryOrder o){return new OrderView(o.getId(),o.getShop().getId(),o.getShop().getName(),o.getAccount().getId(),o.getShipper()==null?null:o.getShipper().getId(),o.getStatus(),o.getPaymentMethod(),o.isPaid(),o.getRecipient(),o.getPhone(),o.getAddressLine(),o.getSubtotal(),o.getShippingFee(),o.getDiscountAmount(),o.getTotalAmount(),o.getCommissionPercent(),o.getCreatedAt(),o.isDeliveryFailed(),o.getVersion(),o.getLines().stream().map(l->new LineView(l.getProduct().getId(),l.getProductName(),l.getQuantity(),l.getUnitPrice(),l.getSnapshotSize(),l.getNote(),l.isTopping())).toList());}
  @Transactional(readOnly=true) public Summary summary(CurrentActor a,Long shopId){
   var list=orders(a,shopId);var paid=list.stream().filter(o->o.paid()&&Set.of(DeliveryOrder.Status.DELIVERED,DeliveryOrder.Status.RETURN_REQUESTED).contains(o.status())).toList();
   return new Summary(list.size(),list.stream().filter(o->Set.of(DeliveryOrder.Status.DELIVERED,DeliveryOrder.Status.RETURN_REQUESTED,DeliveryOrder.Status.RETURNED,DeliveryOrder.Status.REFUNDED).contains(o.status())).count(),list.stream().filter(OrderView::deliveryFailed).count(),paid.stream().map(OrderView::totalAmount).reduce(BigDecimal.ZERO,BigDecimal::add),paid.stream().map(o->o.subtotal().subtract(o.discountAmount()).multiply(o.commissionPercent()).divide(BigDecimal.valueOf(100),2,RoundingMode.HALF_UP)).reduce(BigDecimal.ZERO,BigDecimal::add));
@@ -219,6 +243,6 @@ public class MarketService {
  public ProductView productView(Product p){
   double rating=em.createQuery("select coalesce(avg(r.stars),0) from ProductReview r where r.product.id=:id",Double.class).setParameter("id",p.getId()).getSingleResult();
   long favorite=em.createQuery("select count(i) from ProductInterest i where i.product.id=:id and i.favorite=true",Long.class).setParameter("id",p.getId()).getSingleResult();
-  return new ProductView(p.getId(),p.getName(),p.getSize(),p.getDescription(),p.getPrice(),p.getImageUrl(),p.getCategory().getId(),p.getCategory().getName(),p.getShop()==null?null:p.getShop().getId(),p.getShop()==null?"UTE Tea tại quầy":p.getShop().getName(),p.getDeliveryStock(),Boolean.TRUE.equals(p.getActive()),p.getCatalogVersion(),rating,favorite);
+  return new ProductView(p.getId(),p.getName(),p.getSize(),p.getDescription(),p.getPrice(),p.getImageUrl(),p.getCategory().getId(),p.getCategory().getName(),p.getShop()==null?null:p.getShop().getId(),p.getShop()==null?"UTE Tea tại quầy":p.getShop().getName(),p.getDeliveryStock(),Boolean.TRUE.equals(p.getActive()),p.getCatalogVersion(),rating,favorite,p.menuIdentity());
  }
 }

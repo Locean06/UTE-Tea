@@ -11,4 +11,7 @@ public class DeliveryAddress {
     @Column(name="Phone",nullable=false,length=20) private String phone;
     @Column(name="AddressLine",nullable=false,length=500) private String addressLine;
     @Column(name="IsDefault",nullable=false) private boolean defaultAddress;
+    @Column(name="Area",length=120) private String area;
+    @Column(name="Latitude") private Double latitude;
+    @Column(name="Longitude") private Double longitude;
 }

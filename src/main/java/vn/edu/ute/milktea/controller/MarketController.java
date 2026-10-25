@@ -15,6 +15,7 @@ import java.util.*;
 public class MarketController {
  private final MarketService service;
  private final CatalogSearchService catalog;
+ private final BranchSelectionService branches;
  @GetMapping("/marketplace") public ModelAndView page(){return new ModelAndView("customer/marketplace");}
  @GetMapping("/merchant") public ModelAndView merchant(){return new ModelAndView("market/portal");}
  @GetMapping("/api/v1/public/market/catalog") public ApiResponse<CatalogPage> catalog(
@@ -22,6 +23,9 @@ public class MarketController {
   @RequestParam(required=false) BigDecimal min,@RequestParam(required=false) BigDecimal max,
   @RequestParam(defaultValue="newest") String sort,@RequestParam(defaultValue="0") int page,@RequestParam(defaultValue="20") int size){return ApiResponse.ok(catalog.search(q,category,shop,min,max,sort,page,size));}
  @GetMapping("/api/v1/public/market/shops") public ApiResponse<List<ShopView>> publicShops(){return ApiResponse.ok(service.shops(null,true));}
+ @GetMapping("/api/v1/public/market/products/{id}/options") public ApiResponse<MenuOptions> options(@PathVariable Long id){return ApiResponse.ok(catalog.options(id));}
+ @GetMapping("/api/v1/account/cart/branches") public ApiResponse<List<BranchOption>> branches(@AuthenticationPrincipal CurrentActor a,@RequestParam Long addressId){return ApiResponse.ok(branches.recommendations(a,addressId));}
+ @PostMapping("/api/v1/account/cart/quote") public ApiResponse<CartQuote> quote(@AuthenticationPrincipal CurrentActor a,@Valid @RequestBody QuoteInput input){return ApiResponse.ok(service.quote(a,input));}
  @GetMapping("/api/v1/public/market/carriers") public ApiResponse<List<CarrierView>> carriers(){return ApiResponse.ok(service.carriers());}
  @GetMapping("/api/v1/market/shops") public ApiResponse<List<ShopView>> shops(@AuthenticationPrincipal CurrentActor a){return ApiResponse.ok(service.shops(a,false));}
  @PostMapping("/api/v1/market/shops") public ApiResponse<ShopView> createShop(@AuthenticationPrincipal CurrentActor a,@Valid @RequestBody ShopInput input){return ApiResponse.ok(service.createShop(a,input));}

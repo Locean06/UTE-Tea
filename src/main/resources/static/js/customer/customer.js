@@ -19,6 +19,7 @@ const CustomerApp = (() => {
     const accountId = document.body.dataset.accountId;
     let accountCartVersion = '0';
     let cartWrite = Promise.resolve();
+    let contextReady = null;
 
     function getLocalCartStorageKey() {
         const ctx = window.MilkTeaContext || {};
@@ -65,7 +66,11 @@ const CustomerApp = (() => {
     }
 
     // Khách đặt hàng trực tuyến: nhận tại quầy / mang về. Bàn do thu ngân gán trong POS.
-    async function initContext() {
+    function initContext() {
+        if(!contextReady)contextReady=initializeContext().catch(error=>{contextReady=null;throw error;});
+        return contextReady;
+    }
+    async function initializeContext() {
         // Clear legacy browser table selections to avoid showing a previous guest's table.
         window.MilkTeaContext.tableId = null;
         window.MilkTeaContext.tableName = null;
@@ -80,6 +85,10 @@ const CustomerApp = (() => {
             const cart = await MilkTeaApi.get('/api/v1/account/cart');
             accountCartVersion = cart.version;
             localCart = cart.items.map(it => ({...it, price: it.unitPrice}));
+            try {
+                const guest=JSON.parse(localStorage.getItem(getLocalCartStorageKey())||'[]');
+                if(Array.isArray(guest)&&guest.length){localCart.push(...guest);await saveLocalCart();localStorage.removeItem(getLocalCartStorageKey());}
+            } catch(e) {MilkTeaApi.showToast('Giỏ tạm vẫn được giữ trên máy. '+e.message,'warning');}
         } else { loadLocalCart(); }
         updateCartBadge();
         setupRealtimeListeners();
@@ -138,6 +147,7 @@ const CustomerApp = (() => {
 
     // Thêm món vào giỏ
     async function addToCart(product, quantity = 1, note = '', selectedToppings = []) {
+        await initContext();
         const toppingIds = (selectedToppings || []).map(t => Number(t.id || t.productId)).filter(Boolean).sort((a, b) => a - b);
         const toppingSum = (selectedToppings || []).reduce((acc, t) => acc + (Number(t.price) || 0), 0);
         const unitPriceWithTopping = (Number(product.price) || 0) + toppingSum;
@@ -157,7 +167,7 @@ const CustomerApp = (() => {
 
         if (window.MilkTeaContext.sessionId) {
             // Đã có phiên -> Gửi lên giỏ server
-            addServerCartItem(item);
+            await addServerCartItem(item);
         } else {
             // Chưa có phiên -> Lưu giỏ RAM, chỉ gộp nếu cùng productId, note VÀ cùng toppings
             const tKey = toppingIds.join(',');
@@ -173,7 +183,8 @@ const CustomerApp = (() => {
             } else {
                 localCart.push(item);
             }
-            try { await saveLocalCart(); } catch (_) { return; }
+            updateCartBadge(true);
+            await saveLocalCart();
             updateCartBadge();
             MilkTeaApi.showToast(`Đã thêm ${item.productName} vào giỏ`, 'success');
         }
@@ -252,6 +263,7 @@ const CustomerApp = (() => {
         } catch (e) {
             MilkTeaApi.showToast(e.message || 'Lỗi khi cập nhật giỏ hàng', 'error');
             await loadServerCart(); // Tải lại bản mới nếu bị xung đột version
+            throw e;
         }
     }
 
@@ -292,21 +304,31 @@ const CustomerApp = (() => {
                 await loadServerCart();
             }
         } else {
-            try { await saveLocalCart(); } catch (_) { return; }
+            updateCartBadge(true);
+            try { await saveLocalCart(); } catch (_) { return false; }
         }
 
         updateCartBadge();
         if (typeof renderCartItems === 'function') {
-            const total = currentItems.reduce((acc, it) => acc + (it.lineTotal || (it.price || it.unitPrice || 0) * it.quantity), 0);
-            renderCartItems(currentItems, total);
+            const updatedItems=window.MilkTeaContext.sessionId?serverCart:localCart;
+            const total = updatedItems.reduce((acc, it) => acc + (it.lineTotal || (it.price || it.unitPrice || 0) * it.quantity), 0);
+            renderCartItems(updatedItems, total);
         }
+        return true;
     }
 
     async function removeItem(index) {
         await updateQuantity(index, -999999);
     }
+    async function replaceItem(index,product,quantity,note,toppings) {
+        const items=window.MilkTeaContext.sessionId?serverCart:localCart;
+        if(!items[index])throw Error('Món trong giỏ đã thay đổi. Vui lòng tải lại.');
+        items[index]={productId:product.id,productName:product.name,size:product.size,price:Number(product.price),quantity,note,
+            toppings,toppingIds:toppings.map(t=>t.id),lineTotal:(Number(product.price)+toppings.reduce((sum,t)=>sum+Number(t.price),0))*quantity};
+        if(await updateQuantity(index,0)===false)throw Error('Chưa lưu được thay đổi. Vui lòng kiểm tra giỏ mới nhất.');
+    }
 
-    function updateCartBadge() {
+    function updateCartBadge(pending=false) {
         const badges = document.querySelectorAll('#cartCountBadge, [data-cart-count]');
         const currentItems = window.MilkTeaContext.sessionId ? serverCart : localCart;
         const count = currentItems.reduce((acc, it) => acc + it.quantity, 0);
@@ -314,15 +336,12 @@ const CustomerApp = (() => {
             badge.textContent = count;
             badge.style.display = count > 0 ? 'inline-block' : 'none';
         });
+        document.dispatchEvent(new CustomEvent('ute:cart-changed',{detail:{items:currentItems,version:accountCartVersion,pending}}));
     }
 
     // Đặt đơn hàng
     async function submitOrder() {
         const currentItems = window.MilkTeaContext.sessionId ? serverCart : localCart;
-        if (!window.MilkTeaContext.sessionId && currentItems.some(item => item.shopId)) {
-            window.location.href = '/marketplace';
-            return;
-        }
         if (currentItems.length === 0) {
             MilkTeaApi.showToast('Giỏ hàng đang trống!', 'warning');
             return;
@@ -387,6 +406,9 @@ const CustomerApp = (() => {
         addToCart,
         updateQuantity,
         removeItem,
+        replaceItem,
+        clearCart: async()=>{await clearLocalCart();updateCartBadge();},
+        getCartVersion: ()=>accountCartVersion,
         submitOrder,
         loadServerCart,
         getLocalCart: () => localCart,

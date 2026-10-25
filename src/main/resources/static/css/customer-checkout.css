@@ -1,0 +1,14 @@
+/* Customer checkout only: keep controls in flow and make narrow cards usable. */
+#branchCheckout, #branchCheckout .row > *, #branchQuote, #deliveryCart { min-width:0; }
+#branchCheckout :is(input,select,textarea) { min-width:0; max-width:100%; }
+#branchQuote > div { flex-wrap:wrap; }
+#branchAvailability { overflow-wrap:anywhere; }
+#deliveryCart button, #branchCheckout .btn, #customizeModal .btn { min-height:44px; }
+.ute-cart-page #cartList .d-flex.align-items-center.gap-2 { flex-wrap:wrap; min-width:0; max-width:100%; }
+.ute-cart-page #cartList .flex-grow-1 { min-width:0; overflow-wrap:anywhere; }
+.milk-menu-page .floating-cart-btn { position:static; width:fit-content; margin:20px auto; }
+@media(max-width:575.98px) {
+    #branchCheckout { padding:16px!important; }
+    #customizeModal .modal-body { padding:16px; }
+    #cartList .product-price { min-width:0!important; }
+}

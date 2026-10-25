@@ -1,7 +1,7 @@
 (() => {
  const $=id=>document.getElementById(id),api='/api/v1/market',pub='/api/v1/public/market';
  const signedIn=!!document.body.dataset.accountId;
- let page=0,request=0,catalog=[],cart={version:'0',items:[]},carriers=[],orders=[];
+ let page=0,request=0,catalog=[],orders=[];
  const labels={NEW:'Mới',CONFIRMED:'Đã xác nhận',SHIPPING:'Đang giao',DELIVERED:'Đã giao',DELIVERY_FAILED:'Giao thất bại',CANCELLED:'Đã hủy',RETURN_REQUESTED:'Yêu cầu trả hàng',RETURNED:'Đã trả hàng',REFUNDED:'Đã hoàn tiền'};
  function node(tag,text,cls){const n=document.createElement(tag);if(text!=null)n.textContent=text;if(cls)n.className=cls;return n;}
  function message(text,error=false){$('marketMessage').className='alert '+(error?'alert-danger':'alert-success');$('marketMessage').textContent=text;}
@@ -15,30 +15,27 @@
   for(const p of catalog){
    const col=node('div',null,'col'),card=node('article',null,'card h-100 overflow-hidden');
    const img=node('img');img.src=p.imageUrl||'/images/ute-tea-product-fallback.svg';img.alt=p.name;img.loading='lazy';img.style.cssText='width:100%;aspect-ratio:1;object-fit:cover';img.onerror=()=>{img.onerror=null;img.src='/images/ute-tea-product-fallback.svg';};
-   const content=node('div',null,'card-body d-flex flex-column gap-2');content.append(node('h3',p.name+' · '+p.size,'h6'),node('p',p.shopName,'small text-muted mb-0'),node('strong',MilkTeaApi.formatVND(p.price)),node('p',p.rating.toFixed(1)+' ★ · '+p.favorites+' yêu thích','small mb-0'));
-   content.append(button('Đánh giá',()=>showReviews(p.id)),button('♡ Yêu thích',async()=>{if(!signedIn)return login();await MilkTeaApi.put('/api/v1/account/favorites/'+p.id+'?enabled=true');message('Đã lưu vào yêu thích.');}));
-   if(p.shopId){content.append(button(p.stock>0?'Thêm vào giỏ':'Hết hàng',async()=>{if(!signedIn)return login();if(p.stock<1)return;const line=cart.items.find(l=>l.productId===p.id);if(line)line.quantity++;else cart.items.push({productId:p.id,quantity:1,toppingIds:[]});await saveCart();if(signedIn)await MilkTeaApi.post('/api/v1/account/viewed/'+p.id);},'btn btn-primary-custom mt-auto'));}
-   else {const a=node('a','Đặt nhận tại quầy','btn btn-outline-secondary mt-auto');a.href='/?product='+p.id+'#uteCatalog';content.append(a);}
+   const content=node('div',null,'card-body d-flex flex-column gap-2');
+   const title=node('a',p.name,'h6 text-decoration-none');title.href='#productReviews';title.onclick=e=>{e.preventDefault();showReviews(p.id).catch(e=>message(e.message,true));};
+   content.append(title,node('span','Size '+p.size,'small text-muted'),node('strong',MilkTeaApi.formatVND(p.price)));
+   content.append(button('♡ Yêu thích',async()=>{if(!signedIn)return login();await MilkTeaApi.put('/api/v1/account/favorites/'+p.id+'?enabled=true');message('Đã lưu vào yêu thích.');}));
+   content.append(button('Thêm',()=>MenuSelection.open(p.id),'btn btn-primary-custom mt-auto'));
    card.append(img,content);col.append(card);grid.append(col);
   }
   $('marketPage').textContent=`Trang ${page+1} / ${Math.max(1,Math.ceil(result.total/20))} · ${result.total} món`;
   $('marketPrevious').disabled=page===0;$('marketNext').disabled=(page+1)*20>=result.total;
  }
- function cartInput(){return{items:cart.items.map(l=>({productId:l.productId,quantity:l.quantity,note:l.note||'',toppingIds:l.toppingIds||[]}))};}
- async function loadCart(){cart=await MilkTeaApi.get('/api/v1/account/cart');renderCart();}
- async function saveCart(){try{cart=await MilkTeaApi.put('/api/v1/account/cart',cartInput(),{'If-Match':cart.version});}catch(e){await loadCart();throw e;}renderCart();}
  function renderCart(){
-  const count=cart.items.reduce((sum,line)=>sum+line.quantity,0);document.querySelectorAll('#cartCountBadge,[data-cart-count]').forEach(badge=>{badge.textContent=count;badge.style.display=count?'inline-block':'none';});
-  const list=$('deliveryCart');list.replaceChildren();const shops=new Map();
-  for(const l of cart.items.filter(l=>l.shopId)){
-   shops.set(l.shopId,l.shopName);const row=node('div',null,'border-bottom py-2');
-   row.append(node('p',l.productName+' · '+l.shopName,'small mb-1'),node('strong',l.quantity+' × '+MilkTeaApi.formatVND(l.unitPrice),'small me-2'),button('−',async()=>{l.quantity--;if(l.quantity<=0)cart.items=cart.items.filter(x=>x!==l);await saveCart();}),button('+',async()=>{l.quantity++;await saveCart();}));list.append(row);
-  }
-  if(!shops.size)list.append(node('p','Chưa có món giao hàng.','text-muted small'));
-  const selected=$('checkoutShop').value;$('checkoutShop').replaceChildren();shops.forEach((name,id)=>option($('checkoutShop'),id,name));if(shops.has(Number(selected)))$('checkoutShop').value=selected;
-  renderCarriers();
+  const list=$('deliveryCart');list.replaceChildren();const items=CustomerApp.getLocalCart();
+  if(!items.length)list.append(node('p','Giỏ hàng đang trống.','text-muted small'));
+  items.forEach((line,index)=>{
+   const row=node('div',null,'border-bottom py-3 text-break');
+   row.append(node('strong',line.productName+' · Size '+line.size),node('p',(line.toppings||[]).map(t=>'+ '+t.name).join(', '),'small text-muted mb-1'));
+   if(line.note)row.append(node('p',line.note,'small text-muted mb-1'));
+   const controls=node('div',null,'d-flex flex-wrap align-items-center gap-2');
+   controls.append(button('−',()=>CustomerApp.updateQuantity(index,-1)),node('span',line.quantity),button('+',()=>CustomerApp.updateQuantity(index,1)),node('strong',MilkTeaApi.formatVND(line.lineTotal),'ms-auto'),button('Sửa',()=>MenuSelection.open(line.productId,index)),button('Xóa',()=>CustomerApp.removeItem(index)));row.append(controls);list.append(row);
+  });
  }
- function renderCarriers(){const id=Number($('checkoutShop').value);$('checkoutCarrier').replaceChildren();for(const c of carriers.filter(c=>!c.shopId||c.shopId===id))option($('checkoutCarrier'),c.id,c.name+' · '+MilkTeaApi.formatVND(c.fee));}
  async function showReviews(id){
   if(signedIn)await MilkTeaApi.post('/api/v1/account/viewed/'+id);
   const reviews=await MilkTeaApi.get(pub+'/products/'+id+'/reviews');const list=$('reviewList');list.replaceChildren();
@@ -68,21 +65,9 @@
  }
  $('marketFilters').addEventListener('submit',e=>{e.preventDefault();page=0;loadCatalog().catch(e=>message(e.message,true));});
  $('marketPrevious').onclick=()=>{page--;loadCatalog().catch(e=>message(e.message,true));};$('marketNext').onclick=()=>{page++;loadCatalog().catch(e=>message(e.message,true));};
- $('checkoutShop').onchange=renderCarriers;$('deliveryStatus').onchange=renderOrders;$('refreshDeliveryOrders').onclick=()=>loadOrders().catch(e=>message(e.message,true));
- $('deliveryCheckout').addEventListener('submit',async event=>{
-  event.preventDefault();if(!signedIn)return login();const submit=event.submitter;submit.disabled=true;let placedOrder=null;
-  try{
-   const shopId=Number($('checkoutShop').value),items=cart.items.filter(l=>l.shopId===shopId).map(l=>({productId:l.productId,quantity:l.quantity}));
-   if(!items.length)throw Error('Chọn ít nhất một món giao hàng.');
-   if(cart.items.some(l=>l.shopId===shopId&&l.toppingIds?.length))throw Error('Đơn giao hàng hiện chọn từng biến thể món, không kèm topping của POS.');
-   const input={shopId,addressId:Number($('checkoutAddress').value),carrierId:Number($('checkoutCarrier').value),voucherCode:$('checkoutVoucher').value.trim().toUpperCase(),paymentMethod:$('checkoutMethod').value,items};
-   const signature=JSON.stringify(input);let attempt=JSON.parse(sessionStorage.getItem('ute.deliveryAttempt')||'null');if(!attempt||attempt.signature!==signature){attempt={signature,key:crypto.randomUUID()};sessionStorage.setItem('ute.deliveryAttempt',JSON.stringify(attempt));}
-   const order=await MilkTeaApi.post(api+'/orders',input,{'Idempotency-Key':attempt.key});
-   placedOrder=order;message('Đã tạo đơn #'+order.id+' · Tổng '+MilkTeaApi.formatVND(order.totalAmount));
-   cart.items=cart.items.filter(l=>l.shopId!==shopId);await saveCart();sessionStorage.removeItem('ute.deliveryAttempt');await loadOrders();await loadCatalog();
-   if(order.paymentMethod==='VNPAY'){const result=await MilkTeaApi.post(api+'/orders/'+order.id+'/payment-url');location.href=result.url;}
-  }catch(e){message((placedOrder?'Đơn #'+placedOrder.id+' đã tạo. ':'')+e.message,true);}finally{submit.disabled=false;}
- });
+ $('deliveryStatus').onchange=renderOrders;$('refreshDeliveryOrders').onclick=()=>loadOrders().catch(e=>message(e.message,true));
+ document.addEventListener('ute:cart-changed',renderCart);
+ document.addEventListener('ute:delivery-placed',()=>{loadOrders().catch(e=>message(e.message,true));loadCatalog().catch(e=>message(e.message,true));});
  $('reviewForm').addEventListener('submit',async event=>{
   event.preventDefault();const form=event.target,submit=event.submitter;submit.disabled=true;
   try{
@@ -93,11 +78,8 @@
   }catch(e){message(e.message,true);}finally{submit.disabled=false;}
  });
  async function init(){
-  const [shops,cats,shipping]=await Promise.all([MilkTeaApi.get(pub+'/shops'),MilkTeaApi.get('/api/v1/catalog/categories'),MilkTeaApi.get(pub+'/carriers')]);carriers=shipping;
-  shops.forEach(s=>option($('marketShop'),s.id,s.name));cats.forEach(c=>option($('marketCategory'),c.id,c.name));
-  const selected=new URLSearchParams(location.search).get('shop');if(selected)$('marketShop').value=selected;
-  if(signedIn){await loadCart();const addresses=await MilkTeaApi.get('/api/v1/account/addresses');addresses.sort((a,b)=>Number(b.defaultAddress)-Number(a.defaultAddress)).forEach(a=>option($('checkoutAddress'),a.id,a.recipient+' · '+a.addressLine));await loadOrders();}
-  else {$('deliveryCart').append(button('Đăng nhập để lưu giỏ',async()=>login()));renderOrders();}
+  const cats=await MilkTeaApi.get('/api/v1/catalog/categories');const names=new Set();cats.forEach(c=>{if(!names.has(c.name)){names.add(c.name);option($('marketCategory'),c.id,c.name);}});
+  await CustomerApp.initContext();renderCart();if(signedIn)await loadOrders();else renderOrders();
   await loadCatalog();
   const params=new URLSearchParams(location.search),counterOrder=Number(params.get('counterOrder')),reviewProduct=Number(params.get('reviewProduct'));
   if(signedIn&&counterOrder&&reviewProduct){const f=$('reviewForm');f.dataset.delivery='false';f.elements.productId.value=reviewProduct;f.elements.orderId.value=counterOrder;$('reviewProductLabel').textContent='Đánh giá món trong đơn tại quầy #'+counterOrder;f.classList.remove('d-none');await showReviews(reviewProduct);}

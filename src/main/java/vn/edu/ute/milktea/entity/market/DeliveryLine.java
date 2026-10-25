@@ -11,5 +11,8 @@ public class DeliveryLine {
 @Column(name="ProductName",nullable=false,length=120) private String productName;
 @Column(name="Quantity",nullable=false) private int quantity;
 @Column(name="UnitPrice",nullable=false,precision=18,scale=2) private java.math.BigDecimal unitPrice;
+@Column(name="SnapshotSize",length=12) private String snapshotSize;
+@Column(name="Note",length=500) private String note;
+@Column(name="IsTopping",nullable=false) private boolean topping;
 }
 

@@ -897,12 +897,7 @@
 
                     <div class="p-3 d-flex flex-column flex-grow-1">
                         <h5 class="fw-bold mb-1 text-truncate" th:text="${p.name}">Trà Sữa Truyền Thống</h5>
-                        <span th:if="${p.shop != null}" th:text="${p.shop.name}" class="small text-muted mb-2"></span>
                         <button type="button" class="btn btn-sm btn-outline-secondary mb-2 align-self-start" th:attr="onclick=|favoriteProduct(${p.id}, this)|" aria-label="Thêm vào yêu thích"><i class="bi bi-heart"></i> Yêu thích</button>
-                        <p class="text-muted small flex-grow-1 mb-2 text-truncate-2"
-                           th:text="${p.description != null ? p.description : 'Đậm vị trà thơm ngậy sữa'}">
-                            Mô tả món
-                        </p>
 
                         <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top">
                             <span class="product-price"
@@ -912,8 +907,7 @@
                             <a sec:authorize="hasRole('CASHIER')"
                                href="/cashier"
                                class="btn btn-sm btn-primary-custom rounded-pill px-3">Tạo đơn tại POS</a>
-                            <a th:if="${p.shop != null}" th:href="@{/marketplace(shop=${p.shop.id})}" class="btn btn-sm btn-primary-custom">Đặt giao hàng</a>
-                            <button th:if="${p.shop == null}" sec:authorize="!hasRole('CASHIER')"
+                            <button sec:authorize="!hasRole('CASHIER')"
                                     type="button"
                                     class="btn btn-sm btn-primary-custom rounded-pill px-3"
                                     th:attr="onclick=|openCustomizeModal(${p.id})|">
@@ -980,116 +974,17 @@
             <span>Xem Giỏ Hàng</span>
         </a>
 
-        <div class="modal fade" id="customizeModal" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-                    <div class="modal-header border-0 pb-0">
-                        <h5 class="modal-title brand-font" id="modalProductName">Tên Món</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
+        <th:block th:replace="~{fragments/product-options :: modal}"></th:block>
 
-                    <div class="modal-body">
-                        <div class="d-flex gap-3 mb-3 pb-3 border-bottom">
-                            <img id="modalProductImg" onerror="this.onerror=null;this.src='/images/ute-tea-product-fallback.svg'"
-                                 src=""
-                                 class="rounded-3"
-                                 style="width: 80px; height: 80px; object-fit: cover;"
-                                 alt="">
-                            <div>
-                                <h4 class="product-price mb-1" id="modalProductPrice">25.000 ₫</h4>
-                                <span class="badge bg-light text-secondary border" id="modalProductCategory">Trà sữa</span>
-                            </div>
-                        </div>
-
-                        <div class="mb-3" id="sizeSelectionSection">
-                            <label class="form-label small fw-semibold text-dark">Kích cỡ (Size):</label>
-                            <div class="d-flex flex-wrap gap-2" id="modalSizeContainer"></div>
-                        </div>
-
-                        <div class="mb-3" id="toppingSelectionSection">
-                            <label class="form-label small fw-semibold text-dark mb-1">Thêm Topping (áp dụng theo ly):</label>
-                            <p class="text-muted small mb-2" style="font-size: 0.8rem;">Topping đã chọn được tính trên mỗi ly trong cùng dòng</p>
-                            <div class="border rounded-3 p-2 bg-light-subtle" id="modalToppingList"></div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label small fw-semibold text-dark">Ghi chú ly</label>
-                            <input type="text"
-                                   id="modalProductNote"
-                                   class="form-control rounded-3"
-                                   placeholder="Ví dụ: 50% đường, 70% đá, ít ngọt...">
-                        </div>
-
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="small fw-semibold text-dark">Số lượng ly:</span>
-                            <div class="input-group" style="width: 130px;">
-                                <button class="btn btn-outline-secondary btn-sm"
-                                        type="button"
-                                        onclick="adjustModalQty(-1)">-</button>
-                                <input type="number"
-                                       id="modalProductQty"
-                                       class="form-control form-control-sm text-center fw-bold"
-                                       value="1"
-                                       min="1"
-                                       readonly>
-                                <button class="btn btn-outline-secondary btn-sm"
-                                        type="button"
-                                        onclick="adjustModalQty(1)">+</button>
-                            </div>
-                        </div>
-
-                        <div class="p-3 bg-light rounded-3 mb-3 border">
-                            <div class="d-flex justify-content-between text-muted small mb-1">
-                                <span>Giá size (<span id="calcSizeLabel">Size M</span>):</span>
-                                <span id="calcBasePrice">25.000 ₫</span>
-                            </div>
-                            <div class="d-flex justify-content-between text-muted small mb-1">
-                                <span>Topping mỗi ly:</span>
-                                <span id="calcToppingPerCup">0 ₫</span>
-                            </div>
-                            <div class="d-flex justify-content-between text-muted small mb-1">
-                                <span>Số lượng:</span>
-                                <span>× <span id="calcQty">1</span></span>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center pt-2 border-top mt-2">
-                                <span class="fw-bold text-dark">Thành tiền ước tính:</span>
-                                <h4 class="product-price mb-0 text-primary" id="calcLineTotal">25.000 ₫</h4>
-                            </div>
-                            <div class="text-muted small mt-1 fst-italic text-end"
-                                 id="calcFormulaText"
-                                 style="font-size: 0.78rem;">
-                                1 × (25.000 ₫ + 0 ₫) = 25.000 ₫
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer border-top">
-                        <div class="d-flex gap-2 w-100">
-                            <button type="button"
-                                    class="btn btn-outline-secondary rounded-pill w-25"
-                                    data-bs-dismiss="modal">Đóng</button>
-                            <button type="button"
-                                    class="btn btn-primary-custom flex-grow-1 py-2 rounded-pill fw-bold"
-                                    onclick="confirmAddToCart()">
-                                <i class="bi bi-bag-plus-fill me-1"></i> Thêm Vào Giỏ Hàng
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <th:block th:fragment="scripts">
         <script th:src="@{/js/customer/customer.js}"></script>
+        <script th:src="@{/js/customer/menu-selection.js}"></script>
         <script th:inline="javascript">
-            let catalog = [];
-            let currentProductVariants = [];
-            let selectedVariant = null;
 
             document.addEventListener('DOMContentLoaded', () => {
                 CustomerApp.initContext();
-                buildCatalog();
                 initializeMenuAnimations();
             });
 
@@ -1109,26 +1004,6 @@
                 cartBtn.classList.remove('cart-bounce');
                 void cartBtn.offsetWidth;
                 cartBtn.classList.add('cart-bounce');
-            }
-
-            function isToppingProduct(p) {
-                if (!p) return false;
-                const catName = (p.categoryName || '').toLowerCase();
-                return catName.includes('topping');
-            }
-
-            function buildCatalog() {
-                const items = document.querySelectorAll('.product-item:not([data-shop-id])');
-                catalog = Array.from(items).map(el => ({
-                    id: Number(el.getAttribute('data-id')),
-                    name: el.getAttribute('data-name'),
-                    size: el.getAttribute('data-size'),
-                    price: Number(el.getAttribute('data-price')),
-                    img: el.getAttribute('data-img'),
-                    categoryId: el.getAttribute('data-category'),
-                    categoryName: el.getAttribute('data-category-name') || '',
-                    allowTopping: el.getAttribute('data-category-allow-topping') !== 'false'
-                }));
             }
 
             // Search and category filters share one predicate; existing category calls still work.
@@ -1187,160 +1062,6 @@
                 document.getElementById('uteCatalog')?.scrollIntoView({behavior:'smooth'});
             }
 
-            function openCustomizeModal(productId) {
-                if (document.body.dataset.accountId) MilkTeaApi.post('/api/v1/account/viewed/' + productId).catch(console.warn);
-                if (!catalog || catalog.length === 0) buildCatalog();
-                const baseItem = catalog.find(p => p.id === productId);
-                if (!baseItem) return;
-
-                const isToppingItem = isToppingProduct(baseItem);
-                const allowTopping = baseItem.allowTopping !== false && !isToppingItem;
-
-                document.getElementById('modalProductName').textContent = baseItem.name;
-                document.getElementById('modalProductImg').src = baseItem.img && baseItem.img.length > 5 ? baseItem.img : '/images/ute-tea-product-fallback.svg';
-                document.getElementById('modalProductCategory').textContent = baseItem.categoryName || 'Món uống';
-                document.getElementById('modalProductNote').value = '';
-                document.getElementById('modalProductQty').value = 1;
-
-                if (isToppingItem) {
-                    currentProductVariants = [baseItem];
-                    selectedVariant = baseItem;
-                    document.getElementById('sizeSelectionSection').style.display = 'none';
-                    document.getElementById('toppingSelectionSection').style.display = 'none';
-                } else {
-                    currentProductVariants = catalog.filter(p => p.name === baseItem.name);
-                    if (currentProductVariants.length === 0) currentProductVariants = [baseItem];
-                    selectedVariant = currentProductVariants.find(p => p.id === productId) || currentProductVariants[0];
-
-                    document.getElementById('sizeSelectionSection').style.display = 'block';
-                    renderSizeOptions();
-
-                    if (allowTopping) {
-                        document.getElementById('toppingSelectionSection').style.display = 'block';
-                        renderToppingOptions();
-                    } else {
-                        document.getElementById('toppingSelectionSection').style.display = 'none';
-                    }
-                }
-
-                updateModalCalculation();
-                const modal = new bootstrap.Modal(document.getElementById('customizeModal'));
-                modal.show();
-            }
-
-            function renderSizeOptions() {
-                const container = document.getElementById('modalSizeContainer');
-                container.innerHTML = '';
-
-                currentProductVariants.forEach(variant => {
-                    const btn = document.createElement('button');
-                    btn.type = 'button';
-                    const isSelected = variant.id === selectedVariant.id;
-
-                    btn.className = `btn btn-sm rounded-pill px-3 py-1 fw-semibold ${isSelected ? 'btn-primary-custom shadow-sm' : 'btn-outline-secondary'}`;
-                    btn.textContent = `Size ${variant.size} · ${MilkTeaApi.formatVND(variant.price)}`;
-
-                    btn.onclick = () => {
-                        selectedVariant = variant;
-                        renderSizeOptions();
-                        updateModalCalculation();
-                    };
-
-                    container.appendChild(btn);
-                });
-            }
-
-            function renderToppingOptions() {
-                const list = document.getElementById('modalToppingList');
-                const seen = new Set();
-                const toppings = [];
-
-                catalog.forEach(p => {
-                    if (isToppingProduct(p) && !seen.has(p.name)) {
-                        seen.add(p.name);
-                        toppings.push(p);
-                    }
-                });
-
-                if (toppings.length === 0) {
-                    list.innerHTML = '<div class="text-muted small py-2 text-center">Không có topping khả dụng</div>';
-                    return;
-                }
-
-                let html = '';
-
-                toppings.forEach(t => {
-                    html += `
-                        <div class="form-check d-flex justify-content-between align-items-center py-1 px-2 mb-1 border-bottom border-light">
-                            <div>
-                                <input class="form-check-input modal-topping-cb" type="checkbox" value="${t.id}" data-name="${MilkTeaApi.escapeHtml(t.name)}" data-price="${t.price}" id="cb_topping_${t.id}" onchange="updateModalCalculation()">
-                                <label class="form-check-label small ms-2 cursor-pointer" for="cb_topping_${t.id}">${MilkTeaApi.escapeHtml(t.name)}</label>
-                            </div>
-                            <span class="small text-muted fw-semibold">+${MilkTeaApi.formatVND(t.price)}</span>
-                        </div>
-                    `;
-                });
-
-                list.innerHTML = html;
-            }
-
-            function getSelectedToppings() {
-                const cbs = document.querySelectorAll('.modal-topping-cb:checked');
-
-                return Array.from(cbs).map(cb => ({
-                    id: Number(cb.value),
-                    name: cb.dataset.name,
-                    price: Number(cb.dataset.price)
-                }));
-            }
-
-            function updateModalCalculation() {
-                if (!selectedVariant) return;
-
-                const qty = parseInt(document.getElementById('modalProductQty').value) || 1;
-                const basePrice = selectedVariant.price || 0;
-                const toppings = getSelectedToppings();
-                const toppingPerCup = toppings.reduce((acc, t) => acc + (t.price || 0), 0);
-
-                const unitPriceWithTopping = basePrice + toppingPerCup;
-                const lineTotal = unitPriceWithTopping * qty;
-
-                document.getElementById('modalProductPrice').textContent = MilkTeaApi.formatVND(unitPriceWithTopping);
-                document.getElementById('calcSizeLabel').textContent = 'Size ' + selectedVariant.size;
-                document.getElementById('calcBasePrice').textContent = MilkTeaApi.formatVND(basePrice);
-                document.getElementById('calcToppingPerCup').textContent = MilkTeaApi.formatVND(toppingPerCup);
-                document.getElementById('calcQty').textContent = qty;
-                document.getElementById('calcLineTotal').textContent = MilkTeaApi.formatVND(lineTotal);
-                document.getElementById('calcFormulaText').textContent =
-                    `${qty} ly × (${MilkTeaApi.formatVND(basePrice)} + ${MilkTeaApi.formatVND(toppingPerCup)}) = ${MilkTeaApi.formatVND(lineTotal)}`;
-            }
-
-            function adjustModalQty(delta) {
-                const input = document.getElementById('modalProductQty');
-                let val = parseInt(input.value) + delta;
-
-                if (val < 1) val = 1;
-
-                input.value = val;
-                updateModalCalculation();
-            }
-
-            function confirmAddToCart() {
-                if (!selectedVariant) return;
-
-                const qty = parseInt(document.getElementById('modalProductQty').value) || 1;
-                const note = document.getElementById('modalProductNote').value.trim();
-                const toppings = getSelectedToppings();
-
-                CustomerApp.addToCart(selectedVariant, qty, note, toppings);
-
-                const modalEl = document.getElementById('customizeModal');
-                const modal = bootstrap.Modal.getInstance(modalEl);
-
-                if (modal) modal.hide();
-
-                triggerCartBounce();
-            }
         </script>
     </th:block>
 </body>

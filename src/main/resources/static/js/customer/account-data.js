@@ -25,7 +25,7 @@
             row.append(element('strong', a.recipient + (a.defaultAddress ? ' · Mặc định' : '')),
                 element('p', a.phone + ' · ' + a.addressLine, 'small text-break mb-2'));
             row.append(action('Sửa', async () => {
-                for (const key of ['id','recipient','phone','addressLine']) form.elements[key].value = a[key];
+                for (const key of ['id','recipient','phone','addressLine','area','latitude','longitude']) form.elements[key].value = a[key]??'';
                 form.elements.defaultAddress.checked = a.defaultAddress;
             }), action('Đặt mặc định', async () => { await MilkTeaApi.put(api + '/addresses/' + a.id, {...a, defaultAddress:true}); await load(); }),
             action('Xóa', async () => { await MilkTeaApi.delete(api + '/addresses/' + a.id); await load(); }));
@@ -47,7 +47,7 @@
     form.addEventListener('submit', async event => {
         event.preventDefault();
         const values = new FormData(form), id = values.get('id');
-        const input = {recipient:values.get('recipient'),phone:values.get('phone'),addressLine:values.get('addressLine'),defaultAddress:form.elements.defaultAddress.checked};
+        const input = {recipient:values.get('recipient'),phone:values.get('phone'),addressLine:values.get('addressLine'),area:values.get('area'),latitude:values.get('latitude')?Number(values.get('latitude')):null,longitude:values.get('longitude')?Number(values.get('longitude')):null,defaultAddress:form.elements.defaultAddress.checked};
         try { await MilkTeaApi[id ? 'put' : 'post'](api+'/addresses'+(id?'/'+id:''), input); form.reset(); await load(); }
         catch (error) { showError(error); }
     });

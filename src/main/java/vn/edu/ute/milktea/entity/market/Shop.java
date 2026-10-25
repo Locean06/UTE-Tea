@@ -13,6 +13,9 @@ public class Shop {
 @Column(name="ManagerCommissionEnabled",nullable=false) private boolean managerCommissionEnabled;
 @Column(name="CommissionPercent",nullable=false,precision=5,scale=2) private java.math.BigDecimal commissionPercent=java.math.BigDecimal.ZERO;
 @Column(name="Address",nullable=false,length=500) private String address;
+@Column(name="Area",length=120) private String area;
+@Column(name="Latitude") private Double latitude;
+@Column(name="Longitude") private Double longitude;
 @Column(name="CreatedAt",nullable=false) private java.time.Instant createdAt=java.time.Instant.now();
 }
 

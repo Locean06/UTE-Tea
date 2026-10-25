@@ -41,12 +41,24 @@ public class Product {
     @Column(name="SearchName",length=240)
     private String searchName;
 
+    @Column(name="MenuCode",length=180)
+    private String menuCode;
+
+    public String menuIdentity() {
+        return menuCode == null || menuCode.isBlank() ? normalizeSearch(name)+"|"+normalizeSearch(size) : normalizeSearch(menuCode);
+    }
+    public String menuVariantIdentity() {return menuIdentity()+"|"+normalizeSearch(size);}
+
     public static String normalizeSearch(String value) {
         return java.text.Normalizer.normalize(value == null ? "" : value, java.text.Normalizer.Form.NFD)
                 .replaceAll("\\p{M}+", "").replace('đ','d').replace('Đ','D').toLowerCase(java.util.Locale.ROOT).trim();
     }
     @PrePersist @PreUpdate
-    public void updateSearchName() { searchName=normalizeSearch(name); }
+    public void updateSearchName() {
+        searchName=normalizeSearch(name);
+        if(menuCode==null||menuCode.isBlank())menuCode=searchName+"|"+normalizeSearch(size);
+        else menuCode=normalizeSearch(menuCode);
+    }
 
     @Column(name = "Size", nullable = false, length = 12)
     private String size; // S, M, L
