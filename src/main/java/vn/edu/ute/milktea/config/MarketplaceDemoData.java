@@ -1,0 +1,34 @@
+package vn.edu.ute.milktea.config;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import vn.edu.ute.milktea.entity.account.*;
+import vn.edu.ute.milktea.entity.catalog.*;
+import vn.edu.ute.milktea.entity.market.*;
+import vn.edu.ute.milktea.repository.account.AccountRepository;
+import vn.edu.ute.milktea.repository.catalog.*;
+import vn.edu.ute.milktea.repository.market.*;
+import java.math.BigDecimal;
+
+/** Demo-only fixtures. Never runs against local/prod SQL Server profiles. */
+@Component @Profile("demo") @Order(10) @RequiredArgsConstructor
+public class MarketplaceDemoData implements CommandLineRunner {
+ private final AccountRepository accounts;private final ShopRepository shops;private final CategoryRepository categories;private final ProductRepository products;private final CarrierRepository carriers;
+ @Override @Transactional public void run(String...args){
+  if(shops.count()>0)return;
+  String hash=accounts.findByEmail("admin@milktea.vn").orElseThrow().getPasswordHash();
+  Account manager=create("manager@ute-tea.demo",Role.MANAGER,hash),shipper=create("shipper@ute-tea.demo",Role.SHIPPER,hash);
+  String[] locations={"Campus","Làng Đại Học","Thủ Đức"};
+  for(int i=0;i<3;i++){
+   Account owner=create("vendor"+(i+1)+"@ute-tea.demo",Role.VENDOR,hash);
+   Shop shop=new Shop();shop.setName("UTE Tea "+locations[i]);shop.setAddress((i+1)+" Võ Văn Ngân, TP. Thủ Đức");shop.setOwner(owner);shop.setActive(true);shop.setCommissionPercent(new BigDecimal("5"));if(i==0)shop.getManagers().add(manager);shops.save(shop);
+   Category cat=Category.builder().name("Trà nhà "+locations[i]).shop(shop).active(true).allowTopping(false).build();categories.save(cat);
+   for(int j=0;j<5;j++)products.save(Product.builder().shop(shop).category(cat).name(new String[]{"Trà lài","Trà đào","Matcha sữa","Trà sen","Trà ô long"}[j]+" "+locations[i]).size("M").description("Pha từ nguyên liệu chọn lọc, giao từ cửa hàng "+locations[i]).price(BigDecimal.valueOf(25000+j*5000)).deliveryStock(50).imageUrl("/images/ute-tea-product-fallback.svg").active(true).build());
+  }
+  Carrier c=new Carrier();c.setName("UTE Tea giao tiêu chuẩn");c.setFee(new BigDecimal("15000"));carriers.save(c);
+ }
+ private Account create(String email,Role role,String hash){return accounts.findByEmail(email).orElseGet(()->accounts.save(Account.builder().email(email).passwordHash(hash).fullName(role+" Demo").role(role).build()));}
+}

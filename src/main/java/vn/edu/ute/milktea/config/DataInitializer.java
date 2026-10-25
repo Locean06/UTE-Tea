@@ -41,6 +41,7 @@ import java.util.List;
 @Component
 @Profile({ "test", "demo" })
 @RequiredArgsConstructor
+@org.springframework.core.annotation.Order(0)
 public class DataInitializer implements CommandLineRunner {
 
         private final AccountRepository accountRepository;

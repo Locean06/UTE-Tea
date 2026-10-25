@@ -8,7 +8,6 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,11 +36,20 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
+    public org.springframework.security.web.csrf.CookieCsrfTokenRepository csrfTokenRepository() {
+        return org.springframework.security.web.csrf.CookieCsrfTokenRepository.withHttpOnlyFalse();
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource,
+            org.springframework.security.web.csrf.CookieCsrfTokenRepository csrfTokens) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(csrf -> csrf
-                        .csrfTokenRepository(org.springframework.security.web.csrf.CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .ignoringRequestMatchers("/ws/**")
+                        .csrfTokenRepository(csrfTokens)
+                        // JWT authentication runs on every request; rotate CSRF only at explicit login/logout.
+                        .sessionAuthenticationStrategy(new org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy())
                         .csrfTokenRequestHandler(new org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
@@ -54,6 +62,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/",
                                 "/menu",
+                                "/marketplace",
                                 "/cart",
                                 "/orders",
                                 "/order-confirmation",
@@ -79,7 +88,7 @@ public class SecurityConfig {
                         // Listing customer history is account-only, including when a table QR exists.
                         .requestMatchers(org.springframework.http.HttpMethod.GET,
                                 "/api/v1/customer/orders", "/api/v1/customer/orders/*")
-                            .hasAnyRole("CUSTOMER", "CASHIER", "ADMIN")
+                            .hasAnyRole("CUSTOMER", "CASHIER", "ADMIN", "VENDOR", "MANAGER", "SHIPPER")
                         // The public table list exposes all table QR secrets and must not be public.
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/tables")
                             .hasAnyRole("ADMIN", "CASHIER")
@@ -103,7 +112,7 @@ public class SecurityConfig {
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
                             String uri = request.getRequestURI();
-                            boolean staffPage = uri.equals("/admin") || uri.startsWith("/admin/")
+                            boolean staffPage = uri.equals("/merchant") || uri.equals("/admin") || uri.startsWith("/admin/")
                                     || uri.equals("/cashier") || uri.startsWith("/cashier/")
                                     || uri.equals("/kitchen") || uri.startsWith("/kitchen/")
                                     || uri.equals("/staff") || uri.startsWith("/staff/");
@@ -117,7 +126,7 @@ public class SecurityConfig {
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
                     String uri = request.getRequestURI();
-                    boolean staffPage = uri.equals("/admin") || uri.startsWith("/admin/")
+                    boolean staffPage = uri.equals("/merchant") || uri.equals("/admin") || uri.startsWith("/admin/")
                             || uri.equals("/cashier") || uri.startsWith("/cashier/")
                             || uri.equals("/kitchen") || uri.startsWith("/kitchen/")
                             || uri.equals("/staff") || uri.startsWith("/staff/");

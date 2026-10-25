@@ -15,7 +15,29 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestControllerAdvice
+@lombok.extern.slf4j.Slf4j
 public class GlobalExceptionHandler {
+
+    private ResponseEntity<ErrorResponse> standardError(HttpStatus status, ErrorCode code, String message) {
+        return ResponseEntity.status(status).body(ErrorResponse.builder().success(false).traceId(UUID.randomUUID().toString())
+                .error(ErrorResponse.ErrorDetail.builder().code(code.name()).message(message).build()).build());
+    }
+
+    @ExceptionHandler({org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class,
+            org.springframework.http.converter.HttpMessageNotReadableException.class,
+            org.springframework.web.bind.MissingRequestHeaderException.class,
+            org.springframework.web.bind.MissingServletRequestParameterException.class,
+            org.springframework.web.multipart.MaxUploadSizeExceededException.class})
+    public ResponseEntity<ErrorResponse> handleInvalidRequest(Exception ex) {
+        return standardError(HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_FAILED, "Dữ liệu, tham số hoặc tệp tải lên không hợp lệ");
+    }
+
+    @ExceptionHandler({org.springframework.dao.DataIntegrityViolationException.class,
+            org.springframework.dao.OptimisticLockingFailureException.class,
+            org.springframework.dao.PessimisticLockingFailureException.class})
+    public ResponseEntity<ErrorResponse> handleDataConflict(Exception ex) {
+        return standardError(HttpStatus.CONFLICT, ErrorCode.ORDER_STATE_CONFLICT, "Dữ liệu đã thay đổi hoặc bị trùng. Vui lòng tải lại và thử lại.");
+    }
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException ex, HttpServletRequest request) {
@@ -79,12 +101,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {
+        log.error("Unhandled application failure", ex);
         ErrorResponse response = ErrorResponse.builder()
                 .success(false)
                 .traceId(UUID.randomUUID().toString())
                 .error(ErrorResponse.ErrorDetail.builder()
                         .code(ErrorCode.INTERNAL_ERROR.name())
-                        .message("Đã xảy ra lỗi hệ thống: " + ex.getMessage())
+                        .message("Đã xảy ra lỗi hệ thống. Vui lòng thử lại hoặc cung cấp mã lỗi cho quản trị viên.")
                         .build())
                 .build();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);

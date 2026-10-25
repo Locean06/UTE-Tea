@@ -21,8 +21,8 @@ public class CatalogService {
 
     @Transactional(readOnly = true)
     public CatalogDto.MenuResponse getMenu() {
-        var categories = categoryRepository.findAllByActiveTrue();
-        var allProducts = productRepository.findAllByActiveTrue();
+        var categories = categoryRepository.findAllByActiveTrue().stream().filter(c -> c.getShop() == null).toList();
+        var allProducts = productRepository.findAllByActiveTrue().stream().filter(p -> p.getShop() == null).toList();
 
         List<CatalogDto.CategoryItem> categoryItems = categories.stream().map(cat -> {
             var products = allProducts.stream()
@@ -63,7 +63,7 @@ public class CatalogService {
 
     @Transactional(readOnly = true)
     public List<CatalogDto.ProductItem> getProducts() {
-        return productRepository.findAllByActiveTrue().stream().map(this::mapProduct).toList();
+        return productRepository.findAllByActiveTrue().stream().filter(p -> p.getShop() == null).map(this::mapProduct).toList();
     }
 
     private CatalogDto.ProductItem mapProduct(Product p) {

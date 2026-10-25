@@ -86,6 +86,7 @@ public class OrderService {
             var existing = orderRepository.findByIdempotencyKey(idempotencyKey);
             if (existing.isPresent()) {
                 Order order = existing.get();
+                assertReplayAccess(order,actor,OrderSource.TABLE);
                 Invoice invoice = invoiceRepository.findByOrderId(order.getId()).orElse(null);
                 List<OrderItem> items = orderItemRepository.findByOrderId(order.getId());
                 return mapToOrderResponse(order, invoice, items, null, null);
@@ -191,6 +192,7 @@ public class OrderService {
             var existing = orderRepository.findByIdempotencyKey(idempotencyKey);
             if (existing.isPresent()) {
                 Order order = existing.get();
+                assertReplayAccess(order,actor,OrderSource.COUNTER);
                 Invoice invoice = invoiceRepository.findByOrderId(order.getId()).orElse(null);
                 List<OrderItem> items = orderItemRepository.findByOrderId(order.getId());
                 return mapToOrderResponse(order, invoice, items, null, null);
@@ -385,6 +387,12 @@ public class OrderService {
         return mapToOrderResponse(order, invoice, items, null, null);
     }
 
+    private void assertReplayAccess(Order order,CurrentActor actor,OrderSource source) {
+        boolean staff=actor!=null&&(actor.hasRole(Role.ADMIN)||actor.hasRole(Role.CASHIER));
+        boolean owner=actor!=null&&actor.isAuthenticated()&&order.getAccount()!=null&&order.getAccount().getId().equals(actor.getAccountId());
+        if(order.getSource()!=source||(!staff&&!owner))throw BusinessException.conflict(ErrorCode.IDEMPOTENCY_CONFLICT,"Mã yêu cầu đã được sử dụng. Không trả dữ liệu của đơn khác.");
+    }
+
     private List<OrderItem> createOrderItemsAndSnapshots(Order order, List<CartDto.CartItemRequest> itemRequests) {
         List<OrderItem> orderItems = new ArrayList<>();
         Map<Long, BigDecimal> aggregatedIngredients = new HashMap<>();
@@ -394,6 +402,9 @@ public class OrderService {
         for (var req : itemRequests) {
             Product product = productRepository.findById(req.getProductId())
                     .orElseThrow(() -> BusinessException.badRequest(ErrorCode.PRODUCT_UNAVAILABLE, "Món không tồn tại: ID " + req.getProductId()));
+            if (product.getShop() != null) {
+                throw BusinessException.badRequest(ErrorCode.PRODUCT_UNAVAILABLE, "Món của shop giao hàng phải đặt qua khu vực giao hàng");
+            }
             if (!Boolean.TRUE.equals(product.getActive())) {
                 throw BusinessException.badRequest(ErrorCode.PRODUCT_UNAVAILABLE, "Món đã ngừng bán: " + product.getName());
             }
@@ -416,6 +427,7 @@ public class OrderService {
                 for (Long tId : req.getToppingIds()) {
                     Product toppingProd = productRepository.findById(tId)
                             .orElseThrow(() -> BusinessException.badRequest(ErrorCode.PRODUCT_UNAVAILABLE, "Topping không tồn tại: ID " + tId));
+                    if (toppingProd.getShop() != null) throw BusinessException.badRequest(ErrorCode.PRODUCT_UNAVAILABLE,"Topping của shop giao hàng không dùng cho đơn POS");
                     if (!Boolean.TRUE.equals(toppingProd.getActive())) {
                         throw BusinessException.badRequest(ErrorCode.PRODUCT_UNAVAILABLE, "Topping đã ngừng bán: " + toppingProd.getName());
                     }

@@ -45,6 +45,8 @@ public class CartDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CartItemResponse {
+        private Long shopId;
+        private String shopName;
         private Long productId;
         private String productName;
         private String size;

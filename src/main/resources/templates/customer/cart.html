@@ -586,6 +586,8 @@
                 if (empty) empty.classList.add('d-none');
                 if (list) list.classList.remove('d-none');
                 if (summary) summary.style.display = 'block';
+                const checkoutButton = document.getElementById('checkoutBtn');
+                if (checkoutButton) checkoutButton.textContent = items.some(item => item.shopId) ? 'Tiếp tục đặt giao hàng' : 'Gửi Đơn Hàng';
 
                 const playEntrance = !cartEntranceShown;
                 const currentQuantities = items.map(it => ({

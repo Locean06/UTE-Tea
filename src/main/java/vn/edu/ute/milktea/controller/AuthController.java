@@ -23,11 +23,15 @@ import java.util.UUID;
 public class AuthController {
 
     private final AuthService authService;
+    private final org.springframework.security.web.csrf.CookieCsrfTokenRepository csrfTokens;
+    @org.springframework.beans.factory.annotation.Value("${app.jwt.cookie-secure:false}")
+    private boolean secureCookie;
     private final vn.edu.ute.milktea.service.media.ProductImageService productImageService;
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthDto.AuthResponse>> login(
             @Valid @RequestBody AuthDto.LoginRequest request,
+            HttpServletRequest servletRequest,
             HttpServletResponse response) {
 
         AuthDto.AuthResponse authResponse = authService.login(request);
@@ -37,7 +41,10 @@ public class AuthController {
         cookie.setHttpOnly(true);
         cookie.setPath("/");
         cookie.setMaxAge(60 * 60); // 1 hour
+        cookie.setSecure(secureCookie);
+        cookie.setAttribute("SameSite", "Lax");
         response.addCookie(cookie);
+        csrfTokens.saveToken(null, servletRequest, response);
 
         return ResponseEntity.ok(ApiResponse.ok(authResponse));
     }
@@ -68,6 +75,7 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(
             @AuthenticationPrincipal CurrentActor actor,
+            HttpServletRequest request,
             HttpServletResponse response) {
 
         if (actor != null && actor.getAccountId() != null) {
@@ -75,6 +83,7 @@ public class AuthController {
         }
 
         // Xóa cookie JWT
+        csrfTokens.saveToken(null, request, response);
         Cookie cookie = new Cookie(JwtAuthenticationFilter.ACCESS_TOKEN_COOKIE, "");
         cookie.setHttpOnly(true);
         cookie.setPath("/");

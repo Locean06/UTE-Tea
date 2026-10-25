@@ -9,6 +9,9 @@ spring:
 app:
   jwt:
     cookie-secure: true
+    secret-base64: ${JWT_SECRET_BASE64}
+  otp:
+    secret: ${OTP_SECRET}
 
 logging:
   file:

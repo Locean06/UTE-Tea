@@ -5,11 +5,19 @@
 const MilkTeaApi = (() => {
     let csrfToken = null;
     let csrfHeaderName = 'X-CSRF-TOKEN';
+    let csrfRequest = null;
+
+    function currentCsrfCookie() {
+        const entry = document.cookie.split(';').map(value => value.trim()).find(value => value.startsWith('XSRF-TOKEN='));
+        return entry ? decodeURIComponent(entry.substring('XSRF-TOKEN='.length)) : null;
+    }
 
     // Khởi tạo CSRF token
     async function initCsrf() {
-        if (csrfToken) return csrfToken;
-        try {
+        const cookie = currentCsrfCookie();
+        if (cookie) { csrfToken = cookie; csrfHeaderName = 'X-XSRF-TOKEN'; return csrfToken; }
+        if (csrfRequest) return csrfRequest;
+        csrfRequest = (async () => { try {
             const res = await fetch('/api/v1/auth/csrf');
             const json = await res.json();
             if (json && json.data) {
@@ -18,8 +26,10 @@ const MilkTeaApi = (() => {
             }
         } catch (e) {
             console.warn('Không thể nạp CSRF token ban đầu:', e);
-        }
+        } finally { csrfRequest = null; }
         return csrfToken;
+        })();
+        return csrfRequest;
     }
 
     // Format tiền tệ VND
@@ -37,6 +47,8 @@ const MilkTeaApi = (() => {
         // Đính kèm CSRF token cho các mutation methods
         if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
             await initCsrf();
+            const cookie = currentCsrfCookie();
+            if (cookie) { csrfToken = cookie; csrfHeaderName = 'X-XSRF-TOKEN'; }
             if (csrfToken) {
                 headers[csrfHeaderName] = csrfToken;
             }

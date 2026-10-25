@@ -142,7 +142,7 @@ body { overflow-x:clip; color:var(--ute-ink); }
         white-space:nowrap;
     }
     .navbar-milktea:has(.ute-mobile-primary) :is(.header-login-btn,.header-account-btn) > i,
-    .navbar-milktea:has(.ute-mobile-primary) .ute-account-email { display:none; }
+    .navbar-milktea .ute-account-email { display:none; }
     .navbar-milktea .ute-mobile-account-label { display:inline; }
     .navbar-milktea .ute-mobile-orders { display:block; }
     .navbar-milktea:has(.ute-mobile-primary) #navbarContent > .d-flex > .dropdown {

@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "MonUong", uniqueConstraints = {
-        @UniqueConstraint(name = "UQ_MonUong_Ten_Size", columnNames = {"TenMon", "Size"})
+        @UniqueConstraint(name = "UQ_MonUong_Shop_Ten_Size", columnNames = {"ShopId", "TenMon", "Size"})
 })
 @Getter
 @Setter
@@ -21,12 +21,32 @@ public class Product {
     @Column(name = "MaMon")
     private Long id;
 
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="ShopId")
+    private vn.edu.ute.milktea.entity.market.Shop shop;
+
+    @Column(name="DeliveryStock")
+    private Integer deliveryStock;
+
+    @Version @Column(name="CatalogVersion",nullable=false)
+    @Builder.Default private Long catalogVersion=0L;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MaDM", nullable = false)
     private Category category;
 
     @Column(name = "TenMon", nullable = false, length = 120)
     private String name;
+
+    @Column(name="SearchName",length=240)
+    private String searchName;
+
+    public static String normalizeSearch(String value) {
+        return java.text.Normalizer.normalize(value == null ? "" : value, java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{M}+", "").replace('đ','d').replace('Đ','D').toLowerCase(java.util.Locale.ROOT).trim();
+    }
+    @PrePersist @PreUpdate
+    public void updateSearchName() { searchName=normalizeSearch(name); }
 
     @Column(name = "Size", nullable = false, length = 12)
     private String size; // S, M, L

@@ -59,31 +59,37 @@ public class CustomerDataService {
         List<CartDto.CartItemRequest> lines;
         try {lines=mapper.readValue(cart.getItemsJson(),new TypeReference<>(){});}
         catch(Exception e){throw new IllegalStateException("Không đọc được giỏ đã lưu",e);}
-        var views=lines.stream().map(this::lineView).toList();
+        var views=lines.stream().map(line->lineView(line,false)).toList();
         return CartDto.CartResponse.builder().version(Long.toString(cart.getRevision())).items(views)
             .totalAmount(views.stream().map(CartDto.CartItemResponse::getLineTotal).reduce(BigDecimal.ZERO,BigDecimal::add)).build();
     }
     private Product available(Long id) {
+        return available(id,true);
+    }
+    private Product available(Long id,boolean strict) {
         if(id==null)throw invalid("Thiếu mã món");
         var p=products.findById(id).orElseThrow(()->invalid("Món không tồn tại"));
-        if(!Boolean.TRUE.equals(p.getActive())||!Boolean.TRUE.equals(p.getCategory().getActive()))throw invalid("Món đã ngừng bán");
+        if(strict&&(!Boolean.TRUE.equals(p.getActive())||!Boolean.TRUE.equals(p.getCategory().getActive())))throw invalid("Món đã ngừng bán");
         return p;
     }
     private CartDto.CartItemResponse lineView(CartDto.CartItemRequest line) {
+        return lineView(line,true);
+    }
+    private CartDto.CartItemResponse lineView(CartDto.CartItemRequest line,boolean strict) {
         if(line==null||line.getQuantity()==null||line.getQuantity()<1||line.getQuantity()>99||
             (line.getNote()!=null&&line.getNote().length()>500))throw invalid("Số lượng phải từ 1–99; ghi chú tối đa 500 ký tự");
-        Product p=available(line.getProductId());
+        Product p=available(line.getProductId(),strict);
         var ids=line.getToppingIds()==null?List.<Long>of():line.getToppingIds();
         if(ids.size()>20||new HashSet<>(ids).size()!=ids.size())throw invalid("Danh sách topping không hợp lệ");
-        if(!ids.isEmpty()&&!Boolean.TRUE.equals(p.getCategory().getAllowTopping()))throw invalid("Món không cho phép topping");
+        if(strict&&!ids.isEmpty()&&!Boolean.TRUE.equals(p.getCategory().getAllowTopping()))throw invalid("Món không cho phép topping");
         var toppings=ids.stream().map(id->{
-            var t=available(id);
+            var t=available(id,strict);
             if(!t.getCategory().getName().toLowerCase(Locale.ROOT).contains("topping"))throw invalid("Món bổ sung không phải topping");
             return CartDto.ToppingItemResponse.builder().id(t.getId()).productId(t.getId()).name(t.getName()).price(t.getPrice()).build();
         }).toList();
         var total=p.getPrice().add(toppings.stream().map(CartDto.ToppingItemResponse::getPrice).reduce(BigDecimal.ZERO,BigDecimal::add))
             .multiply(BigDecimal.valueOf(line.getQuantity()));
-        return CartDto.CartItemResponse.builder().productId(p.getId()).productName(p.getName()).size(p.getSize()).unitPrice(p.getPrice())
+        return CartDto.CartItemResponse.builder().shopId(p.getShop()==null?null:p.getShop().getId()).shopName(p.getShop()==null?null:p.getShop().getName()).productId(p.getId()).productName(p.getName()).size(p.getSize()).unitPrice(p.getPrice())
             .quantity(line.getQuantity()).note(line.getNote()).lineTotal(total).toppingIds(ids).toppings(toppings).build();
     }
     @Transactional(readOnly=true)

@@ -530,6 +530,8 @@
                                     <h6 class="dropdown-header">Tài khoản</h6>
                                 </li>
                                 <li><a class="dropdown-item" th:href="@{/api/v1/account/preferences}"><i class="bi bi-heart me-2"></i> Địa chỉ và yêu thích</a></li>
+                                <li><a class="dropdown-item" th:href="@{/marketplace}">Mua hàng giao tận nơi</a></li>
+                                <li><a class="dropdown-item" th:href="@{/merchant}">Kênh cửa hàng / giao hàng</a></li>
                                 <li class="ute-mobile-orders" sec:authorize="hasRole('CUSTOMER')">
                                     <a class="dropdown-item" th:href="@{/orders}">
                                         <i class="bi bi-receipt me-2"></i> Đơn hàng

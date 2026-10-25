@@ -4,5 +4,8 @@ public enum Role {
     ADMIN,
     CASHIER,
     KITCHEN,
-    CUSTOMER
+    CUSTOMER,
+    VENDOR,
+    MANAGER,
+    SHIPPER
 }

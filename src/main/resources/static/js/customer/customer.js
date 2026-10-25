@@ -319,6 +319,10 @@ const CustomerApp = (() => {
     // Đặt đơn hàng
     async function submitOrder() {
         const currentItems = window.MilkTeaContext.sessionId ? serverCart : localCart;
+        if (!window.MilkTeaContext.sessionId && currentItems.some(item => item.shopId)) {
+            window.location.href = '/marketplace';
+            return;
+        }
         if (currentItems.length === 0) {
             MilkTeaApi.showToast('Giỏ hàng đang trống!', 'warning');
             return;
@@ -351,7 +355,11 @@ const CustomerApp = (() => {
             }
 
             // Xóa giỏ hàng chỉ khi tạo đơn thành công
-            await clearLocalCart();
+            try {
+                await clearLocalCart();
+            } catch (cartError) {
+                MilkTeaApi.showToast('Đơn #' + order.orderId + ' đã được tạo; giỏ hàng đã thay đổi ở nơi khác. Vui lòng kiểm tra trước khi đặt thêm.', 'warning');
+            }
             serverCart = [];
             updateCartBadge();
 

@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "DanhMuc")
+@Table(name = "DanhMuc",uniqueConstraints=@UniqueConstraint(name="UQ_DanhMuc_Shop_Name",columnNames={"ShopId","TenDM"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,7 +17,11 @@ public class Category {
     @Column(name = "MaDM")
     private Long id;
 
-    @Column(name = "TenDM", nullable = false, unique = true, length = 100)
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="ShopId")
+    private vn.edu.ute.milktea.entity.market.Shop shop;
+
+    @Column(name = "TenDM", nullable = false, length = 100)
     private String name;
 
     @Column(name = "HoatDong", nullable = false)

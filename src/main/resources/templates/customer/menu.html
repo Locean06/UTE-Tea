@@ -873,10 +873,17 @@
             Chưa tìm thấy món phù hợp. Hãy thử tên khác nhé!
         </div>
 
+        <div class="row g-2 mb-3">
+            <div class="col-6 col-md-3"><label class="form-label small" for="catalogMin">Giá từ (₫)</label><input id="catalogMin" class="form-control" type="number" min="0" onchange="filterCatalog()"></div>
+            <div class="col-6 col-md-3"><label class="form-label small" for="catalogMax">Giá đến (₫)</label><input id="catalogMax" class="form-control" type="number" min="0" onchange="filterCatalog()"></div>
+            <div class="col-12 col-md-6"><label class="form-label small" for="catalogSort">Sắp xếp</label><select id="catalogSort" class="form-select" onchange="filterCatalog()"><option value="newest">20 sản phẩm mới nhất</option><option value="bestselling">Bán chạy</option><option value="rating">Đánh giá cao</option><option value="favorites">Yêu thích nhiều nhất</option><option value="price_asc">Giá tăng dần</option><option value="price_desc">Giá giảm dần</option></select></div>
+        </div>
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3" aria-label="Phân trang thực đơn"><button class="btn btn-sm btn-outline-secondary" id="catalogPrevious" onclick="changeCatalogPage(-1)" type="button">Trang trước</button><span id="catalogPageLabel" role="status" class="small"></span><button class="btn btn-sm btn-outline-secondary" id="catalogNext" onclick="changeCatalogPage(1)" type="button">Trang sau</button></div>
+
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xxl-5 g-4" id="productsGrid">
             <div th:each="p : ${products}"
                  class="col product-item"
-                 th:attr="data-category=${p.category.id}, data-category-name=${p.category.name}, data-category-allow-topping=${p.category.allowTopping}, data-id=${p.id}, data-name=${p.name}, data-price=${p.price}, data-size=${p.size}, data-img=${p.imageUrl}">
+                 th:attr="data-shop-id=${p.shop != null ? p.shop.id : null}, data-category=${p.category.id}, data-category-name=${p.category.name}, data-category-allow-topping=${p.category.allowTopping}, data-id=${p.id}, data-name=${p.name}, data-price=${p.price}, data-size=${p.size}, data-img=${p.imageUrl}">
                 <div class="product-card">
                     <div class="product-img-wrapper">
                         <img th:src="${p.imageUrl != null and !p.imageUrl.isEmpty() ? p.imageUrl : '/images/ute-tea-product-fallback.svg'}"
@@ -890,6 +897,7 @@
 
                     <div class="p-3 d-flex flex-column flex-grow-1">
                         <h5 class="fw-bold mb-1 text-truncate" th:text="${p.name}">Trà Sữa Truyền Thống</h5>
+                        <span th:if="${p.shop != null}" th:text="${p.shop.name}" class="small text-muted mb-2"></span>
                         <button type="button" class="btn btn-sm btn-outline-secondary mb-2 align-self-start" th:attr="onclick=|favoriteProduct(${p.id}, this)|" aria-label="Thêm vào yêu thích"><i class="bi bi-heart"></i> Yêu thích</button>
                         <p class="text-muted small flex-grow-1 mb-2 text-truncate-2"
                            th:text="${p.description != null ? p.description : 'Đậm vị trà thơm ngậy sữa'}">
@@ -904,7 +912,8 @@
                             <a sec:authorize="hasRole('CASHIER')"
                                href="/cashier"
                                class="btn btn-sm btn-primary-custom rounded-pill px-3">Tạo đơn tại POS</a>
-                            <button sec:authorize="!hasRole('CASHIER')"
+                            <a th:if="${p.shop != null}" th:href="@{/marketplace(shop=${p.shop.id})}" class="btn btn-sm btn-primary-custom">Đặt giao hàng</a>
+                            <button th:if="${p.shop == null}" sec:authorize="!hasRole('CASHIER')"
                                     type="button"
                                     class="btn btn-sm btn-primary-custom rounded-pill px-3"
                                     th:attr="onclick=|openCustomizeModal(${p.id})|">
@@ -1109,7 +1118,7 @@
             }
 
             function buildCatalog() {
-                const items = document.querySelectorAll('.product-item');
+                const items = document.querySelectorAll('.product-item:not([data-shop-id])');
                 catalog = Array.from(items).map(el => ({
                     id: Number(el.getAttribute('data-id')),
                     name: el.getAttribute('data-name'),
@@ -1123,21 +1132,34 @@
             }
 
             // Search and category filters share one predicate; existing category calls still work.
-            function filterCatalog() {
+            let catalogPage = 0;
+            let catalogRequest = 0;
+            async function filterCatalog(reset = true) {
+                if (reset) catalogPage = 0;
+                const request = ++catalogRequest;
                 const selected = document.getElementById('categoryFilterSelect')?.value || 'ALL';
-                const term = (document.getElementById('uteProductSearch')?.value || '')
-                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('vi').trim();
-                let visible = 0;
-                document.querySelectorAll('#productsGrid .product-item').forEach(it => {
-                    const matchesCategory = selected === 'ALL' || it.getAttribute('data-category') === selected;
-                    const name = (it.getAttribute('data-name') || '')
-                        .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('vi');
-                    const show = matchesCategory && name.includes(term);
-                    it.style.display = show ? '' : 'none';
-                    if (show) visible++;
-                });
-                document.getElementById('uteCatalogEmpty')?.classList.toggle('d-none',visible > 0);
+                const params = new URLSearchParams({q:document.getElementById('uteProductSearch')?.value || '',sort:document.getElementById('catalogSort').value,page:String(catalogPage),size:'20'});
+                if (selected !== 'ALL') params.set('category', selected);
+                for (const [key,id] of Object.entries({min:'catalogMin',max:'catalogMax'})) if(document.getElementById(id).value) params.set(key,document.getElementById(id).value);
+                try {
+                    const result = await MilkTeaApi.get('/api/v1/public/market/catalog?'+params);
+                    if(request!==catalogRequest) return;
+                    const grid = document.getElementById('productsGrid');
+                    const nodes = new Map([...grid.querySelectorAll('.product-item')].map(n=>[Number(n.dataset.id),n]));
+                    nodes.forEach(n=>n.style.display='none');
+                    result.items.forEach(p=>{const n=nodes.get(p.id);if(n){n.style.display='';grid.append(n);}});
+                    document.getElementById('uteCatalogEmpty').classList.toggle('d-none',result.items.length>0);
+                    document.getElementById('catalogPageLabel').textContent='Trang '+(catalogPage+1)+' / '+Math.max(1,Math.ceil(result.total/20))+' · '+result.total+' món';
+                    document.getElementById('catalogPrevious').disabled=catalogPage===0;
+                    document.getElementById('catalogNext').disabled=(catalogPage+1)*20>=result.total;
+                } catch(e) { if(request===catalogRequest) MilkTeaApi.showToast(e.message,'error'); }
             }
+            function changeCatalogPage(delta){catalogPage=Math.max(0,catalogPage+delta);filterCatalog(false);}
+            document.addEventListener('DOMContentLoaded',()=>{
+                filterCatalog();
+                const product=Number(new URLSearchParams(location.search).get('product'));
+                if(product) openCustomizeModal(product);
+            });
             function filterCategory(catId) { filterCatalog(); }
             async function favoriteProduct(id, button) {
                 if (!document.body.dataset.accountId) { window.location.href='/login?redirect=/'; return; }
@@ -1251,8 +1273,8 @@
                     html += `
                         <div class="form-check d-flex justify-content-between align-items-center py-1 px-2 mb-1 border-bottom border-light">
                             <div>
-                                <input class="form-check-input modal-topping-cb" type="checkbox" value="${t.id}" data-name="${t.name}" data-price="${t.price}" id="cb_topping_${t.id}" onchange="updateModalCalculation()">
-                                <label class="form-check-label small ms-2 cursor-pointer" for="cb_topping_${t.id}">${t.name}</label>
+                                <input class="form-check-input modal-topping-cb" type="checkbox" value="${t.id}" data-name="${MilkTeaApi.escapeHtml(t.name)}" data-price="${t.price}" id="cb_topping_${t.id}" onchange="updateModalCalculation()">
+                                <label class="form-check-label small ms-2 cursor-pointer" for="cb_topping_${t.id}">${MilkTeaApi.escapeHtml(t.name)}</label>
                             </div>
                             <span class="small text-muted fw-semibold">+${MilkTeaApi.formatVND(t.price)}</span>
                         </div>

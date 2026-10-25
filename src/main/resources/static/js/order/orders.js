@@ -198,6 +198,11 @@ const OrdersApp = (() => {
                 }
             } else {
                 if (o.status !== 'DA_HUY' && !o.paid) actions += button('pay', o.orderId, 'Thanh toán', 'primary');
+                if (o.status === 'HOAN_THANH' && o.paid) {
+                    (o.items || []).forEach(item => {
+                        actions += `<a class="btn btn-sm btn-outline-secondary" href="/marketplace?counterOrder=${encodeURIComponent(o.orderId)}&reviewProduct=${encodeURIComponent(item.productId)}">Đánh giá ${e(item.productName || item.snapshotName || 'món')}</a>`;
+                    });
+                }
                 if (!o.cancellationPending && ['CHO_THANH_TOAN', 'CHO_XAC_NHAN', 'CHO_CHE_BIEN'].includes(o.status)) {
                     actions += button('cancel', o.orderId, 'Yêu cầu hủy', 'outline-danger');
                 }
