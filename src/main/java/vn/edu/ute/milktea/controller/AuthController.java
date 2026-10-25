@@ -112,8 +112,8 @@ public class AuthController {
     @GetMapping("/csrf")
     public ResponseEntity<ApiResponse<Map<String, String>>> getCsrf(HttpServletRequest request) {
         // Cung cấp token CSRF chuẩn cho JavaScript browser mutations
-        String token = UUID.randomUUID().toString();
-        return ResponseEntity.ok(ApiResponse.ok(Map.of("headerName", "X-CSRF-TOKEN", "token", token)));
+        var csrf = (org.springframework.security.web.csrf.CsrfToken) request.getAttribute(org.springframework.security.web.csrf.CsrfToken.class.getName());
+        return ResponseEntity.ok(ApiResponse.ok(Map.of("headerName", csrf.getHeaderName(), "token", csrf.getToken())));
     }
 
     @GetMapping("/me")

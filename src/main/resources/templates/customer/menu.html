@@ -890,6 +890,7 @@
 
                     <div class="p-3 d-flex flex-column flex-grow-1">
                         <h5 class="fw-bold mb-1 text-truncate" th:text="${p.name}">Trà Sữa Truyền Thống</h5>
+                        <button type="button" class="btn btn-sm btn-outline-secondary mb-2 align-self-start" th:attr="onclick=|favoriteProduct(${p.id}, this)|" aria-label="Thêm vào yêu thích"><i class="bi bi-heart"></i> Yêu thích</button>
                         <p class="text-muted small flex-grow-1 mb-2 text-truncate-2"
                            th:text="${p.description != null ? p.description : 'Đậm vị trà thơm ngậy sữa'}">
                             Mô tả món
@@ -1138,6 +1139,15 @@
                 document.getElementById('uteCatalogEmpty')?.classList.toggle('d-none',visible > 0);
             }
             function filterCategory(catId) { filterCatalog(); }
+            async function favoriteProduct(id, button) {
+                if (!document.body.dataset.accountId) { window.location.href='/login?redirect=/'; return; }
+                try {
+                    const enabled=button.dataset.favorite!=='true';
+                    await MilkTeaApi.put('/api/v1/account/favorites/'+id+'?enabled='+enabled);
+                    button.dataset.favorite=String(enabled);
+                    button.textContent=enabled?'♥ Đã yêu thích':'♡ Yêu thích';
+                } catch(e) { MilkTeaApi.showToast(e.message,'error'); }
+            }
 
             // Hero category shortcuts reuse the existing category filter and cart flow.
             function selectFeaturedCategory(keyword) {
@@ -1156,6 +1166,7 @@
             }
 
             function openCustomizeModal(productId) {
+                if (document.body.dataset.accountId) MilkTeaApi.post('/api/v1/account/viewed/' + productId).catch(console.warn);
                 if (!catalog || catalog.length === 0) buildCatalog();
                 const baseItem = catalog.find(p => p.id === productId);
                 if (!baseItem) return;

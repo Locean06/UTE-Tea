@@ -16,6 +16,9 @@ window.MilkTeaContext = {
 const CustomerApp = (() => {
     let localCart = []; // Giỏ RAM khi chưa có phiên bàn mở
     let serverCart = []; // Giỏ server khi đã có phiên bàn mở
+    const accountId = document.body.dataset.accountId;
+    let accountCartVersion = '0';
+    let cartWrite = Promise.resolve();
 
     function getLocalCartStorageKey() {
         const ctx = window.MilkTeaContext || {};
@@ -34,12 +37,30 @@ const CustomerApp = (() => {
         }
     }
 
-    function saveLocalCart() {
+    async function saveLocalCart() {
+        if (accountId) {
+            const items = localCart.map(it => ({productId: it.productId, quantity: it.quantity, note: it.note, toppingIds: extractToppingIds(it)}));
+            cartWrite = cartWrite.catch(() => {}).then(async () => {
+                try {
+                    const cart = await MilkTeaApi.put('/api/v1/account/cart', {items}, {'If-Match': accountCartVersion});
+                    accountCartVersion = cart.version;
+                    localCart = cart.items.map(it => ({...it, price: it.unitPrice}));
+                } catch (e) {
+                    const cart = await MilkTeaApi.get('/api/v1/account/cart');
+                    accountCartVersion = cart.version;
+                    localCart = cart.items.map(it => ({...it, price: it.unitPrice}));
+                    MilkTeaApi.showToast(e.message, 'error');
+                    throw e;
+                } finally { updateCartBadge(); }
+            });
+            return cartWrite;
+        }
         localStorage.setItem(getLocalCartStorageKey(), JSON.stringify(localCart));
     }
 
-    function clearLocalCart() {
+    async function clearLocalCart() {
         localCart = [];
+        if (accountId) return saveLocalCart();
         localStorage.removeItem(getLocalCartStorageKey());
     }
 
@@ -55,7 +76,11 @@ const CustomerApp = (() => {
         localStorage.removeItem('milktea.lastTableQr');
         localStorage.removeItem('milktea.lastTableId');
         window.MilkTeaContext.counterToken = sessionStorage.getItem('milktea.counterToken');
-        loadLocalCart();
+        if (accountId) {
+            const cart = await MilkTeaApi.get('/api/v1/account/cart');
+            accountCartVersion = cart.version;
+            localCart = cart.items.map(it => ({...it, price: it.unitPrice}));
+        } else { loadLocalCart(); }
         updateCartBadge();
         setupRealtimeListeners();
     }
@@ -112,7 +137,7 @@ const CustomerApp = (() => {
     }
 
     // Thêm món vào giỏ
-    function addToCart(product, quantity = 1, note = '', selectedToppings = []) {
+    async function addToCart(product, quantity = 1, note = '', selectedToppings = []) {
         const toppingIds = (selectedToppings || []).map(t => Number(t.id || t.productId)).filter(Boolean).sort((a, b) => a - b);
         const toppingSum = (selectedToppings || []).reduce((acc, t) => acc + (Number(t.price) || 0), 0);
         const unitPriceWithTopping = (Number(product.price) || 0) + toppingSum;
@@ -148,7 +173,7 @@ const CustomerApp = (() => {
             } else {
                 localCart.push(item);
             }
-            saveLocalCart();
+            try { await saveLocalCart(); } catch (_) { return; }
             updateCartBadge();
             MilkTeaApi.showToast(`Đã thêm ${item.productName} vào giỏ`, 'success');
         }
@@ -267,7 +292,7 @@ const CustomerApp = (() => {
                 await loadServerCart();
             }
         } else {
-            saveLocalCart();
+            try { await saveLocalCart(); } catch (_) { return; }
         }
 
         updateCartBadge();
@@ -326,7 +351,7 @@ const CustomerApp = (() => {
             }
 
             // Xóa giỏ hàng chỉ khi tạo đơn thành công
-            clearLocalCart();
+            await clearLocalCart();
             serverCart = [];
             updateCartBadge();
 

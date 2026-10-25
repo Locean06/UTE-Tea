@@ -26,7 +26,7 @@
     <link rel="stylesheet" th:href="@{/css/ute-theme.css}">
     <link rel="stylesheet" th:href="@{/css/ute-olive.css}">
 </head>
-<body>
+<body th:attr="data-account-id=${#authorization.expression('isAuthenticated()') ? #authentication.principal.accountId : ''}">
 
     <div class="ute-topbar" sec:authorize="!hasAnyRole('ADMIN','CASHIER','KITCHEN','CHEF')">
         <span><i class="bi bi-stars me-1"></i> UTE TEA • TINH VỊ TRÀ, CHẠM VỊ THANH XUÂN</span>

@@ -604,7 +604,7 @@
                     const toppingText = toppings.length
                         ? `<div class="small text-muted mb-1">
                             ${toppings.map(t => `
-                                <div>+ ${t.name} (${MilkTeaApi.formatVND(t.price)})</div>
+                                <div>+ ${MilkTeaApi.escapeHtml(t.name)} (${MilkTeaApi.formatVND(t.price)})</div>
                             `).join('')}
                         </div>`
                         : '';
@@ -618,13 +618,13 @@
                     html += `
                         <div class="d-flex align-items-center justify-content-between py-3 ${idx > 0 ? 'border-top' : ''} ${playEntrance ? 'cart-stagger-slide' : ''}" ${playEntrance ? `style="--cart-item-index: ${Math.min(idx, 12)}"` : ''}>
                             <div class="flex-grow-1 me-3">
-                                <h6 class="fw-bold mb-1">${it.productName}</h6>
+                                <h6 class="fw-bold mb-1">${MilkTeaApi.escapeHtml(it.productName)}</h6>
                                 <div class="d-flex align-items-center gap-2 mb-1">
-                                    <span class="badge bg-light text-dark border small">Size ${it.size}</span>
+                                    <span class="badge bg-light text-dark border small">Size ${MilkTeaApi.escapeHtml(it.size)}</span>
                                     <span class="text-muted small">${MilkTeaApi.formatVND(unitPriceWithTopping)} / ly</span>
                                 </div>
                                 ${toppingText}
-                                ${it.note ? `<div class="small text-muted fst-italic"><i class="bi bi-chat-left-dots me-1"></i>${it.note}</div>` : ''}
+                                ${it.note ? `<div class="small text-muted fst-italic"><i class="bi bi-chat-left-dots me-1"></i>${MilkTeaApi.escapeHtml(it.note)}</div>` : ''}
                             </div>
 
                             <div class="d-flex align-items-center gap-2">

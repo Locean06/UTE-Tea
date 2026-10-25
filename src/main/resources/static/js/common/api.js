@@ -120,6 +120,7 @@ const MilkTeaApi = (() => {
     }
 
     return {
+        escapeHtml: value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])),
         get: (url, headers) => request(url, { method: 'GET', headers }),
         post: (url, body, headers) => request(url, { method: 'POST', body, headers }),
         put: (url, body, headers) => request(url, { method: 'PUT', body, headers }),

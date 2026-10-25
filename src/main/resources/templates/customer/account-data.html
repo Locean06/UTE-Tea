@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main :: html(~{::content}, ~{::scripts})}">
+<body>
+<main th:fragment="content" class="container py-4">
+ <section class="ute-page-banner"><div><h1>Sổ địa chỉ và sở thích</h1><p>Quản lý địa chỉ nhận hàng, món yêu thích và những món bạn đã xem.</p></div></section>
+ <div id="customerDataMessage" role="status" class="alert d-none"></div>
+ <div class="row g-4">
+  <section class="col-12 col-lg-6"><div class="card p-3 p-sm-4 h-100">
+   <h2 class="h5">Địa chỉ nhận hàng</h2><div id="addressList"></div>
+   <form id="addressForm" class="mt-3">
+    <input type="hidden" name="id">
+    <label class="form-label" for="recipient">Người nhận</label><input id="recipient" name="recipient" class="form-control mb-2" required maxlength="120" autocomplete="name">
+    <label class="form-label" for="addressPhone">Điện thoại</label><input id="addressPhone" name="phone" class="form-control mb-2" type="tel" required minlength="8" maxlength="20" autocomplete="tel">
+    <label class="form-label" for="addressLine">Địa chỉ đầy đủ</label><textarea id="addressLine" name="addressLine" class="form-control mb-2" required maxlength="500" autocomplete="street-address"></textarea>
+    <label class="d-flex gap-2 mb-3"><input type="checkbox" name="defaultAddress"> Địa chỉ mặc định</label>
+    <button class="btn btn-primary-custom" type="submit">Lưu địa chỉ</button><button class="btn btn-outline-secondary ms-2" type="reset">Nhập mới</button>
+   </form>
+  </div></section>
+  <section class="col-12 col-lg-6"><div class="card p-3 p-sm-4 mb-4"><h2 class="h5">Món yêu thích</h2><div id="favoriteList"></div></div>
+   <div class="card p-3 p-sm-4"><h2 class="h5">Đã xem gần đây</h2><div id="viewedList"></div></div>
+  </section>
+ </div>
+</main>
+<th:block th:fragment="scripts"><script th:src="@{/js/customer/account-data.js}"></script></th:block>
+</body></html>
