@@ -11,7 +11,7 @@
     <div th:fragment="content" class="container-fluid py-4 px-lg-4 admin-settings-page">
         <style>
             .admin-settings-page {
-                --settings-primary: #565c45;
+                --settings-primary: var(--primary-color, #565c45);
                 --settings-primary-hover: #3e4837;
                 --settings-primary-light: #f0f0e8;
                 --settings-secondary: #717763;
@@ -33,8 +33,6 @@
             .admin-settings-page *::before,
             .admin-settings-page *::after {
                 box-sizing: border-box;
-                animation: none !important;
-                transition: none !important;
             }
 
             .admin-settings-page .admin-sidebar {
@@ -187,7 +185,7 @@
             }
 
             .admin-settings-page .form-control::placeholder {
-                color: #A58A74;
+                color: #a1aa9e;
                 font-weight: 400;
             }
 
@@ -291,14 +289,19 @@
                 min-width: 0;
             }
 
-            .admin-settings-page .settings-logo-upload .input-group {
-                flex-wrap: nowrap;
+            .admin-settings-page .settings-logo-upload-row {
+                display: flex;
+                align-items: stretch;
+                gap: 12px;
+                width: 100%;
             }
 
             .admin-settings-page #shopLogoInput {
                 min-width: 0;
-                padding: 7px 9px;
-                border-radius: 12px 0 0 12px !important;
+                width: 100%;
+                flex: 1 1 auto;
+                padding: 10px 12px;
+                border-radius: 12px !important;
             }
 
             .admin-settings-page #shopLogoInput::file-selector-button {
@@ -306,10 +309,21 @@
                 color: var(--settings-primary-hover);
                 border: none;
                 border-radius: 8px;
-                padding: 7px 12px;
+                padding: 8px 12px;
                 margin-right: 12px;
                 font-weight: 600;
                 cursor: pointer;
+            }
+
+            .admin-settings-page .settings-logo-upload-btn {
+                min-width: 138px;
+                height: auto;
+                border-radius: 12px !important;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                white-space: nowrap;
+                flex-shrink: 0;
             }
 
             .admin-settings-page .btn {
@@ -528,8 +542,8 @@
                     align-items: flex-start !important;
                 }
 
-                .admin-settings-page .settings-logo-upload .input-group {
-                    flex-wrap: wrap;
+                .admin-settings-page .settings-logo-upload-row {
+                    flex-direction: column;
                     gap: 8px;
                 }
 
@@ -538,8 +552,9 @@
                     border-radius: 12px !important;
                 }
 
-                .admin-settings-page #btnUploadLogo {
+                .admin-settings-page .settings-logo-upload-btn {
                     width: 100%;
+                    min-width: 100%;
                     border-radius: 12px !important;
                 }
 
@@ -671,14 +686,14 @@
                                             </div>
 
                                             <div class="flex-grow-1 settings-logo-upload">
-                                                <div class="input-group">
+                                                <div class="settings-logo-upload-row">
                                                     <input type="file"
                                                            id="shopLogoInput"
                                                            class="form-control"
                                                            accept="image/jpeg,image/png,image/webp">
 
                                                     <button type="button"
-                                                            class="btn btn-primary"
+                                                            class="btn btn-primary settings-logo-upload-btn"
                                                             id="btnUploadLogo"
                                                             onclick="AdminApp.uploadLogo(document.getElementById('shopLogoInput'))">
                                                         <span class="spinner-border spinner-border-sm me-1 d-none"

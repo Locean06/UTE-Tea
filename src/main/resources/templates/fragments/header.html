@@ -34,14 +34,14 @@
 
             .navbar-milktea .navbar-brand {
                 gap: 8px !important;
-                margin-left: 64px;
+                margin-left: 0;
                 margin-right: 12px;
                 min-width: 0;
                 text-decoration: none;
             }
 
             .navbar-milktea .navbar-brand.admin-navbar-brand {
-                margin-left: 30px;
+                margin-left: 0;
                 gap: 16px !important;
             }
 
@@ -479,11 +479,7 @@
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarContent">
-                    <!-- The staff switcher inside POS/KDS is the only workplace navigation. -->
-                    <ul sec:authorize="hasAnyRole('CASHIER','KITCHEN','ADMIN')"
-                        class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
-                        <li class="nav-item"><span class="nav-link ute-role-caption"><i class="bi bi-shop me-1"></i> Không gian nhân viên UTE Tea</span></li>
-                    </ul>
+                    <!-- Đã bỏ nhãn "Không gian nhân viên UTE Tea" để header gọn hơn. -->
 
                     <ul sec:authorize="!hasAnyRole('ADMIN', 'CASHIER', 'KITCHEN', 'CHEF')"
                         class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3 gap-1">
@@ -526,30 +522,29 @@
                             </button>
 
                             <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 header-account-dropdown">
-                                <li>
-                                    <h6 class="dropdown-header">Tài khoản</h6>
+                                <!-- Dropdown chỉ giữ tác vụ cá nhân; màn hình quản trị/POS/bếp đã có menu riêng. -->
+                                <li><h6 class="dropdown-header">Tài khoản</h6></li>
+                                <li sec:authorize="hasRole('CUSTOMER') and !hasAnyRole('ADMIN','CASHIER','KITCHEN','CHEF')">
+                                    <a class="dropdown-item" th:href="@{/api/v1/account/preferences}">
+                                        <i class="bi bi-heart me-2"></i> Địa chỉ &amp; yêu thích
+                                    </a>
                                 </li>
-                                <li><a class="dropdown-item" th:href="@{/api/v1/account/preferences}"><i class="bi bi-heart me-2"></i> Địa chỉ và yêu thích</a></li>
-                                <li><a class="dropdown-item" th:href="@{/marketplace}">Mua hàng giao tận nơi</a></li>
-                                <li><a class="dropdown-item" th:href="@{/merchant}">Kênh cửa hàng / giao hàng</a></li>
-                                <li class="ute-mobile-orders" sec:authorize="hasRole('CUSTOMER')">
+                                <!-- Desktop đã có mục Đơn hàng; mobile giữ đường dẫn nhanh trong dropdown. -->
+                                <li class="ute-mobile-orders"
+                                    sec:authorize="hasRole('CUSTOMER') and !hasAnyRole('ADMIN','CASHIER','KITCHEN','CHEF')">
                                     <a class="dropdown-item" th:href="@{/orders}">
                                         <i class="bi bi-receipt me-2"></i> Đơn hàng
                                     </a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item" th:href="@{/profile}">
-                                        <i class="bi bi-person-lines-fill me-2 text-primary"></i>
-                                        Hồ sơ cá nhân
+                                        <i class="bi bi-person-lines-fill me-2 text-primary"></i> Hồ sơ cá nhân
                                     </a>
                                 </li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
+                                <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <button class="dropdown-item text-danger" onclick="logoutAccount()">
-                                        <i class="bi bi-box-arrow-right me-1"></i>
-                                        Đăng xuất
+                                        <i class="bi bi-box-arrow-right me-2"></i> Đăng xuất
                                     </button>
                                 </li>
                             </ul>

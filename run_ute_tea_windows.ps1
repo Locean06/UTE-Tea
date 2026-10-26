@@ -12,6 +12,32 @@ param(
 $ErrorActionPreference = 'Stop'
 $projectDir = (Resolve-Path -LiteralPath $PSScriptRoot).Path
 
+# Load local .env into the current PowerShell process before building and launching
+# Spring Boot. This includes Cloudinary, email and payment configuration.
+# Never print secrets, and never commit the .env file to Git.
+$envFile = Join-Path $projectDir '.env'
+if (Test-Path -LiteralPath $envFile) {
+    foreach ($rawLine in (Get-Content -LiteralPath $envFile -Encoding UTF8)) {
+        $line = $rawLine.Trim()
+        if ([string]::IsNullOrWhiteSpace($line) -or $line.StartsWith('#')) { continue }
+        $separator = $line.IndexOf('=')
+        if ($separator -le 0) { continue }
+        $name = $line.Substring(0, $separator).Trim()
+        if ($name -notmatch '^[A-Za-z_][A-Za-z0-9_]*$') { continue }
+        $value = $line.Substring($separator + 1).Trim()
+        if ($value.Length -ge 2 -and (
+                ($value.StartsWith('"') -and $value.EndsWith('"')) -or
+                ($value.StartsWith("'") -and $value.EndsWith("'"))
+        )) {
+            $value = $value.Substring(1, $value.Length - 2)
+        }
+        [Environment]::SetEnvironmentVariable($name, $value, 'Process')
+    }
+    Write-Host 'Da nap bien moi truong tu file .env (khong hien thi gia tri bi mat).' -ForegroundColor Cyan
+} else {
+    Write-Warning 'Khong thay file .env o thu muc goc; can thiet lap bien moi truong truoc khi chay.'
+}
+
 function Fail([string]$message) {
     Write-Host "UTE Tea - LOI: $message" -ForegroundColor Red
     exit 1

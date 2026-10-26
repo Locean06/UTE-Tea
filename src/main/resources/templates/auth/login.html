@@ -8,135 +8,384 @@
 <body>
     <div th:fragment="content" class="container py-5 ute-auth-page">
         <style>
-            .ute-auth-page .card {
-                border-radius: 28px !important;
-                overflow: hidden;
+
+            /* UTE Tea · refined editorial authentication, scoped to auth page only */
+            .ute-auth-page {
+                --ute-ink: #313d30;
+                --ute-olive: #4f6145;
+                --ute-sage: #e8ecdf;
+                --ute-line: #e4e8db;
+                --ute-muted: #7a8475;
+                max-width: 1230px !important;
+                padding-top: 34px !important;
+                padding-bottom: 52px !important;
+                font-family: 'Be Vietnam Pro', sans-serif;
             }
-            .ute-auth-page .card-body {
-                background: linear-gradient(180deg, #ffffff, #fcfbf6);
-            }
-            .ute-auth-page .nav-pills {
-                background: #eef2e4 !important;
-            }
-            .ute-auth-page .nav-pills .nav-link {
-                color: #556047;
-            }
-            .ute-auth-page .nav-pills .nav-link.active {
-                background: linear-gradient(135deg, #556047, #6b7553);
-                color: #fff;
-                box-shadow: 0 8px 20px rgba(85, 96, 71, .18);
-            }
-            .ute-auth-page .input-group-text {
-                background: #f6f7ef !important;
-                border: 1px solid #d9ddcb !important;
-                color: #6b7553 !important;
-                border-radius: 16px 0 0 16px !important;
-                min-width: 48px;
-                justify-content: center;
-            }
-            .ute-auth-page .form-control {
-                border: 1px solid #d9ddcb !important;
-                border-left: 0 !important;
-                background: #fff !important;
-                color: #32402f !important;
-                min-height: 48px;
-                border-radius: 0 16px 16px 0 !important;
-                box-shadow: none !important;
-            }
-            .ute-auth-page .form-control:focus {
-                border-color: #8f9b72 !important;
-                box-shadow: 0 0 0 4px rgba(143, 155, 114, .14) !important;
-            }
-            .ute-auth-page .form-label {
-                color: #44513b;
-                margin-bottom: .45rem;
-            }
-            .ute-auth-page .btn-primary-custom,
-            .ute-auth-page .btn-success {
-                min-height: 48px;
-                font-weight: 700;
-                border-radius: 16px !important;
-            }
-            .ute-auth-page .ute-demo-grid {
-                display: grid;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 12px;
-            }
-            .ute-auth-page .ute-demo-account {
-                border: 1px solid #d8decb;
-                border-radius: 18px !important;
-                background: linear-gradient(180deg, #ffffff, #f8faf3);
-                color: #344131;
-                min-height: 90px;
-                text-align: left;
-                padding: 14px 16px;
+            .ute-auth-page .ute-auth-shell { --bs-gutter-x: 22px; --bs-gutter-y: 22px; }
+            .ute-auth-page .ute-auth-promo {
+                min-height: 0;
+                height: 100%;
+                padding: 34px 36px;
                 display: flex;
                 flex-direction: column;
-                gap: 4px;
-                transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+                justify-content: center;
+                gap: 24px;
+                position: relative;
+                overflow: hidden;
+                isolation: isolate;
+                border-radius: 28px !important;
+                background: linear-gradient(155deg,#344738 0%,#4b6047 62%,#566c51 100%) !important;
+                border: 1px solid #506249;
+                box-shadow: 0 22px 60px rgba(48,63,44,.12);
             }
-            .ute-auth-page .ute-demo-account:hover {
-                transform: translateY(-2px);
-                border-color: #aab890;
-                box-shadow: 0 10px 24px rgba(86, 92, 69, .10);
+            .ute-auth-page .ute-auth-promo::before {
+                content: '';
+                position: absolute;
+                width: 270px;
+                height: 270px;
+                top: -145px;
+                right: -130px;
+                border: 50px solid rgba(232,216,178,.10);
+                border-radius: 50%;
+                pointer-events: none;
             }
-            .ute-auth-page .ute-demo-account small {
-                color: #6b7553;
+            .ute-auth-page .ute-auth-promo::after {
+                content: '';
+                position: absolute;
+                width: 220px;
+                height: 220px;
+                bottom: -150px;
+                left: -100px;
+                border: 1px solid rgba(244,241,222,.14);
+                border-radius: 50%;
+                pointer-events: none;
             }
-            .ute-auth-page .ute-demo-badge {
+            .ute-auth-page .ute-promo-top {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                position: relative;
+                z-index: 1;
+            }
+            .ute-auth-page .ute-promo-eyebrow {
                 display: inline-flex;
                 align-items: center;
-                gap: 6px;
-                width: fit-content;
-                padding: 5px 10px;
-                border-radius: 999px;
-                font-size: 11px;
+                gap: 9px;
+                color: #e9dfbd;
+                text-transform: uppercase;
+                letter-spacing: .19em;
+                font-size: 10.5px;
                 font-weight: 700;
-                letter-spacing: .04em;
-                background: #edf2df;
-                color: #556047;
+            }
+            .ute-auth-page .ute-promo-index {
+                font-family: 'Playfair Display', serif;
+                color: rgba(244,240,218,.50);
+                font-size: 12px;
+                letter-spacing: .08em;
+            }
+            .ute-auth-page .ute-promo-copy { position: relative; z-index: 1; }
+            .ute-auth-page .ute-promo-copy h1 {
+                font-family: 'Playfair Display', Georgia, serif !important;
+                color: #fffaf0 !important;
+                max-width: 470px;
+                font-weight: 500 !important;
+                font-size: clamp(2.25rem, 3.0vw, 3.35rem);
+                line-height: 1.19;
+                letter-spacing: -.035em !important;
+                margin: 0 0 18px;
+            }
+            .ute-auth-page .ute-promo-copy h1 em {
+                color: #e9d8ac;
+                font-style: normal;
+            }
+            .ute-auth-page .ute-promo-copy p {
+                font-size: .86rem;
+                color: #e7ecdf !important;
+                line-height: 1.85;
+                max-width: 425px;
+                margin: 0;
+            }
+            .ute-auth-page .ute-auth-photo-frame {
+                position: relative;
+                z-index: 1;
+                width: 100%;
+                margin: 4px 0 0;
+                padding: 7px;
+                border: 1px solid rgba(255,255,255,.22);
+                border-radius: 22px;
+                background: rgba(255,255,255,.11);
+                overflow: hidden;
+                box-shadow: 0 18px 32px rgba(21,34,20,.18);
+            }
+            .ute-auth-page .ute-auth-photo-frame img {
+                display: block;
+                width: 100% !important;
+                height: clamp(250px, 23vw, 305px) !important;
+                max-height: none !important;
+                border-radius: 15px !important;
+                object-fit: cover !important;
+                object-position: center 53%;
+                filter: saturate(.94) contrast(1.02);
+            }
+            .ute-auth-page .ute-auth-card {
+                border: 1px solid #e5e8dc !important;
+                border-radius: 28px !important;
+                overflow: hidden;
+                background: #fffdfa;
+                box-shadow: 0 20px 60px rgba(46,60,39,.09) !important;
+                min-height: 0;
+                height: 100%;
+            }
+            .ute-auth-page .ute-auth-card .card-header {
+                background: transparent !important;
+                padding: 27px 39px 10px !important;
+            }
+            .ute-auth-page .ute-auth-brand-row { display: flex; justify-content: center; align-items: center; flex-direction: column; }
+            .ute-auth-page .ute-auth-logo {
+                height: 61px;
+                width: 61px;
+                display: block;
+                margin: 0 auto 4px;
+                object-fit: contain;
+            }
+            .ute-auth-page .ute-login-wordmark {
+                color: #3c4d37;
+                font-family: 'Playfair Display', Georgia, serif;
+                letter-spacing: .2em;
+                font-size: .91rem;
+                font-weight: 700;
+            }
+            .ute-auth-page .ute-auth-small-label {
+                margin-top: 16px;
+                text-transform: uppercase;
+                letter-spacing: .16em;
+                font-size: .62rem;
+                color: #a19a77;
+                font-weight: 700;
+            }
+            .ute-auth-page .ute-auth-card .card-header h2 {
+                font-family: 'Playfair Display', Georgia, serif;
+                font-size: clamp(1.55rem,2vw,2rem);
+                font-weight: 600;
+                letter-spacing: -.035em;
+                color: #344530;
+                margin: 8px 0 6px;
+            }
+            .ute-auth-page .ute-auth-card .card-header p {
+                color: #788374 !important;
+                font-size: .77rem;
+                line-height: 1.7;
+            }
+            .ute-auth-page .ute-auth-switch { padding: 12px 39px 0 !important; }
+            .ute-auth-page #authTab {
+                display: grid;
+                grid-template-columns: repeat(2,minmax(0,1fr));
+                gap: 4px;
+                background: #edf0e7 !important;
+                border: 1px solid #e6e9dd;
+                padding: 5px !important;
+                border-radius: 14px !important;
+            }
+            .ute-auth-page #authTab .nav-item { min-width: 0; }
+            .ute-auth-page #authTab .nav-link {
+                width: 100%;
+                border-radius: 10px !important;
+                padding: 12px 5px !important;
+                background: transparent;
+                box-shadow: none;
+                color: #697365;
+                font-size: .82rem;
+                font-weight: 700;
+                transition: background .2s ease, color .2s ease, box-shadow .2s ease;
+            }
+            .ute-auth-page #authTab .nav-link.active {
+                background: #fffdf7 !important;
+                color: #394d37 !important;
+                box-shadow: 0 3px 11px rgba(45,57,39,.09) !important;
+            }
+            .ute-auth-page #authTab .nav-link:focus-visible { outline: 3px solid #a5b491; outline-offset: 1px; }
+            .ute-auth-page .ute-auth-card .card-body {
+                background: transparent !important;
+                padding: 23px 39px 29px !important;
+            }
+            .ute-auth-page .form-label { color: #465744; font-size: .78rem; font-weight: 700; margin-bottom: 9px !important; }
+            .ute-auth-page .input-group { border-radius: 14px; transition: box-shadow .2s ease; }
+            .ute-auth-page .input-group:focus-within { box-shadow: 0 0 0 4px rgba(115,143,105,.14); }
+            .ute-auth-page .input-group .input-group-text {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 50px;
+                color: #7d8e75 !important;
+                background: #f7f8f1 !important;
+                border: 1px solid #dbe2d3 !important;
+                border-right: 0 !important;
+                border-radius: 14px 0 0 14px !important;
+            }
+            .ute-auth-page .form-control {
+                min-height: 51px;
+                background: #fff !important;
+                color: #344a34 !important;
+                border: 1px solid #dbe2d3 !important;
+                box-shadow: none !important;
+                font-size: .85rem;
+            }
+            .ute-auth-page .input-group > .form-control {
+                border-left: 0 !important;
+                border-radius: 0 14px 14px 0 !important;
+            }
+            .ute-auth-page .input-group > .form-control:has(+ .ute-password-toggle) { border-radius: 0 !important; border-right: 0 !important; }
+            .ute-auth-page .form-control:focus { outline: 0; border-color: #9aaf8d !important; box-shadow: none !important; }
+            .ute-auth-page .input-group:focus-within .input-group-text,
+            .ute-auth-page .input-group:focus-within .ute-password-toggle { border-color: #9aaf8d !important; }
+            .ute-auth-page .form-control::placeholder { color: #a1aa9e; opacity: 1; }
+            .ute-auth-page .ute-password-toggle {
+                display: inline-flex; align-items: center; justify-content: center;
+                width: 47px; color: #71826d; background: #fff;
+                border: 1px solid #dbe2d3; border-left: 0;
+                border-radius: 0 14px 14px 0;
+                cursor: pointer;
+            }
+            .ute-auth-page .ute-password-toggle:hover { color: #354f35; background: #f6f8f0; }
+            .ute-auth-page .ute-password-toggle:focus-visible { outline: 3px solid #a5b491; outline-offset: 2px; }
+            .ute-auth-page .ute-auth-card .btn-primary-custom,
+            .ute-auth-page .ute-auth-card .btn-success {
+                min-height: 53px;
+                border-radius: 14px !important;
+                background: #44684f !important;
+                border-color: #44684f !important;
+                box-shadow: 0 10px 21px rgba(63,100,69,.16) !important;
+                font-size: .88rem;
+                font-weight: 700;
+            }
+            .ute-auth-page .ute-auth-card .btn-primary-custom:hover,
+            .ute-auth-page .ute-auth-card .btn-success:hover {
+                background: #31583d !important; border-color: #31583d !important;
+                transform: translateY(-1px);
+            }
+            .ute-auth-page .ute-auth-card .btn:disabled { cursor: wait; opacity: .75; }
+            .ute-auth-page .ute-auth-card a.text-primary { color: #4d7657 !important; }
+            .ute-auth-page .ute-demo-section {
+                border-top: 1px solid #e8ebdf;
+                margin-top: 24px;
+                padding-top: 19px;
+            }
+            .ute-auth-page .ute-demo-heading { display: flex; justify-content: flex-start; align-items: center; gap: 10px; margin-bottom: 13px; }
+            .ute-auth-page .ute-demo-heading strong { font-size: .78rem; font-weight: 700; color: #52614c; }
+            .ute-auth-page .ute-demo-heading span { display: inline-flex; align-items: center; gap: 5px; font-size: .64rem; color: #a18f62; }
+            .ute-auth-page .ute-demo-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+            .ute-auth-page .ute-demo-account {
+                display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+                text-align: left; min-width: 0; min-height: 92px; gap: 5px;
+                background: linear-gradient(145deg,#ffffff,#f8faf5) !important;
+                border: 1px solid #e0e7d7 !important;
+                border-radius: 14px !important;
+                padding: 11px 14px;
+                color: #394934 !important;
+                box-shadow: none;
+                transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+            }
+            .ute-auth-page .ute-demo-account:hover,
+            .ute-auth-page .ute-demo-account:focus-visible {
+                transform: translateY(-2px);
+                border-color: #a6b997 !important;
+                box-shadow: 0 9px 18px rgba(73,91,64,.09);
+            }
+            .ute-auth-page .ute-demo-account strong { font-size: .78rem; font-weight: 700; line-height: 1.3; }
+            .ute-auth-page .ute-demo-account small { color: #8a9484; font-size: .68rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+            .ute-auth-page .ute-demo-badge {
+                display: inline-flex; align-items: center; gap: 5px;
+                background: #ebf0e5;
+                color: #536748;
+                border-radius: 99px;
+                padding: 4px 8px;
+                font-weight: 800;
+                font-size: .57rem;
+                letter-spacing: .05em;
+            }
+            .ute-auth-page .ute-auth-bottom-note { text-align: center; color: #929b90; font-size: .68rem; margin-top: 17px; }
+            .ute-auth-page .ute-auth-bottom-note i { color: #6a8c6f; margin-right: 5px; }
+            .ute-auth-page #registerTabContent .form-text { font-size: .72rem; line-height: 1.6; }
+            .ute-auth-page #registerTabContent .form-control,
+            .ute-auth-page #forgotPasswordModal .form-control { min-height: 50px; }
+            .ute-auth-page .modal-content { border: 1px solid #e4e9db !important; border-radius: 22px !important; }
+            .ute-auth-page #otpCodeInput,
+            .ute-auth-page #resetOtpInput { border-radius: 12px !important; letter-spacing: 8px; border-left: 1px solid #dbe2d3 !important; }
+            @media (max-width: 1199.98px) {
+                .ute-auth-page .ute-auth-promo { padding: 28px 26px; min-height: 0; gap: 20px; }
+                .ute-auth-page .ute-auth-promo .ute-promo-copy h1 { font-size: clamp(2rem,3vw,2.8rem); }
+                .ute-auth-page .ute-auth-card .card-body { padding: 20px 28px 28px !important; }
+                .ute-auth-page .ute-auth-card .card-header { padding: 25px 28px 9px !important; }
+                .ute-auth-page .ute-auth-switch { padding: 10px 28px 0 !important; }
+            }
+            @media (max-width: 991.98px) {
+                .ute-auth-page { max-width: 650px !important; padding-top: 21px !important; }
+                .ute-auth-page .ute-auth-card { min-height: unset; }
             }
             @media (max-width: 575.98px) {
-                .ute-auth-page .ute-demo-grid {
-                    grid-template-columns: 1fr;
-                }
+                .ute-auth-page { padding: 10px 12px 26px !important; }
+                .ute-auth-page .ute-auth-shell { --bs-gutter-x: 0; --bs-gutter-y: 0; }
+                .ute-auth-page .ute-auth-card { border-radius: 21px !important; box-shadow: 0 10px 29px rgba(48,64,43,.07) !important; }
+                .ute-auth-page .ute-auth-card .card-header { padding: 23px 20px 9px !important; }
+                .ute-auth-page .ute-auth-switch { padding: 11px 20px 0 !important; }
+                .ute-auth-page .ute-auth-card .card-body { padding: 21px 20px 25px !important; }
+                .ute-auth-page .ute-auth-card .card-header h2 { font-size: 1.7rem; }
+                .ute-auth-page .ute-demo-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+                .ute-auth-page .ute-demo-account { padding: 11px 9px; }
+                .ute-auth-page .ute-demo-account small { font-size: .60rem; }
+                .ute-auth-page .ute-demo-heading { flex-wrap: wrap; }
+            }
+            @media (max-width: 360px) {
+                .ute-auth-page .ute-demo-grid { grid-template-columns: 1fr; }
+                .ute-auth-page .ute-demo-account { min-height: 76px; }
+            }
+            @media (prefers-reduced-motion: reduce) {
+                .ute-auth-page .ute-demo-account,
+                .ute-auth-page .ute-auth-card .btn,
+                .ute-auth-page #authTab .nav-link { transition: none !important; }
             }
         </style>
-        <div class="row justify-content-center g-4 align-items-stretch">
+        <div class="row justify-content-center g-4 align-items-stretch ute-auth-shell">
             <div class="col-lg-6 d-none d-lg-flex">
-              <aside class="ute-auth-promo w-100" aria-label="Giới thiệu UTE Tea">
-                <div><div class="ute-eyebrow"><i class="bi bi-leaf"></i> UTE TEA EXPERIENCE</div>
-                  <h1>Tinh vị trà,<br><span>chạm vị thanh xuân.</span></h1>
-                  <p>Một khoảng lặng dịu dàng giữa nhịp sống. Chào mừng bạn trở lại với UTE Tea.</p>
-                </div>
-                <img th:src="@{/images/ute-tea-login-hero.webp}" src="/images/ute-tea-login-hero.webp" alt="Thức uống UTE Tea" width="480" height="350">
-                <div class="ute-auth-perks"><span><i class="bi bi-shield-check me-1"></i>Bảo mật tài khoản</span><span><i class="bi bi-lightning-charge me-1"></i>Đặt món nhanh</span><span><i class="bi bi-heart me-1"></i>Trải nghiệm đồng nhất</span></div>
-              </aside>
+                <aside class="ute-auth-promo w-100" aria-label="Giới thiệu UTE Tea">
+                    <div class="ute-promo-copy">
+                        <h1>Tinh vị trà,<br><em>chạm vị thanh xuân.</em></h1>
+                        <p>Gặp nhau bên một ly trà ngon. Thưởng thức từng khoảnh khắc dịu dàng cùng UTE Tea.</p>
+                    </div>
+                    <figure class="ute-auth-photo-frame">
+                        <img th:src="@{/images/ute-tea-login-editorial.webp}"
+                             src="/images/ute-tea-login-editorial.webp"
+                             width="960" height="750"
+                             fetchpriority="high"
+                             alt="Trà xanh, trà sữa trân châu và trà trái cây UTE Tea">
+                    </figure>
+                </aside>
             </div>
 
-            <div class="col-md-8 col-lg-5">
-                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="col-12 col-md-10 col-lg-6">
+                <div class="card ute-auth-card border-0 shadow-lg rounded-4 overflow-hidden">
                     <!-- Card Header -->
                     <div class="card-header bg-white text-center pt-4 pb-2 border-0">
-                        <div class="mb-2">
-                            <img th:src="@{/images/ute-tea-olive-mark.png}" src="/images/ute-tea-olive-mark.png" alt="Biểu tượng lá trà UTE Tea" class="ute-auth-logo" width="72" height="72">
+                        <div class="ute-auth-brand-row">
+                            <img th:src="@{/images/ute-tea-olive-mark.png}" src="/images/ute-tea-olive-mark.png" alt="Biểu tượng lá trà UTE Tea" class="ute-auth-logo" width="61" height="61">
                             <span class="ute-login-wordmark">UTE TEA</span>
                         </div>
-                        <h4 class="brand-font mb-1">Chào mừng trở lại!</h4>
-                        <p class="text-muted small mb-0">Đăng nhập hoặc tạo tài khoản để trải nghiệm UTE Tea</p>
+                        <div class="ute-auth-small-label">Chào mừng đến với UTE Tea</div>
+                        <h2>Rất vui khi gặp lại bạn!</h2>
+                        <p class="text-muted small mb-0">Đăng nhập hoặc tạo tài khoản để tận hưởng vị trà yêu thích.</p>
                     </div>
 
                     <!-- Nav Tabs: Đăng Nhập & Đăng Ký -->
-                    <div class="px-4 pt-2">
+                    <div class="px-4 pt-2 ute-auth-switch">
                         <ul class="nav nav-pills nav-fill bg-light p-1 rounded-3" id="authTab" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active rounded-3 py-2 fw-semibold" id="login-tab"
+                                <button class="nav-link active rounded-3 py-2 fw-semibold" id="login-tab" aria-controls="loginTabContent" aria-selected="true"
                                     data-bs-toggle="tab" data-bs-target="#loginTabContent" type="button" role="tab">
                                     <i class="bi bi-box-arrow-in-right me-1"></i> Đăng Nhập
                                 </button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link rounded-3 py-2 fw-semibold" id="register-tab"
+                                <button class="nav-link rounded-3 py-2 fw-semibold" id="register-tab" aria-controls="registerTabContent" aria-selected="false"
                                     data-bs-toggle="tab" data-bs-target="#registerTabContent" type="button" role="tab">
                                     <i class="bi bi-person-plus me-1"></i> Đăng Ký
                                 </button>
@@ -151,14 +400,14 @@
                         <!-- Tab Content -->
                         <div class="tab-content" id="authTabContent">
                             <!-- TAB 1: ĐĂNG NHẬP -->
-                            <div class="tab-pane fade show active" id="loginTabContent" role="tabpanel">
+                            <div class="tab-pane fade show active" id="loginTabContent" role="tabpanel" aria-labelledby="login-tab">
                                 <form id="loginForm" onsubmit="handleLogin(event)">
                                     <div class="mb-3">
                                         <label for="email" class="form-label small fw-semibold">Email tài khoản</label>
                                         <div class="input-group">
                                             <span class="input-group-text bg-light border-end-0"><i
                                                     class="bi bi-envelope text-muted"></i></span>
-                                            <input type="email" class="form-control border-start-0" id="email" required
+                                            <input type="email" class="form-control border-start-0" id="email" autocomplete="username" required
                                                 placeholder="email@example.com">
                                         </div>
                                     </div>
@@ -178,6 +427,7 @@
                                                     class="bi bi-lock text-muted"></i></span>
                                             <input type="password" class="form-control border-start-0" id="password"
                                                 required placeholder="••••••••">
+                                            <button class="ute-password-toggle" type="button" data-toggle-password="password" aria-label="Hiện mật khẩu" aria-pressed="false"><i class="bi bi-eye" aria-hidden="true"></i></button>
                                         </div>
                                     </div>
 
@@ -185,13 +435,15 @@
                                         class="btn btn-primary-custom w-100 py-2 rounded-3 mt-3">
                                         <span class="spinner-border spinner-border-sm me-2 d-none"
                                             id="loginSpinner"></span>
-                                        Đăng Nhập
+                                        <i class="bi bi-arrow-right-circle me-2" aria-hidden="true"></i> Đăng nhập
                                     </button>
                                 </form>
 
                                 <!-- Tài Khoản Mẫu Nhanh -->
-                                <div class="mt-4 pt-3 border-top">
-                                    <p class="text-center text-muted small fw-semibold mb-3">Chọn nhanh tài khoản thử nghiệm:</p>
+                                <div class="ute-demo-section">
+                                    <div class="ute-demo-heading">
+                                        <strong><i class="bi bi-grid me-1" aria-hidden="true"></i> Truy cập nhanh</strong>
+                                    </div>
                                     <div class="ute-demo-grid">
                                         <button type="button" class="btn ute-demo-account" onclick="fillDemo('admin@milktea.vn', 'Password@123')">
                                             <span class="ute-demo-badge"><i class="bi bi-shield-lock-fill"></i> ADMIN</span>
@@ -214,11 +466,12 @@
                                             <small>customer@milktea.vn</small>
                                         </button>
                                     </div>
+                                    <p class="ute-auth-bottom-note mb-0"><i class="bi bi-shield-check" aria-hidden="true"></i> Thông tin tài khoản được bảo vệ an toàn</p>
                                 </div>
                             </div>
 
                             <!-- TAB 2: ĐĂNG KÝ -->
-                            <div class="tab-pane fade" id="registerTabContent" role="tabpanel">
+                            <div class="tab-pane fade" id="registerTabContent" role="tabpanel" aria-labelledby="register-tab">
                                 <!-- Bước A: Form nhập thông tin đăng ký -->
                                 <div id="registerFormContainer">
                                     <form id="registerForm" onsubmit="handleRegister(event)">
@@ -227,7 +480,7 @@
                                             <div class="input-group">
                                                 <span class="input-group-text bg-light border-end-0"><i
                                                         class="bi bi-person text-muted"></i></span>
-                                                <input type="text" class="form-control border-start-0" id="regFullName"
+                                                <input type="text" class="form-control border-start-0" id="regFullName" autocomplete="name"
                                                     required placeholder="Nguyễn Văn A">
                                             </div>
                                         </div>
@@ -237,7 +490,7 @@
                                             <div class="input-group">
                                                 <span class="input-group-text bg-light border-end-0"><i
                                                         class="bi bi-envelope text-muted"></i></span>
-                                                <input type="email" class="form-control border-start-0" id="regEmail"
+                                                <input type="email" class="form-control border-start-0" id="regEmail" autocomplete="email"
                                                     required placeholder="example@gmail.com">
                                             </div>
                                             <div class="form-text small text-muted">Hệ thống sẽ gửi mã OTP 6 số đến email này để kích hoạt.</div>
@@ -248,7 +501,7 @@
                                             <div class="input-group">
                                                 <span class="input-group-text bg-light border-end-0"><i
                                                         class="bi bi-telephone text-muted"></i></span>
-                                                <input type="tel" class="form-control border-start-0" id="regPhone"
+                                                <input type="tel" class="form-control border-start-0" id="regPhone" autocomplete="tel"
                                                     required pattern="[0-9]{10}" placeholder="0901234567">
                                             </div>
                                         </div>
@@ -258,8 +511,9 @@
                                             <div class="input-group">
                                                 <span class="input-group-text bg-light border-end-0"><i
                                                         class="bi bi-lock text-muted"></i></span>
-                                                <input type="password" class="form-control border-start-0" id="regPassword"
+                                                <input type="password" class="form-control border-start-0" id="regPassword" autocomplete="new-password"
                                                     required minlength="6" placeholder="Tối thiểu 6 ký tự">
+                                                <button class="ute-password-toggle" type="button" data-toggle-password="regPassword" aria-label="Hiện mật khẩu" aria-pressed="false"><i class="bi bi-eye" aria-hidden="true"></i></button>
                                             </div>
                                         </div>
 
@@ -269,13 +523,14 @@
                                                 <span class="input-group-text bg-light border-end-0"><i
                                                         class="bi bi-shield-check text-muted"></i></span>
                                                 <input type="password" class="form-control border-start-0"
-                                                    id="regConfirmPassword" required minlength="6"
+                                                    id="regConfirmPassword" autocomplete="new-password" required minlength="6"
                                                     placeholder="Nhập lại mật khẩu">
+                                                <button class="ute-password-toggle" type="button" data-toggle-password="regConfirmPassword" aria-label="Hiện mật khẩu" aria-pressed="false"><i class="bi bi-eye" aria-hidden="true"></i></button>
                                             </div>
                                         </div>
 
                                         <button type="submit" id="registerBtn"
-                                            class="btn btn-success w-100 py-2 rounded-3 mt-2">
+                                            class="btn btn-primary-custom w-100 py-2 rounded-3 mt-2">
                                             <span class="spinner-border spinner-border-sm me-2 d-none"
                                                 id="registerSpinner"></span>
                                             Đăng Ký & Nhận Mã Xác Thực
@@ -409,19 +664,21 @@
                                     <label for="resetNewPassword" class="form-label small fw-semibold">Mật khẩu mới</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock text-muted"></i></span>
-                                        <input type="password" class="form-control border-start-0" id="resetNewPassword" required minlength="6"
+                                        <input type="password" class="form-control border-start-0" id="resetNewPassword" autocomplete="new-password" required minlength="6"
                                             placeholder="Tối thiểu 6 ký tự">
+                                        <button class="ute-password-toggle" type="button" data-toggle-password="resetNewPassword" aria-label="Hiện mật khẩu" aria-pressed="false"><i class="bi bi-eye" aria-hidden="true"></i></button>
                                     </div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="resetConfirmNewPassword" class="form-label small fw-semibold">Xác nhận mật khẩu mới</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-light border-end-0"><i class="bi bi-shield-check text-muted"></i></span>
-                                        <input type="password" class="form-control border-start-0" id="resetConfirmNewPassword" required
+                                        <input type="password" class="form-control border-start-0" id="resetConfirmNewPassword" autocomplete="new-password" required
                                             minlength="6" placeholder="Nhập lại mật khẩu mới">
+                                        <button class="ute-password-toggle" type="button" data-toggle-password="resetConfirmNewPassword" aria-label="Hiện mật khẩu" aria-pressed="false"><i class="bi bi-eye" aria-hidden="true"></i></button>
                                     </div>
                                 </div>
-                                <button type="submit" id="btnConfirmReset" class="btn btn-success w-100 py-2 rounded-3">
+                                <button type="submit" id="btnConfirmReset" class="btn btn-primary-custom w-100 py-2 rounded-3">
                                     <span class="spinner-border spinner-border-sm me-2 d-none"
                                         id="confirmResetSpinner"></span>
                                     Đặt Lại Mật Khẩu &amp; Hoàn Tất
@@ -444,6 +701,21 @@
             let remainingCooldown = 0;
             let forgotResendTimer = null;
             let forgotRemainingCooldown = 0;
+
+            // Visibility control only: does not change password field IDs or submit handlers.
+            document.addEventListener('click', function (event) {
+                const btn = event.target.closest('[data-toggle-password]');
+                if (!btn) return;
+                const input = document.getElementById(btn.dataset.togglePassword);
+                if (!input) return;
+                const isVisible = input.type === 'password';
+                input.type = isVisible ? 'text' : 'password';
+                btn.setAttribute('aria-pressed', String(isVisible));
+                btn.setAttribute('aria-label', isVisible ? 'Ẩn mật khẩu' : 'Hiện mật khẩu');
+                const icon = btn.querySelector('i');
+                if (icon) icon.className = isVisible ? 'bi bi-eye-slash' : 'bi bi-eye';
+                input.focus({ preventScroll: true });
+            });
 
             function fillDemo(email, pass) {
                 document.getElementById('email').value = email;

@@ -21,7 +21,7 @@ public class MarketController {
  @GetMapping("/api/v1/public/market/catalog") public ApiResponse<CatalogPage> catalog(
   @RequestParam(required=false) String q,@RequestParam(required=false) Long category,@RequestParam(required=false) Long shop,
   @RequestParam(required=false) BigDecimal min,@RequestParam(required=false) BigDecimal max,
-  @RequestParam(defaultValue="newest") String sort,@RequestParam(defaultValue="0") int page,@RequestParam(defaultValue="20") int size){return ApiResponse.ok(catalog.search(q,category,shop,min,max,sort,page,size));}
+  @RequestParam(defaultValue="bestselling") String sort,@RequestParam(defaultValue="0") int page,@RequestParam(defaultValue="20") int size){return ApiResponse.ok(catalog.search(q,category,shop,min,max,sort,page,size));}
  @GetMapping("/api/v1/public/market/shops") public ApiResponse<List<ShopView>> publicShops(){return ApiResponse.ok(service.shops(null,true));}
  @GetMapping("/api/v1/public/market/products/{id}/options") public ApiResponse<MenuOptions> options(@PathVariable Long id){return ApiResponse.ok(catalog.options(id));}
  @GetMapping("/api/v1/account/cart/branches") public ApiResponse<List<BranchOption>> branches(@AuthenticationPrincipal CurrentActor a,@RequestParam Long addressId){return ApiResponse.ok(branches.recommendations(a,addressId));}

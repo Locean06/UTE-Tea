@@ -120,11 +120,20 @@ const MilkTeaApi = (() => {
             const toastBody = toastEl.querySelector('.toast-message') || toastEl.querySelector('.toast-body');
             const toastTitle = toastEl.querySelector('.toast-title');
             if (toastBody) toastBody.textContent = message;
-            if (toastTitle) {
-                toastTitle.textContent = type === 'success' ? 'Thành công' : (type === 'error' ? 'Lỗi' : 'Thông báo');
-            }
-            toastEl.className = `toast align-items-center text-white border-0 bg-${type === 'error' ? 'danger' : (type === 'warning' ? 'warning text-dark' : 'success')}`;
-            const toast = new bootstrap.Toast(toastEl, { delay: 3500 });
+            const variants = {
+                success: { title: 'Thành công', classes: ['bg-success', 'text-white'], live: 'polite' },
+                error: { title: 'Lỗi', classes: ['bg-danger', 'text-white'], live: 'assertive' },
+                warning: { title: 'Cảnh báo', classes: ['bg-warning', 'text-dark'], live: 'polite' },
+                info: { title: 'Thông tin', classes: ['bg-info', 'text-dark'], live: 'polite' }
+            };
+            const variant = variants[type] || variants.info;
+            if (toastTitle) toastTitle.textContent = variant.title;
+            toastEl.className = 'toast align-items-center border-0 ' + variant.classes.join(' ');
+            toastEl.setAttribute('role', type === 'error' ? 'alert' : 'status');
+            toastEl.setAttribute('aria-live', variant.live);
+            const closeBtn = toastEl.querySelector('.btn-close');
+            if (closeBtn) closeBtn.classList.toggle('btn-close-white', !variant.classes.includes('text-dark'));
+            const toast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 3500 });
             toast.show();
         } else {
             alert(message);

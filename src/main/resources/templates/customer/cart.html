@@ -9,7 +9,7 @@
     <div th:fragment="content" class="container py-4 ute-cart-page">
         <style>
             .container:has(#cartContainer) {
-                --cart-primary: #565c45;
+                --cart-primary: var(--primary-color, #565c45);
                 --cart-primary-hover: #3e4837;
                 --cart-primary-light: #f0f0e8;
                 --cart-secondary: #717763;

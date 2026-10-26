@@ -10,11 +10,10 @@
         <div th:replace="~{fragments/staff-navigation :: navigation}"></div>
 
 
-        <link rel="stylesheet" th:href="@{/css/staff-ui.css}">
 
         <style>
             .pos-workspace {
-                --pos-primary: #565c45;
+                --pos-primary: var(--primary-color, #565c45);
                 --pos-primary-hover: #3e4837;
                 --pos-primary-light: #f0f0e8;
                 --pos-secondary: #717763;

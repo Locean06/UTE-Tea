@@ -1,18 +1,14 @@
-
 spring:
   application:
     name: ute-tea
-
-  # Tự động đọc file .env ở thư mục gốc project
+  # Read local .env without requiring exported PowerShell environment variables.
   config:
     import: "optional:file:./.env[.properties]"
-
   datasource:
     url: ${DB_URL:jdbc:sqlserver://localhost:1433;databaseName=UTE_Tea;encrypt=true;trustServerCertificate=true}
     username: ${DB_USERNAME:sa}
     password: ${DB_PASSWORD:12345}
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-
   jpa:
     open-in-view: false
     hibernate:
@@ -27,7 +23,6 @@ spring:
           preferred_instant_jdbc_type: TIMESTAMP
         jdbc:
           time_zone: UTC
-
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
@@ -42,10 +37,8 @@ spring:
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
-
   thymeleaf:
     cache: false
-
   servlet:
     multipart:
       max-file-size: 20MB
@@ -71,32 +64,24 @@ app:
     tmn-code: ${VNPAY_TMN_CODE:}
     hash-secret: ${VNPAY_HASH_SECRET:}
     return-url: ${VNPAY_RETURN_URL:http://localhost:8080/marketplace}
-
   base-url: ${APP_BASE_URL:http://localhost:8080}
-
   jwt:
     issuer: milktea
     audience: milktea-web
     secret-base64: ${JWT_SECRET_BASE64:dGhpc0lzQVZlcnlTZWN1cmVCYXNlNjRTZWNyZXRLZXlGb3JNaWxrVGVhQXBwMjAyNg==}
     ttl-minutes: 60
     cookie-secure: ${JWT_COOKIE_SECURE:false}
-
   websocket:
     allowed-origin: ${WS_ALLOWED_ORIGIN:http://localhost:8080}
-
   admin:
     default-password: ${ADMIN_PASSWORD:123456}
-
-  # Cấu hình Cloudinary lấy từ .env
   cloudinary:
     cloud-name: ${CLOUDINARY_CLOUD_NAME:}
     api-key: ${CLOUDINARY_API_KEY:}
     api-secret: ${CLOUDINARY_API_SECRET:}
-
   mail:
     from: ${MAIL_FROM:${MAIL_USERNAME:khoalkopwk@gmail.com}}
     sender-name: ${MAIL_SENDER_NAME:UTE Tea}
-
   otp:
     secret: ${OTP_SECRET:milktea_secure_otp_secret_key_2026_very_long_and_safe}
     expiry-minutes: 10

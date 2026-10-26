@@ -8,7 +8,7 @@
     <div th:fragment="content" class="container py-4 milk-profile-page">
         <style>
             .milk-profile-page {
-                --profile-primary: #565c45;
+                --profile-primary: var(--primary-color, #565c45);
                 --profile-primary-hover: #3e4837;
                 --profile-primary-light: #f0f0e8;
                 --profile-secondary: #717763;
@@ -445,7 +445,7 @@
                 <div class="mb-3 d-flex justify-content-between align-items-center profile-back-bar">
                     <a id="profileBackBtn"
                        th:href="${backUrl != null ? backUrl : '/'}"
-                       class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                       class="btn">
                         <i class="bi bi-arrow-left me-1"></i> Quay Lại
                     </a>
                     <span class="text-muted small">Hồ sơ người dùng hệ thống UTE Tea</span>

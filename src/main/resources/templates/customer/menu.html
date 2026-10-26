@@ -832,11 +832,6 @@
                 <p class="ute-hero-desc">Mỗi ly trà là một khoảng lặng dịu dàng giữa ngày bận rộn. Tận hưởng nguyên liệu chọn lọc, hương vị hài hòa và những khoảnh khắc đáng nhớ cùng UTE Tea.</p>
                 <div class="ute-hero-actions">
                     <a class="btn ute-hero-cta" href="#uteCatalog">Khám phá thực đơn <i class="bi bi-arrow-right ms-2"></i></a>
-                    <a class="btn ute-hero-ghost" th:href="@{/cart}"><i class="bi bi-bag me-2"></i>Đặt món ngay</a>
-                </div>
-                <div class="ute-hero-highlights" aria-label="Điểm đặc biệt của UTE Tea">
-                    <span><i class="bi bi-flower1"></i> Vị trà nguyên bản</span>
-                    <span><i class="bi bi-heart"></i> Pha chế theo gu</span>
                 </div>
             </div>
             <div class="ute-hero-art">
@@ -904,7 +899,7 @@
         <div class="row g-2 mb-3">
             <div class="col-6 col-md-3"><label class="form-label small" for="catalogMin">Giá từ (₫)</label><input id="catalogMin" class="form-control" type="number" min="0" onchange="filterCatalog()"></div>
             <div class="col-6 col-md-3"><label class="form-label small" for="catalogMax">Giá đến (₫)</label><input id="catalogMax" class="form-control" type="number" min="0" onchange="filterCatalog()"></div>
-            <div class="col-12 col-md-6"><label class="form-label small" for="catalogSort">Sắp xếp</label><select id="catalogSort" class="form-select" onchange="filterCatalog()"><option value="newest">20 sản phẩm mới nhất</option><option value="bestselling">Bán chạy</option><option value="rating">Đánh giá cao</option><option value="favorites">Yêu thích nhiều nhất</option><option value="price_asc">Giá tăng dần</option><option value="price_desc">Giá giảm dần</option></select></div>
+            <div class="col-12 col-md-6"><label class="form-label small" for="catalogSort">Sắp xếp</label><select id="catalogSort" class="form-select" onchange="filterCatalog()"><option value="bestselling" selected>Bán chạy</option><option value="newest">20 sản phẩm mới nhất</option><option value="rating">Đánh giá cao</option><option value="favorites">Yêu thích nhiều nhất</option><option value="price_asc">Giá tăng dần</option><option value="price_desc">Giá giảm dần</option></select></div>
         </div>
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3" aria-label="Phân trang thực đơn"><button class="btn btn-sm btn-outline-secondary" id="catalogPrevious" onclick="changeCatalogPage(-1)" type="button">Trang trước</button><span id="catalogPageLabel" role="status" class="small"></span><button class="btn btn-sm btn-outline-secondary" id="catalogNext" onclick="changeCatalogPage(1)" type="button">Trang sau</button></div>
 
@@ -1044,7 +1039,7 @@
                 const category = get('categoryFilterSelect')?.value || 'ALL';
                 const params = new URLSearchParams({
                     q: get('uteProductSearch')?.value || '',
-                    sort: get('catalogSort')?.value || 'newest',
+                    sort: get('catalogSort')?.value || 'bestselling',
                     page: String(catalogPage),
                     size: '20'
                 });

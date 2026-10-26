@@ -14,6 +14,7 @@ import vn.edu.ute.milktea.util.MenuCatalogSupport;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -92,7 +93,7 @@ public class CatalogSearchService {
             displayProducts.removeIf(p -> p.getPrice() == null || p.getPrice().compareTo(max) > 0);
         }
 
-        displayProducts.sort(comparator(sort));
+        displayProducts.sort(comparator(sort, matched));
 
         long total = displayProducts.size();
         int fromIndex = Math.min(page * size, displayProducts.size());
@@ -101,8 +102,8 @@ public class CatalogSearchService {
         return new CatalogPage(items, total, page, size);
     }
 
-    private Comparator<Product> comparator(String sort) {
-        String normalizedSort = sort == null ? "newest" : sort.toLowerCase(Locale.ROOT);
+    private Comparator<Product> comparator(String sort, List<Product> variants) {
+        String normalizedSort = sort == null || sort.isBlank() ? "bestselling" : sort.toLowerCase(Locale.ROOT);
         Comparator<Product> newestTieBreak = Comparator.comparing(Product::getId, Comparator.nullsLast(Comparator.reverseOrder()));
         return switch (normalizedSort) {
             case "newest" -> newestTieBreak;
@@ -114,8 +115,19 @@ public class CatalogSearchService {
                     .thenComparing(newestTieBreak);
             case "rating" -> Comparator.comparingDouble(this::ratingScore).reversed()
                     .thenComparing(newestTieBreak);
-            case "bestselling" -> Comparator.comparingLong(this::bestSellingScore).reversed()
-                    .thenComparing(newestTieBreak);
+            case "bestselling" -> {
+                // Aggregate sales by displayed drink (across M/L/etc. variants).
+                // Query sales only twice for the whole catalog, not once per comparator call.
+                Map<Long, Long> soldByVariantId = salesByProductId();
+                Map<String, Long> soldByDrink = new HashMap<>();
+                for (Product variant : variants) {
+                    soldByDrink.merge(MenuCatalogSupport.displayKey(variant),
+                            soldByVariantId.getOrDefault(variant.getId(), 0L), Long::sum);
+                }
+                yield Comparator.comparingLong((Product p) ->
+                                soldByDrink.getOrDefault(MenuCatalogSupport.displayKey(p), 0L))
+                        .reversed().thenComparing(newestTieBreak);
+            }
             default -> throw BusinessException.badRequest(ErrorCode.VALIDATION_FAILED, "Tiêu chí sắp xếp không hợp lệ");
         };
     }
@@ -136,18 +148,37 @@ public class CatalogSearchService {
                 .getSingleResult();
     }
 
-    private long bestSellingScore(Product product) {
-        Long posSold = em.createQuery(
-                        "select coalesce(sum(i.quantity),0) from OrderItem i where i.product.id=:id and i.order.status=vn.edu.ute.milktea.entity.order.OrderStatus.HOAN_THANH",
-                        Long.class)
-                .setParameter("id", product.getId())
-                .getSingleResult();
-        Long marketSold = em.createQuery(
-                        "select coalesce(sum(l.quantity),0) from DeliveryLine l where l.product.id=:id and l.order.status=vn.edu.ute.milktea.entity.market.DeliveryOrder.Status.DELIVERED",
-                        Long.class)
-                .setParameter("id", product.getId())
-                .getSingleResult();
-        return (posSold == null ? 0 : posSold) + (marketSold == null ? 0 : marketSold);
+    /**
+     * Quantity sold by original product ID, including completed counter orders
+     * and delivered marketplace orders. Grouping variants into one menu card
+     * happens in comparator() using MenuCatalogSupport.displayKey().
+     */
+    private Map<Long, Long> salesByProductId() {
+        Map<Long, Long> totals = new HashMap<>();
+        List<Object[]> counterSales = em.createQuery(
+                        "select i.product.id, coalesce(sum(i.quantity), 0) " +
+                        "from OrderItem i where i.order.status = :status group by i.product.id",
+                        Object[].class)
+                .setParameter("status", vn.edu.ute.milktea.entity.order.OrderStatus.HOAN_THANH)
+                .getResultList();
+        for (Object[] row : counterSales) {
+            if (row[0] != null && row[1] != null) {
+                totals.merge(((Number) row[0]).longValue(), ((Number) row[1]).longValue(), Long::sum);
+            }
+        }
+        List<Object[]> deliverySales = em.createQuery(
+                        "select l.product.id, coalesce(sum(l.quantity), 0) " +
+                        "from DeliveryLine l where l.order.status = :status " +
+                        "and l.topping = false group by l.product.id",
+                        Object[].class)
+                .setParameter("status", vn.edu.ute.milktea.entity.market.DeliveryOrder.Status.DELIVERED)
+                .getResultList();
+        for (Object[] row : deliverySales) {
+            if (row[0] != null && row[1] != null) {
+                totals.merge(((Number) row[0]).longValue(), ((Number) row[1]).longValue(), Long::sum);
+            }
+        }
+        return totals;
     }
 
     private boolean hasText(String value) {
