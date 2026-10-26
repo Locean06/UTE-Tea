@@ -9,6 +9,7 @@ import vn.edu.ute.milktea.dto.MarketDto.*;
 import vn.edu.ute.milktea.dto.CustomerDataDto;
 import vn.edu.ute.milktea.entity.account.*;
 import vn.edu.ute.milktea.entity.market.DeliveryOrder;
+import vn.edu.ute.milktea.entity.market.Voucher;
 import vn.edu.ute.milktea.repository.account.AccountRepository;
 import vn.edu.ute.milktea.repository.catalog.ProductRepository;
 import vn.edu.ute.milktea.service.market.*;
@@ -55,12 +56,32 @@ class MarketIntegrationTest {
   assertEquals(8,products.findById(product).orElseThrow().getDeliveryStock());
   assertThrows(BusinessException.class,()->market.checkout(buyer,input(null),"checkout-key-1"));
  }
+ VoucherInput promo(String code,String cap,Voucher.Kind kind,String percent){return new VoucherInput(code,new BigDecimal(cap),BigDecimal.ZERO,Instant.now().minusSeconds(60),Instant.now().plusSeconds(600),5,1,true,kind,percent==null?null:new BigDecimal(percent));}
+ @Test void percentAndShippingPromotionsArePricedOnServer(){
+  // đơn mẫu: 2 x 25.000 = 50.000, phí ship 10.000
+  market.saveVoucher(vendor,shop,promo("PCT10","3000",Voucher.Kind.PERCENT,"10"));
+  var pct=market.checkout(buyer,input("PCT10"),"promo-key-1");
+  assertEquals(0,new BigDecimal("3000").compareTo(pct.discountAmount()));   // 10% = 5.000 nhưng tối đa 3.000
+  assertEquals(0,new BigDecimal("57000").compareTo(pct.totalAmount()));
+  market.saveVoucher(vendor,shop,promo("SHIP4K","4000",Voucher.Kind.SHIPPING,null));
+  var fixed=market.checkout(buyer,input("SHIP4K"),"promo-key-2");
+  assertEquals(0,fixed.discountAmount().signum());
+  assertEquals(0,new BigDecimal("6000").compareTo(fixed.shippingFee()));
+  assertEquals(0,new BigDecimal("56000").compareTo(fixed.totalAmount()));
+  market.saveVoucher(vendor,shop,promo("FREESHIP","10000",Voucher.Kind.SHIPPING,"100"));
+  var free=market.checkout(buyer,input("FREESHIP"),"promo-key-3");
+  assertEquals(0,free.shippingFee().signum());
+  assertEquals(0,new BigDecimal("50000").compareTo(free.totalAmount()));
+  assertThrows(BusinessException.class,()->market.saveVoucher(vendor,shop,promo("BADPCT","1000",Voucher.Kind.PERCENT,"0")));
+ }
  @Test void shipperWorkflowAndPurchasedOnlyReviews(){
   var o=market.checkout(buyer,input(null),"checkout-key-2");
   Long orderId=o.id();
   assertThrows(BusinessException.class,()->reviews.create(other,product,new ReviewInput(orderId,true,5,"Đây là đánh giá dài hơn năm mươi ký tự nhưng tài khoản này chưa mua hàng.")));
   o=market.transition(vendor,o.id(),new Transition(DeliveryOrder.Status.CONFIRMED,o.version(),null));
   o=market.assignShipper(vendor,o.id(),new AssignShipper(shipper.getAccountId(),o.version()));
+  o=market.transition(shipper,o.id(),new Transition(DeliveryOrder.Status.PICKED_UP,o.version(),null));
+  assertEquals(DeliveryOrder.Status.PICKED_UP,o.status());
   o=market.transition(shipper,o.id(),new Transition(DeliveryOrder.Status.SHIPPING,o.version(),null));
   o=market.transition(shipper,o.id(),new Transition(DeliveryOrder.Status.DELIVERED,o.version(),null));
   assertTrue(o.paid());

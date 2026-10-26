@@ -32,8 +32,11 @@ public class MarketDto {
  public record CarrierInput(@NotBlank @Size(max=120) String name,@NotNull @DecimalMin("0") BigDecimal fee,boolean active) {}
  public record CarrierView(Long id,String name,BigDecimal fee,Long shopId,boolean active) {}
  public record VoucherInput(@NotBlank @Pattern(regexp="[A-Z0-9_-]{3,32}") String code,@NotNull @DecimalMin("0.01") BigDecimal discountAmount,
-   @NotNull @DecimalMin("0") BigDecimal minimumAmount,@NotNull Instant startsAt,@NotNull Instant endsAt,@Min(1) int usageLimit,@Min(1) int perAccountLimit,boolean active) {}
- public record VoucherView(Long id,String code,Long shopId,BigDecimal discountAmount,BigDecimal minimumAmount,Instant startsAt,Instant endsAt,int usageLimit,int usedCount,int perAccountLimit,boolean active) {}
+   @NotNull @DecimalMin("0") BigDecimal minimumAmount,@NotNull Instant startsAt,@NotNull Instant endsAt,@Min(1) int usageLimit,@Min(1) int perAccountLimit,boolean active,
+   vn.edu.ute.milktea.entity.market.Voucher.Kind kind,@DecimalMin("0") @DecimalMax("100") BigDecimal percent) {
+   public VoucherInput(String code,BigDecimal discountAmount,BigDecimal minimumAmount,Instant startsAt,Instant endsAt,int usageLimit,int perAccountLimit,boolean active){this(code,discountAmount,minimumAmount,startsAt,endsAt,usageLimit,perAccountLimit,active,null,null);}
+ }
+ public record VoucherView(Long id,String code,Long shopId,BigDecimal discountAmount,BigDecimal minimumAmount,Instant startsAt,Instant endsAt,int usageLimit,int usedCount,int perAccountLimit,boolean active,String kind,BigDecimal percent) {}
  public record BuyLine(@NotNull Long productId,@Min(1) @Max(99) int quantity,@Size(max=500) String note,@Size(max=20) List<@NotNull Long> toppingIds) {
    public BuyLine(Long productId,int quantity){this(productId,quantity,null,List.of());}
  }

@@ -2,7 +2,7 @@
  const $=id=>document.getElementById(id),api='/api/v1/market',pub='/api/v1/public/market';
  const signedIn=!!document.body.dataset.accountId;
  let page=0,request=0,catalog=[],orders=[];
- const labels={NEW:'Mới',CONFIRMED:'Đã xác nhận',SHIPPING:'Đang giao',DELIVERED:'Đã giao',DELIVERY_FAILED:'Giao thất bại',CANCELLED:'Đã hủy',RETURN_REQUESTED:'Yêu cầu trả hàng',RETURNED:'Đã trả hàng',REFUNDED:'Đã hoàn tiền'};
+ const labels={NEW:'Mới',CONFIRMED:'Đã xác nhận',PICKED_UP:'Đã lấy hàng',SHIPPING:'Đang giao',DELIVERED:'Đã giao',DELIVERY_FAILED:'Giao thất bại',CANCELLED:'Đã hủy',RETURN_REQUESTED:'Yêu cầu trả hàng',RETURNED:'Đã trả hàng',REFUNDED:'Đã hoàn tiền'};
  function node(tag,text,cls){const n=document.createElement(tag);if(text!=null)n.textContent=text;if(cls)n.className=cls;return n;}
  function message(text,error=false){$('marketMessage').className='alert '+(error?'alert-danger':'alert-success');$('marketMessage').textContent=text;}
  function button(text,fn,cls='btn btn-sm btn-outline-secondary'){const b=node('button',text,cls);b.type='button';b.addEventListener('click',async()=>{b.disabled=true;try{await fn();}catch(e){message(e.message,true);}finally{b.disabled=false;}});return b;}
@@ -54,7 +54,7 @@
    for(const l of o.items)card.append(node('p',l.quantity+' × '+l.name,'small mb-1'));
    const transition=async status=>{await MilkTeaApi.put(api+'/orders/'+o.id+'/status',{status,version:o.version});await loadOrders();await loadCatalog();};
    if(o.status==='NEW')card.append(button('Hủy đơn',()=>transition('CANCELLED')));
-   if(o.paymentMethod==='VNPAY'&&!o.paid&&['NEW','CONFIRMED'].includes(o.status))card.append(button('Thanh toán VNPAY',async()=>{const result=await MilkTeaApi.post(api+'/orders/'+o.id+'/payment-url');location.href=result.url;}));
+   if(o.paymentMethod==='VNPAY'&&!o.paid&&['NEW','CONFIRMED','PICKED_UP'].includes(o.status))card.append(button('Thanh toán VNPAY',async()=>{const result=await MilkTeaApi.post(api+'/orders/'+o.id+'/payment-url');location.href=result.url;}));
    if(o.status==='DELIVERED'){
     card.append(button('Yêu cầu trả hàng',()=>transition('RETURN_REQUESTED')));
     for(const l of o.items)card.append(button('Đánh giá '+l.name,async()=>{const f=$('reviewForm');f.reset();f.dataset.delivery='true';f.elements.productId.value=l.productId;f.elements.orderId.value=o.id;$('reviewProductLabel').textContent='Đánh giá '+l.name;f.classList.remove('d-none');await showReviews(l.productId);}));

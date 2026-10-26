@@ -6,7 +6,7 @@ import vn.edu.ute.milktea.entity.catalog.Product;
 @Entity @Table(name="DeliveryOrder",uniqueConstraints=@UniqueConstraint(name="UQ_DeliveryOrder_Key",columnNames={"AccountId","IdempotencyKey"})) @Getter @Setter @NoArgsConstructor
 public class DeliveryOrder {
 @Id @GeneratedValue(strategy=GenerationType.IDENTITY) @Column(name="Id") private Long id;
-public enum Status { NEW, CONFIRMED, SHIPPING, DELIVERED, DELIVERY_FAILED, CANCELLED, RETURN_REQUESTED, RETURNED, REFUNDED }
+public enum Status { NEW, CONFIRMED, PICKED_UP, SHIPPING, DELIVERED, DELIVERY_FAILED, CANCELLED, RETURN_REQUESTED, RETURNED, REFUNDED }
 public enum Method { COD, VNPAY }
 @ManyToOne(fetch=FetchType.LAZY,optional=false) @JoinColumn(name="AccountId") private Account account;
 @ManyToOne(fetch=FetchType.LAZY,optional=false) @JoinColumn(name="ShopId") private Shop shop;
@@ -34,4 +34,3 @@ public enum Method { COD, VNPAY }
 @Version @Column(name="Version",nullable=false) private Long version=0L;
 @OneToMany(mappedBy="order",cascade=CascadeType.ALL) private java.util.List<DeliveryLine> lines=new java.util.ArrayList<>();
 }
-
