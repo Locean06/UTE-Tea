@@ -3,6 +3,7 @@ package vn.edu.ute.milktea.common;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
@@ -100,11 +101,27 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {
-        log.error("Unhandled application failure", ex);
+    public ResponseEntity<?> handleGeneralException(Exception ex, HttpServletRequest request) {
+        String traceId = UUID.randomUUID().toString();
+        log.error("Unhandled application failure [traceId={}] path={}", traceId, request.getRequestURI(), ex);
+        String accept = request.getHeader("Accept");
+        String path = request.getRequestURI();
+        if (accept != null && accept.contains("text/html") && !path.startsWith("/api/")) {
+            String html = "<!doctype html><html lang=\"vi\"><head><meta charset=\"UTF-8\">"
+                + "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
+                + "<title>UTE Tea - Tạm thời gián đoạn</title><style>body{margin:0;background:#faf9f3;"
+                + "font:16px/1.6 system-ui,sans-serif;color:#303a2d;display:grid;place-items:center;min-height:100vh}"
+                + "main{max-width:550px;padding:36px;background:#fff;border-radius:20px;box-shadow:0 12px 36px #263a2914}"
+                + "a{display:inline-block;background:#565c45;color:white;padding:10px 18px;border-radius:10px;text-decoration:none}"
+                + "small{color:#697166}</style></head><body><main><h1>UTE Tea</h1>"
+                + "<h2>Trang đang tạm thời gián đoạn</h2><p>Không thể tải nội dung lúc này. "
+                + "Vui lòng thử lại sau hoặc liên hệ quản trị viên.</p><p><a href=\"/\">Về trang chủ</a></p>"
+                + "<small>Mã lỗi: " + traceId + "</small></main></body></html>";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.TEXT_HTML).body(html);
+        }
         ErrorResponse response = ErrorResponse.builder()
                 .success(false)
-                .traceId(UUID.randomUUID().toString())
+                .traceId(traceId)
                 .error(ErrorResponse.ErrorDetail.builder()
                         .code(ErrorCode.INTERNAL_ERROR.name())
                         .message("Đã xảy ra lỗi hệ thống. Vui lòng thử lại hoặc cung cấp mã lỗi cho quản trị viên.")

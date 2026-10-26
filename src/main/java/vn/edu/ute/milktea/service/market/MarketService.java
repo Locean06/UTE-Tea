@@ -14,6 +14,7 @@ import vn.edu.ute.milktea.repository.catalog.*;
 import vn.edu.ute.milktea.repository.market.*;
 import vn.edu.ute.milktea.security.CurrentActor;
 import vn.edu.ute.milktea.service.account.CustomerDataService;
+import vn.edu.ute.milktea.util.MenuCatalogSupport;
 import java.math.*;
 import java.time.Instant;
 import java.util.*;
@@ -243,6 +244,6 @@ public class MarketService {
  public ProductView productView(Product p){
   double rating=em.createQuery("select coalesce(avg(r.stars),0) from ProductReview r where r.product.id=:id",Double.class).setParameter("id",p.getId()).getSingleResult();
   long favorite=em.createQuery("select count(i) from ProductInterest i where i.product.id=:id and i.favorite=true",Long.class).setParameter("id",p.getId()).getSingleResult();
-  return new ProductView(p.getId(),p.getName(),p.getSize(),p.getDescription(),p.getPrice(),p.getImageUrl(),p.getCategory().getId(),p.getCategory().getName(),p.getShop()==null?null:p.getShop().getId(),p.getShop()==null?"UTE Tea tại quầy":p.getShop().getName(),p.getDeliveryStock(),Boolean.TRUE.equals(p.getActive()),p.getCatalogVersion(),rating,favorite,p.menuIdentity());
+  return new ProductView(p.getId(),p.getName(),p.getSize(),p.getDescription(),p.getPrice(),MenuCatalogSupport.resolveIllustration(p),p.getCategory().getId(),p.getCategory().getName(),p.getShop()==null?null:p.getShop().getId(),p.getShop()==null?"UTE Tea tại quầy":p.getShop().getName(),p.getDeliveryStock(),Boolean.TRUE.equals(p.getActive()),p.getCatalogVersion(),rating,favorite,p.menuIdentity());
  }
 }

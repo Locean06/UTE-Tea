@@ -223,6 +223,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>4.1.1</version>
                 <configuration>
+                    <mainClass>vn.edu.ute.MilkteaApplication</mainClass>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>

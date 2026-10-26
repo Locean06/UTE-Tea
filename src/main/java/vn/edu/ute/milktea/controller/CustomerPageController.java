@@ -16,10 +16,15 @@ import vn.edu.ute.milktea.repository.settings.GlobalSettingsRepository;
 import vn.edu.ute.milktea.security.CurrentActor;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import vn.edu.ute.milktea.util.MenuCatalogSupport;
 
 @Controller
 @RequiredArgsConstructor
 public class CustomerPageController {
+
+    private static final Logger log = LoggerFactory.getLogger(CustomerPageController.class);
 
     private final GlobalSettingsRepository settingsRepository;
     private final CategoryRepository categoryRepository;
@@ -35,9 +40,36 @@ public class CustomerPageController {
             jakarta.servlet.http.HttpServletResponse response,
             Model model) {
 
-        GlobalSettings settings = settingsRepository.findById(1).orElse(null);
-        List<Category> categories = categoryRepository.findAllByActiveTrue();
-        List<Product> products = productRepository.findAllByActiveTrue();
+        // Each read is independent so a database migration issue cannot turn the
+        // entire public home/menu page into a JSON 500 response.
+        boolean dataUnavailable = false;
+        GlobalSettings settings = null;
+        List<Category> categories = List.of();
+        List<Product> products = List.of();
+        try {
+            settings = settingsRepository.findById(1).orElse(null);
+        } catch (org.springframework.dao.DataAccessException ex) {
+            dataUnavailable = true;
+            log.error("UTE Tea storefront settings query failed. Check database migrations.", ex);
+        }
+        try {
+            categories = categoryRepository.findAllByActiveTrue().stream()
+                    .filter(c -> c.getShop() == null && Boolean.TRUE.equals(c.getActive())).toList();
+        } catch (org.springframework.dao.DataAccessException ex) {
+            dataUnavailable = true;
+            log.error("UTE Tea storefront category query failed. Check DanhMuc columns/migrations.", ex);
+        }
+        try {
+            products = MenuCatalogSupport.toDisplayProducts(
+                    productRepository.findAllByActiveTrue().stream()
+                            .filter(p -> p.getShop() == null && p.getCategory() != null && Boolean.TRUE.equals(p.getCategory().getActive()))
+                            .toList()
+            );
+        } catch (org.springframework.dao.DataAccessException ex) {
+            dataUnavailable = true;
+            log.error("UTE Tea storefront product query failed. Check MonUong columns/migrations.", ex);
+        }
+        model.addAttribute("catalogUnavailable", dataUnavailable);
 
         DiningTable table = null; // Dine-in tables are assigned at the authenticated POS.
 

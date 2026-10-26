@@ -7,6 +7,101 @@
 
 <body>
     <div th:fragment="content" class="container py-5 ute-auth-page">
+        <style>
+            .ute-auth-page .card {
+                border-radius: 28px !important;
+                overflow: hidden;
+            }
+            .ute-auth-page .card-body {
+                background: linear-gradient(180deg, #ffffff, #fcfbf6);
+            }
+            .ute-auth-page .nav-pills {
+                background: #eef2e4 !important;
+            }
+            .ute-auth-page .nav-pills .nav-link {
+                color: #556047;
+            }
+            .ute-auth-page .nav-pills .nav-link.active {
+                background: linear-gradient(135deg, #556047, #6b7553);
+                color: #fff;
+                box-shadow: 0 8px 20px rgba(85, 96, 71, .18);
+            }
+            .ute-auth-page .input-group-text {
+                background: #f6f7ef !important;
+                border: 1px solid #d9ddcb !important;
+                color: #6b7553 !important;
+                border-radius: 16px 0 0 16px !important;
+                min-width: 48px;
+                justify-content: center;
+            }
+            .ute-auth-page .form-control {
+                border: 1px solid #d9ddcb !important;
+                border-left: 0 !important;
+                background: #fff !important;
+                color: #32402f !important;
+                min-height: 48px;
+                border-radius: 0 16px 16px 0 !important;
+                box-shadow: none !important;
+            }
+            .ute-auth-page .form-control:focus {
+                border-color: #8f9b72 !important;
+                box-shadow: 0 0 0 4px rgba(143, 155, 114, .14) !important;
+            }
+            .ute-auth-page .form-label {
+                color: #44513b;
+                margin-bottom: .45rem;
+            }
+            .ute-auth-page .btn-primary-custom,
+            .ute-auth-page .btn-success {
+                min-height: 48px;
+                font-weight: 700;
+                border-radius: 16px !important;
+            }
+            .ute-auth-page .ute-demo-grid {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
+            }
+            .ute-auth-page .ute-demo-account {
+                border: 1px solid #d8decb;
+                border-radius: 18px !important;
+                background: linear-gradient(180deg, #ffffff, #f8faf3);
+                color: #344131;
+                min-height: 90px;
+                text-align: left;
+                padding: 14px 16px;
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+            }
+            .ute-auth-page .ute-demo-account:hover {
+                transform: translateY(-2px);
+                border-color: #aab890;
+                box-shadow: 0 10px 24px rgba(86, 92, 69, .10);
+            }
+            .ute-auth-page .ute-demo-account small {
+                color: #6b7553;
+            }
+            .ute-auth-page .ute-demo-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                width: fit-content;
+                padding: 5px 10px;
+                border-radius: 999px;
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: .04em;
+                background: #edf2df;
+                color: #556047;
+            }
+            @media (max-width: 575.98px) {
+                .ute-auth-page .ute-demo-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
         <div class="row justify-content-center g-4 align-items-stretch">
             <div class="col-lg-6 d-none d-lg-flex">
               <aside class="ute-auth-promo w-100" aria-label="Giới thiệu UTE Tea">
@@ -14,7 +109,7 @@
                   <h1>Tinh vị trà,<br><span>chạm vị thanh xuân.</span></h1>
                   <p>Một khoảng lặng dịu dàng giữa nhịp sống. Chào mừng bạn trở lại với UTE Tea.</p>
                 </div>
-                <img th:src="@{/images/ute-tea-drinks-hero.webp}" src="/images/ute-tea-drinks-hero.webp" alt="Thức uống UTE Tea" width="480" height="350">
+                <img th:src="@{/images/ute-tea-login-hero.webp}" src="/images/ute-tea-login-hero.webp" alt="Thức uống UTE Tea" width="480" height="350">
                 <div class="ute-auth-perks"><span><i class="bi bi-shield-check me-1"></i>Bảo mật tài khoản</span><span><i class="bi bi-lightning-charge me-1"></i>Đặt món nhanh</span><span><i class="bi bi-heart me-1"></i>Trải nghiệm đồng nhất</span></div>
               </aside>
             </div>
@@ -96,27 +191,27 @@
 
                                 <!-- Tài Khoản Mẫu Nhanh -->
                                 <div class="mt-4 pt-3 border-top">
-                                    <p class="text-center text-muted small fw-semibold mb-2">Chọn nhanh tài khoản thử nghiệm:</p>
-                                    <div class="d-grid gap-2">
-                                        <button type="button"
-                                            class="btn btn-sm btn-outline-danger text-start py-2 px-3 rounded-3"
-                                            onclick="fillDemo('admin@milktea.vn', 'Password@123')">
-                                            <i class="bi bi-shield-lock-fill me-2"></i><strong>Quản Trị Viên (ADMIN)</strong>
+                                    <p class="text-center text-muted small fw-semibold mb-3">Chọn nhanh tài khoản thử nghiệm:</p>
+                                    <div class="ute-demo-grid">
+                                        <button type="button" class="btn ute-demo-account" onclick="fillDemo('admin@milktea.vn', 'Password@123')">
+                                            <span class="ute-demo-badge"><i class="bi bi-shield-lock-fill"></i> ADMIN</span>
+                                            <strong>Quản trị viên</strong>
+                                            <small>admin@milktea.vn</small>
                                         </button>
-                                        <button type="button"
-                                            class="btn btn-sm btn-outline-primary text-start py-2 px-3 rounded-3"
-                                            onclick="fillDemo('cashier@milktea.vn', 'Password@123')">
-                                            <i class="bi bi-calculator me-2"></i><strong>Thu Ngân (CASHIER)</strong>
+                                        <button type="button" class="btn ute-demo-account" onclick="fillDemo('cashier@milktea.vn', 'Password@123')">
+                                            <span class="ute-demo-badge"><i class="bi bi-calculator"></i> CASHIER</span>
+                                            <strong>Thu ngân</strong>
+                                            <small>cashier@milktea.vn</small>
                                         </button>
-                                        <button type="button"
-                                            class="btn btn-sm btn-outline-success text-start py-2 px-3 rounded-3"
-                                            onclick="fillDemo('kitchen@milktea.vn', 'Password@123')">
-                                            <i class="bi bi-fire me-2"></i><strong>Bếp Trưởng (KITCHEN)</strong>
+                                        <button type="button" class="btn ute-demo-account" onclick="fillDemo('kitchen@milktea.vn', 'Password@123')">
+                                            <span class="ute-demo-badge"><i class="bi bi-fire"></i> KITCHEN</span>
+                                            <strong>Nhân sự bếp</strong>
+                                            <small>kitchen@milktea.vn</small>
                                         </button>
-                                        <button type="button"
-                                            class="btn btn-sm btn-outline-secondary text-start py-2 px-3 rounded-3"
-                                            onclick="fillDemo('customer@milktea.vn', 'Password@123')">
-                                            <i class="bi bi-person me-2"></i><strong>Khách Hàng Demo (CUSTOMER)</strong>
+                                        <button type="button" class="btn ute-demo-account" onclick="fillDemo('customer@milktea.vn', 'Password@123')">
+                                            <span class="ute-demo-badge"><i class="bi bi-person"></i> CUSTOMER</span>
+                                            <strong>Khách hàng demo</strong>
+                                            <small>customer@milktea.vn</small>
                                         </button>
                                     </div>
                                 </div>
@@ -398,9 +493,17 @@
                     alertEl.className = 'alert alert-danger py-2 small rounded-3';
                     if (err.code === 'AUTH_EMAIL_NOT_VERIFIED') {
                         currentVerifyEmail = email;
-                        alertEl.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-1"></i> ${err.message || 'Email chưa được xác thực.'} <br><a href="javascript:void(0)" onclick="openVerifyFromLogin()" class="fw-bold text-decoration-underline text-danger mt-1 d-inline-block"><i class="bi bi-shield-check me-1"></i>Nhập mã OTP kích hoạt tài khoản ngay</a>`;
+                        // Do not insert API error messages into innerHTML (XSS).
+                        const message = document.createElement('span');
+                        message.textContent = err.message || 'Email chưa được xác thực.';
+                        const verifyButton = document.createElement('button');
+                        verifyButton.type = 'button';
+                        verifyButton.className = 'btn btn-link fw-bold text-decoration-underline text-danger mt-1 p-0 d-block';
+                        verifyButton.textContent = 'Nhập mã OTP kích hoạt tài khoản ngay';
+                        verifyButton.addEventListener('click', openVerifyFromLogin);
+                        alertEl.replaceChildren(message, verifyButton);
                     } else if (err.code === 'ACCESS_DENIED') {
-                        alertEl.innerHTML = `<i class="bi bi-lock-fill me-1"></i> ${err.message || 'Tài khoản đã bị tạm khóa bởi ban quản trị.'}`;
+                        alertEl.textContent = err.message || 'Tài khoản đã bị tạm khóa bởi ban quản trị.';
                     } else {
                         alertEl.textContent = err.message || 'Email hoặc mật khẩu không chính xác';
                     }
