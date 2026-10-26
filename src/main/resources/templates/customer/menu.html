@@ -827,6 +827,13 @@
             <div class="ute-service-item"><i class="bi bi-bag-heart"></i><div><strong>Đặt món tiện lợi</strong><span>Theo dõi đơn hàng dễ dàng</span></div></div>
         </section>
 
+        <section id="uteBestSellers" class="ute-category-section d-none" aria-labelledby="uteBestTitle">
+            <div class="ute-section-label">BÁN CHẠY NHẤT</div>
+            <h2 class="ute-serif ute-centered-title" id="uteBestTitle">Món được yêu thích nhất</h2>
+            <p class="ute-section-subtitle">Những món đã bán trên 10 ly, xếp từ nhiều đến ít.</p>
+            <div id="uteBestGrid" class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3"></div>
+        </section>
+
         <section class="ute-category-section" id="uteCategories" aria-labelledby="uteCategoryTitle">
             <div class="ute-section-label">KHÁM PHÁ HƯƠNG VỊ</div>
             <h2 class="ute-serif ute-centered-title" id="uteCategoryTitle">Chọn thức uống dành cho bạn</h2>
@@ -1030,7 +1037,32 @@
                 } catch(e) { if(request===catalogRequest) MilkTeaApi.showToast(e.message,'error'); }
             }
             function changeCatalogPage(delta){catalogPage=Math.max(0,catalogPage+delta);filterCatalog(false);}
+            async function loadBestSellers() {
+                try {
+                    const list = await MilkTeaApi.get('/api/v1/public/market/best-sellers?minSold=10&limit=12');
+                    const section = document.getElementById('uteBestSellers'), grid = document.getElementById('uteBestGrid');
+                    if (!list || !list.length) return;
+                    grid.replaceChildren();
+                    list.forEach(item => {
+                        const p = item.product, col = document.createElement('div'), card = document.createElement('article');
+                        col.className = 'col'; card.className = 'card h-100 overflow-hidden';
+                        const img = document.createElement('img');
+                        img.src = p.imageUrl || '/images/ute-tea-product-fallback.svg'; img.alt = p.name; img.loading = 'lazy';
+                        img.style.cssText = 'width:100%;aspect-ratio:1;object-fit:cover';
+                        img.onerror = () => { img.onerror = null; img.src = '/images/ute-tea-product-fallback.svg'; };
+                        const body = document.createElement('div'); body.className = 'card-body d-flex flex-column gap-1';
+                        const name = document.createElement('h3'); name.className = 'h6 mb-0'; name.textContent = p.name;
+                        const sold = document.createElement('span'); sold.className = 'small text-muted'; sold.textContent = 'Đã bán ' + item.sold;
+                        const price = document.createElement('strong'); price.textContent = MilkTeaApi.formatVND(p.price);
+                        const add = document.createElement('button'); add.type = 'button'; add.className = 'btn btn-primary-custom btn-sm mt-auto'; add.textContent = 'Thêm';
+                        add.addEventListener('click', () => MenuSelection.open(p.id));
+                        body.append(name, sold, price, add); card.append(img, body); col.append(card); grid.append(col);
+                    });
+                    section.classList.remove('d-none');
+                } catch (e) { /* khu vực bán chạy là phần phụ, không chặn trang chủ */ }
+            }
             document.addEventListener('DOMContentLoaded',()=>{
+                loadBestSellers();
                 filterCatalog();
                 const product=Number(new URLSearchParams(location.search).get('product'));
                 if(product) openCustomizeModal(product);

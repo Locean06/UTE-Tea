@@ -26,6 +26,7 @@ public class MarketDto {
    public ProductInput(Long categoryId,String name,String size,String description,BigDecimal price,int stock,boolean active){this(categoryId,name,size,description,price,stock,active,null);}
  }
  public record ProductView(Long id,String name,String size,String description,BigDecimal price,String imageUrl,Long categoryId,String categoryName,Long shopId,String shopName,Integer stock,boolean active,Long catalogVersion,double rating,long favorites,String menuCode) {}
+ public record BestSeller(ProductView product,long sold) {}
  public record CatalogPage(List<ProductView> items,long total,int page,int size) {}
  public record MenuOptions(ProductView selected,List<ProductView> variants,List<ProductView> toppings,boolean allowTopping) {}
  public record CategoryView(Long id,String name,Long shopId,boolean active,boolean allowTopping) {}

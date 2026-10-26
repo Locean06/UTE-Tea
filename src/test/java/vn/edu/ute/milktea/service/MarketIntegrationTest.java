@@ -85,6 +85,9 @@ class MarketIntegrationTest {
   o=market.transition(shipper,o.id(),new Transition(DeliveryOrder.Status.SHIPPING,o.version(),null));
   o=market.transition(shipper,o.id(),new Transition(DeliveryOrder.Status.DELIVERED,o.version(),null));
   assertTrue(o.paid());
+  var best=search.bestSellers(1,50).stream().filter(b->shop.equals(b.product().shopId())).toList();
+  assertEquals(1,best.size());assertEquals(2,best.getFirst().sold());   // 2 ly đã giao
+  assertTrue(search.bestSellers(2,50).stream().noneMatch(b->shop.equals(b.product().shopId())));   // "trên" ngưỡng: 2 không lớn hơn 2
   var review=reviews.create(buyer,product,new ReviewInput(o.id(),true,5,"Trà rất thơm ngon, đóng gói cẩn thận và giao hàng nhanh chóng, mình rất hài lòng."));
   assertEquals(5,review.stars());assertEquals(1,reviews.list(product,0).size());
   assertEquals(new BigDecimal("5000.00"),market.summary(vendor,shop).platformCommission());

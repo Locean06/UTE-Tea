@@ -24,6 +24,21 @@ public class CatalogSearchService {
   boolean allowTopping=products.findAllByActiveTrue().stream().anyMatch(p->p.menuVariantIdentity().equals(selected.menuVariantIdentity())&&Boolean.TRUE.equals(p.getCategory().getAllowTopping()));
   return new MenuOptions(market.productView(selected),variants,toppings,allowTopping&&!Product.normalizeSearch(selected.getCategory().getName()).contains("topping"));
  }
+ /** Món đã bán TRÊN {@code minSold} sản phẩm (đơn giao đã giao + đơn quầy hoàn thành), sắp xếp từ nhiều đến ít. Món trùng menu giữa các cơ sở được cộng dồn. */
+ @Transactional(readOnly=true)
+ public List<BestSeller> bestSellers(long minSold,int limit){
+  if(minSold<0||limit<1||limit>100)throw BusinessException.badRequest(ErrorCode.VALIDATION_FAILED,"Tham số không hợp lệ");
+  Map<Long,Long> sold=new HashMap<>();
+  for(Object[] r:em.createQuery("select l.product.id,sum(l.quantity) from DeliveryLine l where l.order.status=vn.edu.ute.milktea.entity.market.DeliveryOrder.Status.DELIVERED group by l.product.id",Object[].class).getResultList())sold.merge((Long)r[0],((Number)r[1]).longValue(),Long::sum);
+  for(Object[] r:em.createQuery("select i.product.id,sum(i.quantity) from OrderItem i where i.order.status=vn.edu.ute.milktea.entity.order.OrderStatus.HOAN_THANH group by i.product.id",Object[].class).getResultList())sold.merge((Long)r[0],((Number)r[1]).longValue(),Long::sum);
+  Map<String,Product> representative=new LinkedHashMap<>();Map<String,Long> total=new HashMap<>();
+  em.createQuery("select p from Product p left join p.shop s where p.active=true and p.category.active=true and (p.shop is null or s.active=true) order by p.id",Product.class).getResultList().forEach(p->{
+   String key=p.menuVariantIdentity();representative.putIfAbsent(key,p);total.merge(key,sold.getOrDefault(p.getId(),0L),Long::sum);
+  });
+  return total.entrySet().stream().filter(e->e.getValue()>minSold)
+    .sorted(Map.Entry.<String,Long>comparingByValue().reversed().thenComparing(e->representative.get(e.getKey()).getId()))
+    .limit(limit).map(e->new BestSeller(market.productView(representative.get(e.getKey())),e.getValue())).toList();
+ }
  @Transactional(readOnly=true)
  public CatalogPage search(String term,Long category,Long shop,BigDecimal min,BigDecimal max,String sort,int page,int size){
   if(page<0||page>100000||size<1||size>100||(min!=null&&min.signum()<0)||(max!=null&&max.signum()<0)||(min!=null&&max!=null&&min.compareTo(max)>0)||term!=null&&term.length()>120)throw BusinessException.badRequest(ErrorCode.VALIDATION_FAILED,"Bộ lọc hoặc phân trang không hợp lệ");

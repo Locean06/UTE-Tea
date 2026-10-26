@@ -23,6 +23,7 @@ public class MarketController {
   @RequestParam(required=false) BigDecimal min,@RequestParam(required=false) BigDecimal max,
   @RequestParam(defaultValue="newest") String sort,@RequestParam(defaultValue="0") int page,@RequestParam(defaultValue="20") int size){return ApiResponse.ok(catalog.search(q,category,shop,min,max,sort,page,size));}
  @GetMapping("/api/v1/public/market/shops") public ApiResponse<List<ShopView>> publicShops(){return ApiResponse.ok(service.shops(null,true));}
+ @GetMapping("/api/v1/public/market/best-sellers") public ApiResponse<List<BestSeller>> bestSellers(@RequestParam(defaultValue="10") long minSold,@RequestParam(defaultValue="12") int limit){return ApiResponse.ok(catalog.bestSellers(minSold,limit));}
  @GetMapping("/api/v1/public/market/products/{id}/options") public ApiResponse<MenuOptions> options(@PathVariable Long id){return ApiResponse.ok(catalog.options(id));}
  @GetMapping("/api/v1/account/cart/branches") public ApiResponse<List<BranchOption>> branches(@AuthenticationPrincipal CurrentActor a,@RequestParam Long addressId){return ApiResponse.ok(branches.recommendations(a,addressId));}
  @PostMapping("/api/v1/account/cart/quote") public ApiResponse<CartQuote> quote(@AuthenticationPrincipal CurrentActor a,@Valid @RequestBody QuoteInput input){return ApiResponse.ok(service.quote(a,input));}
