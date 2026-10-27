@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Kiểm tra thành phẩm sơ chế"]
+  D{"Đầu ra, đầu vào và định lượng hợp lệ?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Kiểm tra sản lượng chuẩn"]
+  D -- Đúng --> P1
+  P2["Duyệt từng đầu vào và loại bỏ cấu hình sai"]
+  P1 --> P2
+  P3["Tạo PreparationRecipe cùng các item"]
+  P2 --> P3
+  P4["Lưu và trả cấu hình"]
+  P3 --> P4
+  P4 --> F

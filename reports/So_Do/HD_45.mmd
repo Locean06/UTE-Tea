@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Tìm Order và dữ liệu bổ sung"]
+  D{"Tồn BEP đủ cho lượng pha bù?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Tìm nguyên liệu tương ứng"]
+  D -- Đúng --> P1
+  P2["Khóa tồn BEP"]
+  P1 --> P2
+  P3["Trừ lượng bổ sung và ghi biến động"]
+  P2 --> P3
+  P4["Lưu audit theo đơn/người thực hiện"]
+  P3 --> P4
+  P4 --> F

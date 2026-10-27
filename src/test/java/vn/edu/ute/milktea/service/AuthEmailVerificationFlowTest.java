@@ -66,7 +66,7 @@ class AuthEmailVerificationFlowTest {
     @BeforeEach
     void setUp() {
         otpService = new OtpService(otpRepository);
-        ReflectionTestUtils.setField(otpService, "otpSecret", "test_very_secret_otp_key_2026");
+        ReflectionTestUtils.setField(otpService, "otpSecret", "test_very_secret_otp_key_2026_minimum_32_chars");
         ReflectionTestUtils.setField(otpService, "cooldownSeconds", 60);
         ReflectionTestUtils.setField(otpService, "defaultMaxAttempts", 5);
 
@@ -96,7 +96,7 @@ class AuthEmailVerificationFlowTest {
                 .password("Password@123")
                 .build();
 
-        when(accountRepository.findByEmail(email)).thenReturn(Optional.empty());
+        when(accountRepository.findByEmailForUpdate(email)).thenReturn(Optional.empty());
         when(accountRepository.save(any(Account.class))).thenAnswer(inv -> {
             Account acc = inv.getArgument(0);
             acc.setId(100L);
@@ -243,7 +243,7 @@ class AuthEmailVerificationFlowTest {
 
         // Lần 1: Nhập sai mã
         BusinessException ex1 = assertThrows(BusinessException.class, () ->
-                authService.verifyEmail(new AuthDto.VerifyEmailRequest(email, "000000")));
+                authService.verifyEmail(new AuthDto.VerifyEmailRequest(email, generated.rawOtp().equals("000000") ? "000001" : "000000")));
         assertEquals(ErrorCode.AUTH_OTP_INVALID, ex1.getErrorCode());
         assertEquals(1, otpEntity.getAttempts());
         assertTrue(ex1.getMessage().contains("Bạn còn 4 lần thử"));
@@ -251,7 +251,7 @@ class AuthEmailVerificationFlowTest {
         // Lần 2, 3, 4 nhập sai tiếp
         otpEntity.setAttempts(4);
         BusinessException ex5 = assertThrows(BusinessException.class, () ->
-                authService.verifyEmail(new AuthDto.VerifyEmailRequest(email, "000000")));
+                authService.verifyEmail(new AuthDto.VerifyEmailRequest(email, generated.rawOtp().equals("000000") ? "000001" : "000000")));
         assertEquals(ErrorCode.AUTH_OTP_INVALID, ex5.getErrorCode());
         assertEquals(5, otpEntity.getAttempts());
         assertNotNull(otpEntity.getRevokedAt(), "Mã phải bị thu hồi sau 5 lần thử sai");
@@ -262,7 +262,7 @@ class AuthEmailVerificationFlowTest {
     void testResendOtp_RateLimitCooldown() {
         String email = "cooldown@gmail.com";
         Account account = Account.builder().email(email).emailVerified(false).build();
-        when(accountRepository.findByEmail(email)).thenReturn(Optional.of(account));
+        when(accountRepository.findByEmailForUpdate(email)).thenReturn(Optional.of(account));
 
         EmailVerificationOtp recentOtp = EmailVerificationOtp.builder()
                 .email(email)
@@ -271,7 +271,7 @@ class AuthEmailVerificationFlowTest {
                 .createdAt(Instant.now().minus(20, ChronoUnit.SECONDS))
                 .build();
 
-        when(otpRepository.findTopByEmailAndPurposeAndRevokedAtIsNullAndUsedAtIsNullOrderByCreatedAtDesc(eq(email), eq(EmailVerificationOtp.PURPOSE_REGISTER)))
+        when(otpRepository.findTopByEmailAndPurposeOrderByCreatedAtDesc(eq(email), eq(EmailVerificationOtp.PURPOSE_REGISTER)))
                 .thenReturn(Optional.of(recentOtp));
 
         BusinessException ex = assertThrows(BusinessException.class, () -> authService.resendRegisterOtp(email));
@@ -365,7 +365,7 @@ class AuthEmailVerificationFlowTest {
 
         // Thử nhập sai OTP -> ném ngoại lệ
         assertThrows(BusinessException.class, () ->
-                authService.verifyPasswordResetOtp(email, "999999"));
+                authService.verifyPasswordResetOtp(email, generated.rawOtp().equals("999999") ? "999998" : "999999"));
 
         // Xác thực đúng OTP -> trả về resetToken tạm thời
         String resetToken = authService.verifyPasswordResetOtp(email, generated.rawOtp());

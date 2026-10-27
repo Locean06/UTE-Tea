@@ -20,6 +20,10 @@ public class DiningTable {
     @Column(name = "TenBan", nullable = false, unique = true, length = 40)
     private String name;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ShopId")
+    private vn.edu.ute.milktea.entity.market.Shop shop;
+
     @Column(name = "MaQR", nullable = false, unique = true, length = 64)
     private String qrCode;
 

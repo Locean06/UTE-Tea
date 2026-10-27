@@ -22,6 +22,14 @@ public class OrderDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateTableOrderRequest {
+        private Long shopId;
+        private vn.edu.ute.milktea.entity.payment.PaymentMethod paymentMethod;
+        @jakarta.validation.constraints.Size(max = 32)
+        private String voucherCode;
+        private BigDecimal expectedTotal;
+        private String qrCode;
+        private String tableToken;
+
         @NotNull(message = "Mã bàn không được để trống")
         private Long tableId;
 
@@ -39,6 +47,12 @@ public class OrderDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateCounterOrderRequest {
+        private Long shopId;
+        private vn.edu.ute.milktea.entity.payment.PaymentMethod paymentMethod;
+        @jakarta.validation.constraints.Size(max = 32)
+        private String voucherCode;
+        private BigDecimal expectedTotal;
+
         @NotEmpty(message = "Danh sách món đặt không được rỗng")
         @jakarta.validation.Valid
         private List<CartDto.CartItemRequest> items;
@@ -76,6 +90,15 @@ public class OrderDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class OrderResponse {
+        private Long shopId;
+        private String shopName;
+        private String fulfillmentMode;
+        private String paymentStatus;
+        private String bankName;
+        private String bankAccountNumber;
+        private String bankAccountHolder;
+        private String transferContent;
+        private String vietQrUrl;
         private Long orderId;
         private Long sessionId;
         private Long tableId;

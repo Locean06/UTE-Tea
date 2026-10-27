@@ -546,7 +546,7 @@
                                         </div>
                                         <h5 class="fw-bold mb-1">Xác Thực Địa Chỉ Email</h5>
                                         <p class="text-muted small mb-0">
-                                            Mã xác thực gồm 6 chữ số đã được gửi tới:
+                                            Nhập mã xác thực 6 chữ số cho địa chỉ email:
                                         </p>
                                         <div class="fw-bold text-primary mt-1" id="verifyTargetEmail">email@example.com</div>
                                     </div>
@@ -839,6 +839,12 @@
                     showOtpVerificationScreen(email, maskedEmail, cooldown);
 
                 } catch (err) {
+                    if (err.code === 'MAIL_SEND_FAILED' || err.errorCode === 'MAIL_SEND_FAILED') {
+                        showOtpVerificationScreen(email, email, 60);
+                        const otpAlert = document.getElementById('otpAlert');
+                        otpAlert.textContent = 'Tài khoản đang chờ kích hoạt. Chưa gửi được email; hãy gửi lại mã sau khi SMTP hoạt động.';
+                        otpAlert.classList.remove('d-none');
+                    }
                     alertEl.textContent = err.message || 'Không thể đăng ký tài khoản';
                     alertEl.className = 'alert alert-danger py-2 small rounded-3';
                     alertEl.classList.remove('d-none');

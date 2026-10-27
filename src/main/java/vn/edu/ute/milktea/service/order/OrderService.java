@@ -74,26 +74,47 @@ public class OrderService {
     private final FixedRecipeService fixedRecipeService;
     private final MaterialRepository materialRepository;
     private final vn.edu.ute.milktea.service.realtime.RealtimeEventPublisher realtimeEventPublisher;
+    private final OrderBranchService branchService;
+    private final vn.edu.ute.milktea.repository.market.VoucherRepository vouchers;
+    private final vn.edu.ute.milktea.repository.market.DeliveryOrderRepository deliveryOrders;
+
     @Transactional
     public OrderDto.OrderResponse createTableOrder(OrderDto.CreateTableOrderRequest request, CurrentActor actor, String idempotencyKey) {
-        // A table number is not permission to place an order on somebody else's table.
-        // Without QR self-ordering, dine-in orders MUST originate from the authenticated POS.
-        if (actor == null || !(actor.hasRole(Role.CASHIER) || actor.hasRole(Role.ADMIN))) {
-            throw BusinessException.forbidden(ErrorCode.ACCESS_DENIED,
-                    "Đặt món tại bàn cần được nhân viên thu ngân xác nhận");
+        if (idempotencyKey != null && (idempotencyKey.isBlank() || idempotencyKey.length() > 64))
+            throw BusinessException.badRequest(ErrorCode.VALIDATION_FAILED,"Mã yêu cầu không hợp lệ");
+        if (idempotencyKey == null) idempotencyKey = UUID.randomUUID().toString();
+        if (request == null || request.getTableId() == null)
+            throw BusinessException.forbidden(ErrorCode.ACCESS_DENIED,"Hãy quét mã QR bàn hợp lệ");
+        DiningTable table = tableRepository.findByIdWithLock(request.getTableId())
+                .orElseThrow(() -> BusinessException.notFound(ErrorCode.TABLE_NOT_FOUND, "Không tìm thấy bàn"));
+        boolean staff = actor != null && (actor.hasRole(Role.CASHIER) || actor.hasRole(Role.ADMIN));
+        if (!staff) {
+            boolean qrValid = request.getQrCode() != null && !request.getQrCode().isBlank()
+                    && java.security.MessageDigest.isEqual(request.getQrCode().getBytes(java.nio.charset.StandardCharsets.UTF_8),
+                        table.getQrCode().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            var proof = guestAccessService.validateTableToken(request.getTableToken());
+            boolean sessionValid = proof.isPresent() && proof.get().getSession().getTable().getId().equals(table.getId())
+                    && Objects.equals(table.getActiveSessionId(), proof.get().getSession().getId());
+            if (!qrValid && !sessionValid) throw BusinessException.forbidden(ErrorCode.ACCESS_DENIED, "Hãy quét mã QR bàn hợp lệ");
         }
+        var shop = branchService.tableBranch(table);
+        branchService.assertCustomer(shop, actor);
+        if (request.getShopId() != null && !request.getShopId().equals(shop.getId()))
+            throw BusinessException.forbidden(ErrorCode.ACCESS_DENIED, "Không được đổi cơ sở của bàn");
+        if (staff) branchService.assertStaff(Order.builder().shop(shop).build(), actor.getAccountId());
+        String fingerprint = fingerprint(request);
         if (idempotencyKey != null && !idempotencyKey.isBlank()) {
             var existing = orderRepository.findByIdempotencyKey(idempotencyKey);
             if (existing.isPresent()) {
                 Order order = existing.get();
                 assertReplayAccess(order,actor,OrderSource.TABLE);
+                assertFingerprint(order, fingerprint);
                 Invoice invoice = invoiceRepository.findByOrderId(order.getId()).orElse(null);
                 List<OrderItem> items = orderItemRepository.findByOrderId(order.getId());
                 return mapToOrderResponse(order, invoice, items, null, null);
             }
         }
-        DiningTable table = tableRepository.findByIdWithLock(request.getTableId())
-                .orElseThrow(() -> BusinessException.notFound(ErrorCode.TABLE_NOT_FOUND, "Không tìm thấy bàn"));
+
         if (!Boolean.TRUE.equals(table.getActive())) {
             throw BusinessException.badRequest(ErrorCode.TABLE_NOT_FOUND, "Bàn đang ngừng hoạt động");
         }
@@ -136,6 +157,8 @@ public class OrderService {
             session = sessionRepository.findById(table.getActiveSessionId())
                     .orElseThrow(() -> BusinessException.conflict(ErrorCode.TABLE_SESSION_CHANGED, "Không tìm thấy phiên"));
         }
+        if (session.getStatus() != TableSessionStatus.OPEN || !session.getTable().getId().equals(table.getId()))
+            throw BusinessException.conflict(ErrorCode.TABLE_SESSION_CHANGED,"Phiên bàn đã kết thúc hoặc không thuộc bàn này");
         // Tạo đơn hàng và tính giá snapshot
         Account customerAccount = (actor != null && actor.isAuthenticated()) ?
                 accountRepository.findById(actor.getAccountId()).orElse(null) : null;
@@ -146,6 +169,9 @@ public class OrderService {
                 .status(actor != null && (actor.hasRole(Role.CASHIER) || actor.hasRole(Role.ADMIN))
                         ? OrderStatus.CHO_THANH_TOAN : OrderStatus.CHO_XAC_NHAN)
                 .idempotencyKey(idempotencyKey)
+                .shop(shop)
+                .requestedPaymentMethod(request.getPaymentMethod() != null ? request.getPaymentMethod() : PaymentMethod.CASH)
+                .requestFingerprint(fingerprint)
                 .createdAt(Instant.now())
                 .version(0L)
                 .build();
@@ -155,6 +181,9 @@ public class OrderService {
         BigDecimal subtotal = calculateOrderSubtotal(savedItems);
         GlobalSettings settings = settingsRepository.findById(1).orElse(null);
         CalculatedDiscount discount = computeDiscount(subtotal, settings);
+        discount = applyVoucher(order, request.getVoucherCode(), subtotal, discount, true);
+        if (request.getExpectedTotal() != null && request.getExpectedTotal().compareTo(discount.totalAmount) != 0)
+            throw BusinessException.conflict(ErrorCode.VALIDATION_FAILED, "Giá hoặc giảm giá đã thay đổi. Vui lòng kiểm tra tổng tiền mới.");
         Invoice invoice = Invoice.builder()
                 .order(order)
                 .subtotal(subtotal)
@@ -168,7 +197,7 @@ public class OrderService {
                 .build();
         invoice = invoiceRepository.save(invoice);
         // Cập nhật phần còn lại của giỏ hàng trên server
-        sessionCartService.replaceCart(session.getId(),
+        if (staff) sessionCartService.replaceCart(session.getId(),
                 new CartDto.ReplaceCartRequest(request.getRemainingCartItems() != null ? request.getRemainingCartItems() : Collections.emptyList()),
                 null);
         auditRepository.save(BusinessAudit.builder()
@@ -188,11 +217,20 @@ public class OrderService {
 
     @Transactional
     public OrderDto.OrderResponse createCounterOrder(OrderDto.CreateCounterOrderRequest request, CurrentActor actor, String idempotencyKey) {
+        if (idempotencyKey != null && (idempotencyKey.isBlank() || idempotencyKey.length() > 64))
+            throw BusinessException.badRequest(ErrorCode.VALIDATION_FAILED,"Mã yêu cầu không hợp lệ");
+        if (idempotencyKey == null) idempotencyKey = UUID.randomUUID().toString();
+        var shop = branchService.resolve(request.getShopId());
+        branchService.assertCustomer(shop, actor);
+        if (actor != null && (actor.hasRole(Role.ADMIN) || actor.hasRole(Role.CASHIER)))
+            branchService.assertStaff(Order.builder().shop(shop).build(), actor.getAccountId());
+        String fingerprint = fingerprint(request);
         if (idempotencyKey != null && !idempotencyKey.isBlank()) {
             var existing = orderRepository.findByIdempotencyKey(idempotencyKey);
             if (existing.isPresent()) {
                 Order order = existing.get();
                 assertReplayAccess(order,actor,OrderSource.COUNTER);
+                assertFingerprint(order, fingerprint);
                 Invoice invoice = invoiceRepository.findByOrderId(order.getId()).orElse(null);
                 List<OrderItem> items = orderItemRepository.findByOrderId(order.getId());
                 return mapToOrderResponse(order, invoice, items, null, null);
@@ -208,6 +246,9 @@ public class OrderService {
                         ? OrderStatus.CHO_THANH_TOAN : OrderStatus.CHO_XAC_NHAN)
                 .note(request.getNote())
                 .idempotencyKey(idempotencyKey)
+                .shop(shop)
+                .requestedPaymentMethod(request.getPaymentMethod() != null ? request.getPaymentMethod() : PaymentMethod.CASH)
+                .requestFingerprint(fingerprint)
                 .createdAt(Instant.now())
                 .version(0L)
                 .build();
@@ -216,6 +257,9 @@ public class OrderService {
         BigDecimal subtotal = calculateOrderSubtotal(savedItems);
         GlobalSettings settings = settingsRepository.findById(1).orElse(null);
         CalculatedDiscount discount = computeDiscount(subtotal, settings);
+        discount = applyVoucher(order, request.getVoucherCode(), subtotal, discount, true);
+        if (request.getExpectedTotal() != null && request.getExpectedTotal().compareTo(discount.totalAmount) != 0)
+            throw BusinessException.conflict(ErrorCode.VALIDATION_FAILED, "Giá hoặc giảm giá đã thay đổi. Vui lòng kiểm tra tổng tiền mới.");
         Invoice invoice = Invoice.builder()
                 .order(order)
                 .subtotal(subtotal)
@@ -244,6 +288,7 @@ public class OrderService {
     public void assignCounterOrderToTable(Long orderId, Long tableId, Long cashierId) {
         Order order = orderRepository.findByIdWithLock(orderId)
                 .orElseThrow(() -> BusinessException.notFound(ErrorCode.ORDER_STATE_CONFLICT, "Không tìm thấy đơn hàng"));
+        branchService.assertStaff(order, cashierId);
         if (order.getSource() != OrderSource.COUNTER) {
             throw BusinessException.badRequest(ErrorCode.ORDER_STATE_CONFLICT, "Chỉ được gắn đơn hàng tại quầy vào bàn");
         }
@@ -251,6 +296,11 @@ public class OrderService {
             throw BusinessException.badRequest(ErrorCode.ORDER_STATE_CONFLICT, "Đơn hàng đã được gắn vào phiên bàn khác");
         }
         // Mở phiên nếu bàn chưa có phiên, hoặc lấy phiên hiện tại
+        var targetTable = tableRepository.findByIdWithLock(tableId).orElseThrow(() ->
+                BusinessException.notFound(ErrorCode.TABLE_NOT_FOUND,"Không tìm thấy bàn"));
+        var targetShop = branchService.tableBranch(targetTable);
+        if (order.getShop() != null && !order.getShop().getId().equals(targetShop.getId()))
+            throw BusinessException.forbidden(ErrorCode.ACCESS_DENIED,"Không được gắn đơn sang bàn khác cơ sở");
         TableSession session = tableSessionService.openByCashier(tableId, cashierId);
         order.setSession(session);
         orderRepository.save(order);
@@ -270,6 +320,7 @@ public class OrderService {
     public void confirm(Long orderId, Long cashierId) {
         Order order = orderRepository.findByIdWithLock(orderId)
                 .orElseThrow(() -> BusinessException.notFound(ErrorCode.ORDER_STATE_CONFLICT, "Không tìm thấy đơn hàng"));
+        branchService.assertStaff(order, cashierId);
         if (order.getStatus() == OrderStatus.CHO_CHE_BIEN) {
             return;
         }
@@ -304,6 +355,7 @@ public class OrderService {
     public void start(Long orderId, Long kitchenId) {
         Order order = orderRepository.findByIdWithLock(orderId)
                 .orElseThrow(() -> BusinessException.notFound(ErrorCode.ORDER_STATE_CONFLICT, "Không tìm thấy đơn hàng"));
+        branchService.assertStaff(order, kitchenId);
         if (order.getStatus() == OrderStatus.DANG_CHE_BIEN) {
             return;
         }
@@ -346,6 +398,7 @@ public class OrderService {
     public void complete(Long orderId, Long kitchenId) {
         Order order = orderRepository.findByIdWithLock(orderId)
                 .orElseThrow(() -> BusinessException.notFound(ErrorCode.ORDER_STATE_CONFLICT, "Không tìm thấy đơn hàng"));
+        branchService.assertStaff(order, kitchenId);
         if (order.getStatus() == OrderStatus.HOAN_THANH) {
             return;
         }
@@ -402,9 +455,11 @@ public class OrderService {
         for (var req : itemRequests) {
             Product product = productRepository.findById(req.getProductId())
                     .orElseThrow(() -> BusinessException.badRequest(ErrorCode.PRODUCT_UNAVAILABLE, "Món không tồn tại: ID " + req.getProductId()));
-            if (product.getShop() != null) {
-                throw BusinessException.badRequest(ErrorCode.PRODUCT_UNAVAILABLE, "Món của shop giao hàng phải đặt qua khu vực giao hàng");
-            }
+            product = branchService.product(product, order.getShop());
+            if (req.getQuantity() == null || req.getQuantity() < 1 || req.getQuantity() > 99)
+                throw BusinessException.badRequest(ErrorCode.VALIDATION_FAILED, "Số lượng không hợp lệ");
+            if (product.getCategory() != null && !Boolean.TRUE.equals(product.getCategory().getActive()))
+                throw BusinessException.badRequest(ErrorCode.PRODUCT_UNAVAILABLE, "Danh mục đã ngừng bán");
             if (!Boolean.TRUE.equals(product.getActive())) {
                 throw BusinessException.badRequest(ErrorCode.PRODUCT_UNAVAILABLE, "Món đã ngừng bán: " + product.getName());
             }
@@ -424,10 +479,14 @@ public class OrderService {
                     throw BusinessException.badRequest(ErrorCode.VALIDATION_FAILED,
                             "Cấu hình món/danh mục đã thay đổi: Danh mục \"" + product.getCategory().getName() + "\" không còn cho phép chọn topping đi kèm. Vui lòng cập nhật lại giỏ hàng.");
                 }
+                if (new HashSet<>(req.getToppingIds()).size() != req.getToppingIds().size() || req.getToppingIds().size() > 20)
+                    throw BusinessException.badRequest(ErrorCode.VALIDATION_FAILED, "Topping trùng hoặc quá giới hạn");
                 for (Long tId : req.getToppingIds()) {
                     Product toppingProd = productRepository.findById(tId)
                             .orElseThrow(() -> BusinessException.badRequest(ErrorCode.PRODUCT_UNAVAILABLE, "Topping không tồn tại: ID " + tId));
-                    if (toppingProd.getShop() != null) throw BusinessException.badRequest(ErrorCode.PRODUCT_UNAVAILABLE,"Topping của shop giao hàng không dùng cho đơn POS");
+                    toppingProd = branchService.product(toppingProd, order.getShop());
+                    if (toppingProd.getCategory() == null || !Product.normalizeSearch(toppingProd.getCategory().getName()).contains("topping"))
+                        throw BusinessException.badRequest(ErrorCode.VALIDATION_FAILED,"Món bổ sung không phải topping");
                     if (!Boolean.TRUE.equals(toppingProd.getActive())) {
                         throw BusinessException.badRequest(ErrorCode.PRODUCT_UNAVAILABLE, "Topping đã ngừng bán: " + toppingProd.getName());
                     }
@@ -609,7 +668,18 @@ public class OrderService {
                     .toppings(toppingsList)
                     .build();
         }).toList();
+        var bank = settingsRepository.findById(1).orElse(null);
+        String transferContent = "UTETEA ORD" + order.getId();
         return OrderDto.OrderResponse.builder()
+                .shopId(order.getShop() != null ? order.getShop().getId() : null)
+                .shopName(order.getShop() != null ? order.getShop().getName() : null)
+                .fulfillmentMode(order.getSession() != null ? "DINE_IN" : "TAKEAWAY")
+                .paymentStatus(isPaid ? "PAID" : "PENDING_PAYMENT")
+                .bankName(bank != null ? bank.getBankName() : null)
+                .bankAccountNumber(bank != null ? bank.getBankAccountNumber() : null)
+                .bankAccountHolder(bank != null ? bank.getBankAccountHolder() : null)
+                .transferContent(transferContent)
+                .vietQrUrl(vietQr(bank, invoice, transferContent))
                 .orderId(order.getId())
                 .sessionId(order.getSession() != null ? order.getSession().getId() : null)
                 .tableId(order.getSession() != null ? order.getSession().getTable().getId() : null)
@@ -633,7 +703,7 @@ public class OrderService {
                 .refund(refundRepository.findByOrderId(order.getId()).map(r -> vn.edu.ute.milktea.service.cancellation.RefundService.toResponse(r)).orElse(null))
                 .cancellationPending(cancellationRepository.findFirstByOrderIdAndStatus(order.getId(), CancellationStatus.CHO).isPresent())
                 .staffCreated(order.getAccount() != null && (order.getAccount().getRole() == Role.CASHIER || order.getAccount().getRole() == Role.ADMIN))
-                .paymentRequestMethod(latestNotice != null ? latestNotice.getMethod().name() : null)
+                .paymentRequestMethod(latestNotice != null ? latestNotice.getMethod().name() : order.getRequestedPaymentMethod() != null ? order.getRequestedPaymentMethod().name() : null)
                 .transferNotified(transferNotified)
                 .paid(isPaid)
                 .items(itemResponses)
@@ -659,7 +729,7 @@ public class OrderService {
         }
         // Neither a QR nor a guest capability can list history. The order receipt
         // is fetched separately with getOrderForCustomer() and a per-order token.
-        return orders.stream().sorted(java.util.Comparator.comparing(Order::getCreatedAt).reversed()).map(this::mapOrderToResponse).toList();
+        return orders.stream().filter(this::staffCanRead).sorted(java.util.Comparator.comparing(Order::getCreatedAt).reversed()).map(this::mapOrderToResponse).toList();
     }
 
 
@@ -671,7 +741,7 @@ public class OrderService {
             throw BusinessException.forbidden(ErrorCode.ACCESS_DENIED, "Bạn không có quyền xem đơn hàng này");
         }
         boolean allowed = actor.hasRole(vn.edu.ute.milktea.entity.account.Role.CASHIER) || actor.hasRole(vn.edu.ute.milktea.entity.account.Role.ADMIN);
-        if (allowed) return mapOrderToResponse(order);
+        if (allowed) { branchService.assertStaff(order, actor.getAccountId()); return mapOrderToResponse(order); }
         if (actor.getAccountId() != null && order.getAccount() != null) {
             allowed = actor.getAccountId().equals(order.getAccount().getId());
         } else if (actor.getOrderId() != null) {
@@ -688,6 +758,87 @@ public class OrderService {
     @Transactional(readOnly = true)
     public List<OrderDto.OrderResponse> getOrdersForCashier(OrderStatus status) {
         return getOrdersForCashier(status, null, null);
+    }
+
+    @org.springframework.beans.factory.annotation.Value("${app.payment.vietqr-bank-bin:}")
+    private String bankBin;
+
+    private String vietQr(GlobalSettings bank, Invoice invoice, String content) {
+        if (bank == null || invoice == null || bankBin == null || !bankBin.matches("[0-9]{6}")
+                || bank.getBankAccountNumber() == null || !bank.getBankAccountNumber().matches("[0-9]{6,30}")
+                || bank.getBankAccountHolder() == null || bank.getBankAccountHolder().isBlank()) return null;
+        return "https://img.vietqr.io/image/" + bankBin + "-" + bank.getBankAccountNumber() + "-compact2.png?amount="
+                + invoice.getTotalAmount().toPlainString() + "&addInfo=" + java.net.URLEncoder.encode(content, java.nio.charset.StandardCharsets.UTF_8)
+                + "&accountName=" + java.net.URLEncoder.encode(bank.getBankAccountHolder(), java.nio.charset.StandardCharsets.UTF_8);
+    }
+    @Transactional
+    public Map<String,Object> quote(OrderDto.CreateCounterOrderRequest request, CurrentActor actor) {
+        var shop = branchService.resolve(request.getShopId());
+        branchService.assertCustomer(shop, actor);
+        BigDecimal subtotal = BigDecimal.ZERO;
+        for (var item : request.getItems()) {
+            Product source = productRepository.findById(item.getProductId()).orElseThrow(() ->
+                    BusinessException.badRequest(ErrorCode.PRODUCT_UNAVAILABLE,"Món không tồn tại"));
+            Product product = branchService.product(source, shop);
+            if (!Boolean.TRUE.equals(product.getActive())) throw BusinessException.badRequest(ErrorCode.PRODUCT_UNAVAILABLE,"Món ngừng bán");
+            BigDecimal price = product.getPrice();
+            if (item.getToppingIds() != null) for (Long id : item.getToppingIds()) {
+                var topping = branchService.product(productRepository.findById(id).orElseThrow(() ->
+                        BusinessException.badRequest(ErrorCode.PRODUCT_UNAVAILABLE,"Topping không tồn tại")), shop);
+                if (!Boolean.TRUE.equals(topping.getActive())) throw BusinessException.badRequest(ErrorCode.PRODUCT_UNAVAILABLE,"Topping ngừng bán");
+                price = price.add(topping.getPrice());
+            }
+            subtotal = subtotal.add(price.multiply(BigDecimal.valueOf(item.getQuantity())));
+        }
+        var draft = Order.builder().shop(shop).account(actor != null && actor.isAuthenticated()
+                ? accountRepository.findById(actor.getAccountId()).orElse(null) : null).build();
+        var discount = applyVoucher(draft, request.getVoucherCode(), subtotal,
+                computeDiscount(subtotal, settingsRepository.findById(1).orElse(null)), false);
+        return Map.of("shopId",shop.getId(),"subtotal",subtotal,"discountAmount",discount.discountAmount,"totalAmount",discount.totalAmount,"shippingFee",BigDecimal.ZERO);
+    }
+
+    private String fingerprint(Object request) {
+        try {
+            var mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            var tree = mapper.valueToTree(request);
+            if (tree instanceof com.fasterxml.jackson.databind.node.ObjectNode object) {
+                object.remove("tableToken");
+                object.remove("expectedSessionId");
+            }
+            byte[] input = mapper.writeValueAsBytes(tree);
+            return HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(input));
+        } catch (Exception ex) { throw new IllegalStateException("Không thể kiểm tra yêu cầu đặt hàng", ex); }
+    }
+    private void assertFingerprint(Order order, String fingerprint) {
+        if (order.getRequestFingerprint() != null && !order.getRequestFingerprint().equals(fingerprint))
+            throw BusinessException.conflict(ErrorCode.IDEMPOTENCY_CONFLICT,"Mã yêu cầu đã dùng cho nội dung khác");
+    }
+    private boolean staffCanRead(Order order) {
+        var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !(auth.getPrincipal() instanceof CurrentActor actor)) return true;
+        if (!actor.hasRole(Role.ADMIN) && !actor.hasRole(Role.CASHIER) && !actor.hasRole(Role.KITCHEN)) return true;
+        return branchService.canAccess(order.getShop(), actor.getAccountId());
+    }
+    private CalculatedDiscount applyVoucher(Order order, String code, BigDecimal subtotal, CalculatedDiscount original, boolean consume) {
+        if (code == null || code.isBlank()) return original;
+        if (order.getAccount() == null) throw BusinessException.badRequest(ErrorCode.VALIDATION_FAILED,"Vui lòng đăng nhập để dùng mã giảm giá");
+        var voucher = vouchers.lockCode(code.trim().toUpperCase(Locale.ROOT)).orElseThrow(() ->
+                BusinessException.badRequest(ErrorCode.VALIDATION_FAILED,"Mã giảm giá không tồn tại"));
+        Instant now = Instant.now();
+        long used = orderRepository.countByAccountIdAndVoucherId(order.getAccount().getId(), voucher.getId())
+                + deliveryOrders.countByAccountIdAndVoucherId(order.getAccount().getId(), voucher.getId());
+        if (!voucher.isActive() || now.isBefore(voucher.getStartsAt()) || !now.isBefore(voucher.getEndsAt())
+                || voucher.getUsedCount() >= voucher.getUsageLimit() || used >= voucher.getPerAccountLimit()
+                || subtotal.compareTo(voucher.getMinimumAmount()) < 0
+                || voucher.getShop() != null && !voucher.getShop().getId().equals(order.getShop().getId()))
+            throw BusinessException.badRequest(ErrorCode.VALIDATION_FAILED,"Mã hết hạn, hết lượt hoặc không áp dụng cho cơ sở/giỏ hàng này");
+        if (consume) {
+            order.setVoucher(voucher);
+            voucher.setUsedCount(voucher.getUsedCount() + 1);
+            vouchers.save(voucher);
+        }
+        BigDecimal discount = original.discountAmount.add(voucher.getDiscountAmount()).min(subtotal).max(BigDecimal.ZERO);
+        return new CalculatedDiscount(discount, subtotal.subtract(discount), original.snapshotPercent, original.discountType, original.configValue);
     }
 
     private static class CalculatedDiscount {
@@ -742,7 +893,7 @@ public class OrderService {
         } else {
             orders = orderRepository.findAll();
         }
-        var stream = orders.stream()
+        var stream = orders.stream().filter(this::staffCanRead)
                 .sorted(java.util.Comparator.comparing(Order::getCreatedAt).reversed())
                 .map(this::mapOrderToResponse);
         if (query != null && !query.isBlank()) {
@@ -807,12 +958,12 @@ public class OrderService {
     public List<OrderDto.OrderResponse> getOrdersForKitchen() {
         List<Order> orders = orderRepository.findByStatusInOrderByCreatedAtAsc(
                 List.of(OrderStatus.CHO_CHE_BIEN, OrderStatus.DANG_CHE_BIEN));
-        return orders.stream().map(this::mapOrderToResponse).toList();
+        return orders.stream().filter(this::staffCanRead).map(this::mapOrderToResponse).toList();
     }
 
     @Transactional(readOnly = true)
     public OrderDto.OrderWorkSummaryResponse getOrderWorkSummary() {
-        List<Order> allOrders = orderRepository.findAll();
+        List<Order> allOrders = orderRepository.findAll().stream().filter(this::staffCanRead).toList();
         long totalCount = allOrders.size();
         long confirmCount = 0;
         long cookingCount = 0;

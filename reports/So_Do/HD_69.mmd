@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Xác minh scope"]
+  D{"Có quyền đối với cơ sở?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Tìm Account khách và quan hệ mua"]
+  D -- Đúng --> P1
+  P2["Cập nhật cờ blocked"]
+  P1 --> P2
+  P3["Lưu ShopCustomerAccess"]
+  P2 --> P3
+  P4["Các lệnh quote/tạo đơn kiểm tra assertCustomer"]
+  P3 --> P4
+  P4 --> F

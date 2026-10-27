@@ -1,0 +1,10 @@
+erDiagram
+  Account ||--o{ Order : MaTK
+  Shop ||--o{ Order : ShopId
+  DiningTable ||--o{ TableSession : MaBan
+  TableSession |o--o{ Order : MaPhien
+  Order ||--o| Invoice : MaDH
+  Order ||--o{ OrderItem : MaDH
+  OrderItem ||--o{ OrderItemTopping : MaChiTiet
+  Invoice ||--o| Payment : MaHD
+  Invoice ||--o{ PaymentNotice : MaHD

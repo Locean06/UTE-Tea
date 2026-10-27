@@ -28,7 +28,7 @@ public class OtpService {
     private final EmailVerificationOtpRepository otpRepository;
     private final SecureRandom secureRandom = new SecureRandom();
 
-    @Value("${app.otp.secret:milktea_secure_otp_secret_key_2026_very_long_and_safe}")
+    @Value("${app.otp.secret:}")
     private String otpSecret;
 
     @Value("${app.otp.cooldown-seconds:60}")
@@ -44,11 +44,15 @@ public class OtpService {
      */
     @Transactional
     public GeneratedOtp generateAndSaveOtp(String email, String purpose, int ttlMinutes) {
+        if (otpSecret == null || otpSecret.length() < 32) {
+            log.error("Thiếu cấu hình OTP_SECRET: cần khóa bí mật tối thiểu 32 ký tự");
+            throw BusinessException.badRequest(ErrorCode.VALIDATION_FAILED,"Chưa cấu hình dịch vụ xác thực email. Vui lòng liên hệ quản trị viên.");
+        }
         String cleanEmail = email.trim().toLowerCase();
         Instant now = Instant.now();
 
         // 1. Kiểm tra cooldown chống gửi dồn dập / spam
-        var latestActiveOpt = otpRepository.findTopByEmailAndPurposeAndRevokedAtIsNullAndUsedAtIsNullOrderByCreatedAtDesc(
+        var latestActiveOpt = otpRepository.findTopByEmailAndPurposeOrderByCreatedAtDesc(
                 cleanEmail, purpose);
 
         if (latestActiveOpt.isPresent()) {
@@ -104,7 +108,7 @@ public class OtpService {
     /**
      * Xác thực mã OTP và cập nhật trạng thái used/attempts.
      */
-    @Transactional
+    @Transactional(noRollbackFor = BusinessException.class)
     public void verifyOtp(String email, String purpose, String rawOtp) {
         String cleanEmail = email.trim().toLowerCase();
         String cleanOtp = rawOtp != null ? rawOtp.trim() : "";
@@ -127,7 +131,7 @@ public class OtpService {
         Instant now = Instant.now();
 
         // Kiểm tra hết hạn
-        if (otp.getExpiresAt().isBefore(now)) {
+        if (!otp.getExpiresAt().isAfter(now)) {
             otp.setRevokedAt(now);
             otpRepository.save(otp);
             throw BusinessException.badRequest(
@@ -148,7 +152,7 @@ public class OtpService {
 
         // So sánh HMAC Hash
         String expectedHash = computeHmacHash(cleanOtp, otp.getSalt(), cleanEmail, purpose);
-        if (!expectedHash.equals(otp.getOtpHash())) {
+        if (!java.security.MessageDigest.isEqual(expectedHash.getBytes(StandardCharsets.UTF_8), otp.getOtpHash().getBytes(StandardCharsets.UTF_8))) {
             int newAttempts = otp.getAttempts() + 1;
             otp.setAttempts(newAttempts);
             if (newAttempts >= otp.getMaxAttempts()) {

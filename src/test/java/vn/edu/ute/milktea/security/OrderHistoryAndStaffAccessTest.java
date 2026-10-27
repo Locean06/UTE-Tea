@@ -74,10 +74,10 @@ class OrderHistoryAndStaffAccessTest {
         verifyNoInteractions(orderRepository);
     }
 
-    @Test void customerCannotExchangeRetiredQrForTableSessionToken() {
-        assertThrows(BusinessException.class, () -> tableController.getTableContext("QR_TABLE_01_TOKEN_A1B2C3D4", null,
-                CurrentActor.authenticated(4L, Role.CUSTOMER)));
-        verifyNoInteractions(tableContextService);
+    @Test void scannedQrUsesTheExistingContextService() {
+        tableController.getTableContext("QR_TABLE_01_TOKEN_A1B2C3D4", null,
+                CurrentActor.authenticated(4L, Role.CUSTOMER));
+        verify(tableContextService).readByQr("QR_TABLE_01_TOKEN_A1B2C3D4");
     }
 
     @Test void staffPortalIsRestrictedByRole() {

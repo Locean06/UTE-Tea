@@ -1,0 +1,30 @@
+{
+  "java_files_checked": 183,
+  "java_changes": [],
+  "code_segments_verified": 127,
+  "code_segment_issues": [],
+  "original_template_unchanged": true,
+  "chapters": [
+    "KIẾN TRÚC ỨNG DỤNG",
+    "SƠ ĐỒ HOẠT ĐỘNG CÁC CHỨC NĂNG",
+    "GIAO DIỆN HỆ THỐNG"
+  ],
+  "sections": 5,
+  "page_setups_unchanged": true,
+  "paragraphs": 3513,
+  "tables": 153,
+  "inline_shapes": 103,
+  "zip_bad_member": null,
+  "old_project_terms": [],
+  "unchanged_old_media": [],
+  "field_instructions": 336,
+  "xml_parse_errors": [],
+  "missing_image_targets": [],
+  "diagram_png": 76,
+  "diagram_mermaid": 76,
+  "screenshots": 27,
+  "invalid_png": [],
+  "caption_sequence_errors": [],
+  "toc_fields": 4,
+  "docx_sha256": "d25183617b64a5f575754214a6b02d9b565905329a82cad886736995977719fa"
+}

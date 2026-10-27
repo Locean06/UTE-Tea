@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Khóa AccountCart theo tài khoản"]
+  D{"If-Match và lựa chọn hợp lệ?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["So sánh phiên bản"]
+  D -- Đúng --> P1
+  P2["Chuẩn hóa món/topping sang menu chung và kiểm tra lựa chọn"]
+  P1 --> P2
+  P3["Gộp lựa chọn giống nhau rồi serialize vào ItemsJson"]
+  P2 --> P3
+  P4["Tăng Revision và trả giỏ mới"]
+  P3 --> P4
+  P4 --> F

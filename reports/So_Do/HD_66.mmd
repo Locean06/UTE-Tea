@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Kiểm tra ADMIN"]
+  D{"Vai trò nhân viên thuộc tập cho phép?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Tìm Shop trong scope"]
+  D -- Đúng --> P1
+  P2["Kiểm tra vai trò tài khoản đích"]
+  P1 --> P2
+  P3["Thêm/bỏ khỏi tập managers"]
+  P2 --> P3
+  P4["JPA đồng bộ bảng nối ShopManager"]
+  P3 --> P4
+  P4 --> F

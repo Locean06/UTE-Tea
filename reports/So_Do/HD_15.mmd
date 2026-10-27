@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Khóa cơ sở và kiểm tra quyền mua"]
+  D{"Yêu cầu có quyền và dữ liệu hợp lệ?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Nếu key đã có và fingerprint khớp thì trả đơn trước đó"]
+  D -- Đúng --> P1
+  P2["Chỉ yêu cầu mới: tạo Order COUNTER và snapshot món"]
+  P1 --> P2
+  P3["Tính lại tổng; kiểm tra expectedTotal; tạo Invoice"]
+  P2 --> P3
+  P4["Cấp chứng từ riêng; audit và phát sự kiện sau commit"]
+  P3 --> P4
+  P4 --> F

@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Khóa tài khoản theo email"]
+  D{"Đã hết cooldown và chưa xác thực?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Kiểm tra trạng thái chưa xác thực"]
+  D -- Đúng --> P1
+  P2["Kiểm tra lần gửi mới nhất, kể cả mã đã thu hồi"]
+  P1 --> P2
+  P3["Thu hồi mã cũ và tạo OTP mới"]
+  P2 --> P3
+  P4["Gửi thư sau commit và trả thông báo email được che"]
+  P3 --> P4
+  P4 --> F

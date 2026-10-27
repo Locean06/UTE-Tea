@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Kiểm tra email và trạng thái tài khoản"]
+  D{"OTP khôi phục hợp lệ?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Xác minh OTP PASSWORD_RESET"]
+  D -- Đúng --> P1
+  P2["Sinh chuỗi resetToken ngẫu nhiên"]
+  P1 --> P2
+  P3["Lưu hash của vé tạm và thời hạn"]
+  P2 --> P3
+  P4["Trả vé tạm cho bước xác nhận mật khẩu"]
+  P3 --> P4
+  P4 --> F

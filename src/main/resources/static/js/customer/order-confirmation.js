@@ -26,6 +26,17 @@
         $('confirmStatus').textContent = states[o.status] || o.status || 'Đang xử lý';
         $('confirmPayment').textContent = o.paid ? 'Đã thu tiền' : 'Chưa xác nhận';
         $('confirmTotal').textContent = MilkTeaApi.formatVND(o.totalAmount);
+        $('confirmBranch').textContent = (o.shopName || 'Cơ sở phục vụ') + (o.tableName ? ' · Bàn '+o.tableName : ' · Mang về');
+        const transfer = o.paymentRequestMethod === 'BANK_TRANSFER';
+        $('confirmCashMessage').classList.toggle('d-none',transfer || o.paid);
+        const bank = $('confirmBankDetails'); bank.replaceChildren(); bank.classList.toggle('d-none',!transfer || o.paid);
+        if (transfer && !o.paid) {
+            const values = o.bankName && o.bankAccountNumber && o.bankAccountHolder
+                ? ['Ngân hàng: '+o.bankName,'Số tài khoản: '+o.bankAccountNumber,'Chủ tài khoản: '+o.bankAccountHolder,'Số tiền: '+MilkTeaApi.formatVND(o.totalAmount),'Nội dung: '+o.transferContent,'Đang chờ thu ngân xác minh giao dịch.']
+                : ['Cơ sở chưa cấu hình đầy đủ tài khoản ngân hàng. Vui lòng liên hệ thu ngân; đơn vẫn chờ thanh toán.'];
+            for (const text of values) {const p=document.createElement('p');p.textContent=text;bank.append(p);}
+            if (o.vietQrUrl) {const img=document.createElement('img');img.src=o.vietQrUrl;img.alt='QR chuyển khoản đúng đơn hàng';img.style.maxWidth='100%';img.width=280;bank.append(img);}
+        }
         const list = $('confirmationItems');
         list.replaceChildren();
         (o.items || []).forEach(item => {
@@ -38,7 +49,7 @@
             li.appendChild(price);
             list.appendChild(li);
         });
-        $('confirmationPaymentActions').classList.toggle('d-none', Boolean(o.paid) || o.status === 'DA_HUY');
+        $('confirmationPaymentActions').classList.toggle('d-none', Boolean(o.paid) || !transfer || o.status === 'DA_HUY');
     }
     async function refresh() {
         if (!/^\d+$/.test(orderId) || !orderId) { error('Mã đơn hàng không hợp lệ.'); return; }
@@ -56,7 +67,7 @@
         const btn = $('confirmationTransferBtn');
         btn.disabled = true;
         try {
-            await MilkTeaApi.post('/api/v1/orders/' + encodeURIComponent(orderId) + '/payment-notices', {method: 'BANK_TRANSFER'}, proofHeaders);
+            await MilkTeaApi.post('/api/v1/orders/' + encodeURIComponent(orderId) + '/payment-notices', {method: 'BANK_TRANSFER',reference:'CUSTOMER_TRANSFERRED_'+orderId}, {...proofHeaders,'Idempotency-Key':'notice-'+orderId});
             MilkTeaApi.showToast('Đã gửi thông báo chuyển khoản. Thu ngân sẽ kiểm tra.', 'success');
             await refresh();
         } catch (err) {

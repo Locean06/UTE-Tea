@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Khóa đơn và kiểm tra nguồn"]
+  D{"Đơn quầy chưa gắn và cùng cơ sở?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Từ chối đơn đã gắn phiên"]
+  D -- Đúng --> P1
+  P2["Khóa bàn và đối chiếu cơ sở"]
+  P1 --> P2
+  P3["Mở/lấy phiên bằng TableSessionService"]
+  P2 --> P3
+  P4["Gắn session vào chính Order và ghi audit"]
+  P3 --> P4
+  P4 --> F

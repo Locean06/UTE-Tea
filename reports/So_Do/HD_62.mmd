@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Xác định khoảng thời gian"]
+  D{"Kỳ báo cáo có dữ liệu?"}
+  E["Trả tổng doanh thu bằng 0 và dữ liệu rỗng trong kỳ."]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Truy vấn dữ liệu tiền/hóa đơn theo thời điểm phù hợp"]
+  D -- Đúng --> P1
+  P2["Tính các chỉ tiêu được DTO định nghĩa"]
+  P1 --> P2
+  P3["Nhóm và sắp dữ liệu"]
+  P2 --> P3
+  P4["Trả RevenueReportView"]
+  P3 --> P4
+  P4 --> F

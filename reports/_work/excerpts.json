@@ -1,0 +1,891 @@
+[
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/auth/AuthService.java",
+    "method": "register",
+    "start": 86,
+    "end": 98,
+    "sha256": "3bb3efe73610298ed2ecbfa6c1655353c0351e8c6dfe92063324827c7638382b"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/auth/AuthService.java",
+    "method": "register",
+    "start": 101,
+    "end": 111,
+    "sha256": "9235b0f327a91ee249b100b7541c41a290c9bf51113feb4dc8c9db02fd6d6f4f"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/auth/AuthService.java",
+    "method": "register",
+    "start": 126,
+    "end": 137,
+    "sha256": "6337a279dac806ce29787b11375b0d0533ba5544d6ae00a744f9e06cf13f0fed"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/auth/AuthService.java",
+    "method": "verifyEmail",
+    "start": 143,
+    "end": 161,
+    "sha256": "e26af5d2b1dee88947b3381e58cd6ed6f21ae3e0ffb12c217aac309ba4dcf741"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/auth/AuthService.java",
+    "method": "resendRegisterOtp",
+    "start": 167,
+    "end": 182,
+    "sha256": "a2c24b5003a12f3b68ee877aa340689c0303823c671960668e9782c8c17e2799"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/auth/AuthService.java",
+    "method": "login",
+    "start": 40,
+    "end": 76,
+    "sha256": "4d1f31bc039ff9eefa5af618d3332ca517c55b8d34da0b8fc36719afcceaf7dc"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/auth/AuthService.java",
+    "method": "logout",
+    "start": 185,
+    "end": 193,
+    "sha256": "5d470fae5c22343cbac07a260759458906319bd09ea73e0ea1037816a9e1ad66"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/auth/AuthService.java",
+    "method": "requestPasswordReset",
+    "start": 202,
+    "end": 226,
+    "sha256": "01c3f147e6a3d40ae2f3b6fb2075b1ab23f8f84c2939c6cba85cdb3721bd82ed"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/auth/AuthService.java",
+    "method": "verifyPasswordResetOtp",
+    "start": 232,
+    "end": 262,
+    "sha256": "90bcadb013eb0b85fec163c7ea8461c055cadffe0fd3abae5d1aacabe2f1c87a"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/auth/AuthService.java",
+    "method": "confirmPasswordReset",
+    "start": 268,
+    "end": 280,
+    "sha256": "51c2e4d14234d52dd0d486663f0c40c458fd379121541895b755262e33670a5e"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/auth/AuthService.java",
+    "method": "confirmPasswordReset",
+    "start": 290,
+    "end": 300,
+    "sha256": "fbb61ebd9390efdb742d8f9bd01755e6a9573354c845ec67b97cc3a807adf578"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/auth/AuthService.java",
+    "method": "confirmPasswordReset",
+    "start": 312,
+    "end": 323,
+    "sha256": "b8a5458893fb8714f79758889823c484e8937ea1fb10f597d1d25d198e4793ff"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/market/CatalogSearchService.java",
+    "method": "search",
+    "start": 68,
+    "end": 80,
+    "sha256": "e8263b97f79e87a404b2e67c07dbf4e9a2645de7ed67cfd4c1239821cf8d4f1f"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/market/CatalogSearchService.java",
+    "method": "search",
+    "start": 88,
+    "end": 98,
+    "sha256": "964d1ed0ae2cfb75344dfd476123936927f6a72b4080106bbd3fb145efff0ae8"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/market/CatalogSearchService.java",
+    "method": "search",
+    "start": 100,
+    "end": 111,
+    "sha256": "5e4da73e0050f4c18fcc96fb42fc27e1720e11a0e192487f59d887fbc4e55790"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/market/CatalogSearchService.java",
+    "method": "options",
+    "start": 32,
+    "end": 65,
+    "sha256": "5e27a41b2e81a69e149dbeaa364fc974761e48f81a64525828aed97a015783c0"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/account/CustomerDataService.java",
+    "method": "replaceCart",
+    "start": 44,
+    "end": 70,
+    "sha256": "6b6048364286ba0ec7412c93573214c0020c848646ec2b2264d5d2ad96c357b0"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/account/CustomerDataService.java",
+    "method": "cart",
+    "start": 39,
+    "end": 42,
+    "sha256": "0a23fc09d873d3419e8a5178cef84529e341a2abebffd674e560c3d9f406d6fb"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/table/TableContextService.java",
+    "method": "readByQr",
+    "start": 28,
+    "end": 63,
+    "sha256": "f16ec44f3b7f28a483f990c2fea3ed55c7348c55f94d54dec32666cb54f68521"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "quote",
+    "start": 775,
+    "end": 798,
+    "sha256": "6fa5739b5eb9192d93b431da4c81ead18f4d34f1f9fe15f95f21e9a0165820e5"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "createCounterOrder",
+    "start": 219,
+    "end": 231,
+    "sha256": "383b2a53667200103354175ab9819eec9ea34db277be623dfbfed86e60e3d6f4"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "createCounterOrder",
+    "start": 261,
+    "end": 271,
+    "sha256": "f9d324e1addcf8ed1532b428cab20843191ecaa8ebdb199a0213aaf82d8f809d"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "createCounterOrder",
+    "start": 274,
+    "end": 285,
+    "sha256": "7fc2fd9f057b53f790e30f6f03ad08f0c7db3323b04d388459309d499635d153"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "createTableOrder",
+    "start": 82,
+    "end": 94,
+    "sha256": "9fc15af092256e1fa6c1a51f0adff02404f588aa55664dfeae33cf04821dd1fb"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "createTableOrder",
+    "start": 98,
+    "end": 108,
+    "sha256": "e065a02dc3fb969ba9f242e3ea0c6e4e2d1206848d788c5c19e473eb4078fbb7"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "createTableOrder",
+    "start": 205,
+    "end": 216,
+    "sha256": "1f1bc36a194a631114e85fd335987658573201ba23c1c888db61ed59c0d75ca9"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/payment/PaymentService.java",
+    "method": "createNoticeForOrder",
+    "start": 307,
+    "end": 311,
+    "sha256": "028cbbbe5f561cc87c944a0299b84b4e963adb5ff9ec5a004e4966b984840c18"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "getOrderForCustomer",
+    "start": 737,
+    "end": 756,
+    "sha256": "664ce074451a51c1f38f55763a9ebe24aa21f227f904fd2a6c2c78ac54c21a38"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "getOrdersForCustomer",
+    "start": 723,
+    "end": 733,
+    "sha256": "19ed5da74d7b2a332400fa221a772f8dcef1f16cd6e0e58eae72c44026375379"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/cancellation/CancellationService.java",
+    "method": "requestCancellation",
+    "start": 46,
+    "end": 58,
+    "sha256": "916dac407e76a59555b471daa0a40c8afa736a80f1984bdc2d6ffa2605244b6a"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/cancellation/CancellationService.java",
+    "method": "requestCancellation",
+    "start": 60,
+    "end": 70,
+    "sha256": "b5b2c2ba5a8964dc93a825aa586eeba204349125882d4b28558fa6199b6f2b11"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/cancellation/CancellationService.java",
+    "method": "requestCancellation",
+    "start": 123,
+    "end": 134,
+    "sha256": "8015c8f2b7ec65119f1483c986392c94db4b746c9f1d92c03750996352bb4f2b"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/auth/AuthService.java",
+    "method": "updateProfile",
+    "start": 339,
+    "end": 358,
+    "sha256": "253e4389e94863412dffc9bd9a12286c3ce4356c3792e1e662fdeb952133c020"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/auth/AuthService.java",
+    "method": "changePassword",
+    "start": 361,
+    "end": 372,
+    "sha256": "73dd84c9887a39545ecf9fa341a4a95b0fa08bc27464648752979e091b211c5c"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/account/CustomerDataService.java",
+    "method": "interest",
+    "start": 139,
+    "end": 145,
+    "sha256": "2828ad575a3fb29d8d23886e20ee31f15b77332a8c8cbf2ec8d9db54c848e934"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/market/ReviewService.java",
+    "method": "create",
+    "start": 32,
+    "end": 50,
+    "sha256": "0bb74671d59bb4db1a12676a2c4ff32e7da03b5df091eb189c45380ee49637d0"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/market/ReviewService.java",
+    "method": "media",
+    "start": 55,
+    "end": 75,
+    "sha256": "510bf398286534f406e2e41ee69ee942992d6c8a1adb1baef9c1b11f3a2123ab"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/account/CustomerDataService.java",
+    "method": "saveAddress",
+    "start": 118,
+    "end": 129,
+    "sha256": "2dfec3b12031d0a184365bacb88bdea05c6339542f4665dbf53ed00b222e4658"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "getOrdersForCashier",
+    "start": 888,
+    "end": 900,
+    "sha256": "2a21e3bbf4be198b093663ebf6ac6015aba421bc5a335e55c74f562af76709cf"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "getOrdersForCashier",
+    "start": 907,
+    "end": 917,
+    "sha256": "df8c37c6e93661fbfe6f0f1b9d2320d28b271b78b574f734572a470a3643d330"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "getOrdersForCashier",
+    "start": 919,
+    "end": 930,
+    "sha256": "e1f0c287d8195a22f39f8842ed098f940f520dd06b209808605c49544fe647b7"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "confirm",
+    "start": 320,
+    "end": 352,
+    "sha256": "f04dbdccaafce9f285d1dc6f30b36dc59a67abecad5f79faa02ec2ebc85431a1"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "createCounterOrder",
+    "start": 219,
+    "end": 231,
+    "sha256": "383b2a53667200103354175ab9819eec9ea34db277be623dfbfed86e60e3d6f4"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "createCounterOrder",
+    "start": 261,
+    "end": 271,
+    "sha256": "f9d324e1addcf8ed1532b428cab20843191ecaa8ebdb199a0213aaf82d8f809d"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "createCounterOrder",
+    "start": 274,
+    "end": 285,
+    "sha256": "7fc2fd9f057b53f790e30f6f03ad08f0c7db3323b04d388459309d499635d153"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/payment/PaymentService.java",
+    "method": "recordReceipt",
+    "start": 44,
+    "end": 56,
+    "sha256": "e3abef4dfe09f903deb2a550f03bdaf37b22c6fa5221f38da7a6a6cbb2b0bd59"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/payment/PaymentService.java",
+    "method": "recordReceipt",
+    "start": 58,
+    "end": 68,
+    "sha256": "60cbb209dc4ee99fad43044c851ec431e5a9ac10dfa1851160dce1f9871a87a7"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/payment/PaymentService.java",
+    "method": "recordReceipt",
+    "start": 214,
+    "end": 225,
+    "sha256": "e5fcc17fc0587f721393e40ee92f7ec566f17884d60dccb62ef1a67cad25b98b"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/payment/PaymentService.java",
+    "method": "confirmTransferReceiptForOrder",
+    "start": 279,
+    "end": 297,
+    "sha256": "e09d8e46330115ef914c51a0ece20f6852945d06255d4bcd1120640500bac3c8"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/table/TableSessionService.java",
+    "method": "openByCashier",
+    "start": 43,
+    "end": 55,
+    "sha256": "6557fbb4ebe7ccac18513c72a1b13535f50bf35801094a936f34e618e0c809a5"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/table/TableSessionService.java",
+    "method": "openByCashier",
+    "start": 66,
+    "end": 76,
+    "sha256": "e15f5d5ae8bb2ce20cf1dd4afa4d11fae281652e8dcfba38bce4028c4dc4a35f"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/table/TableSessionService.java",
+    "method": "openByCashier",
+    "start": 78,
+    "end": 89,
+    "sha256": "dacc30272bd550c6f77be3f6837ccbc2d36373f9ee25927a88bfe79addf83237"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "assignCounterOrderToTable",
+    "start": 288,
+    "end": 317,
+    "sha256": "e52b4936e4c74e4ae8ccce4eac0cf5e6ee8101e94c3b43a3f7b93e57721fa8cb"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/table/TableSessionService.java",
+    "method": "closeBySessionId",
+    "start": 183,
+    "end": 188,
+    "sha256": "ce603eda72c5fb7c5f3bd09733e531104a6f089906132a0bbf0b06279a966eb6"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/cancellation/CancellationService.java",
+    "method": "decideCancellation",
+    "start": 151,
+    "end": 163,
+    "sha256": "fa7b0dda86361a5299253a2cb7aa966550e41b271cd0209c504c50229654c011"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/cancellation/CancellationService.java",
+    "method": "decideCancellation",
+    "start": 165,
+    "end": 175,
+    "sha256": "d6e6e5e4f711f36a3bbc86e9e2c7daf53f6d715a1c4812815d5335183d6632d8"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/cancellation/CancellationService.java",
+    "method": "decideCancellation",
+    "start": 200,
+    "end": 211,
+    "sha256": "f830a75ba805ab9a0d2667974155097e75c094aca276a52aa3429780c187147d"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/cancellation/RefundService.java",
+    "method": "refundCash",
+    "start": 72,
+    "end": 84,
+    "sha256": "f0046a1fccfbaea846d5dc10350038461824695c796e2a9f9ce26e01a1699b98"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/cancellation/RefundService.java",
+    "method": "refundCash",
+    "start": 86,
+    "end": 96,
+    "sha256": "c1fc6699108df08401c6f9d0d8f657707b098180c6b9cfd3abe1dcc5a3bc34c6"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/cancellation/RefundService.java",
+    "method": "refundCash",
+    "start": 109,
+    "end": 120,
+    "sha256": "ed801fb6208a23fea90dffd3a53cd1448d142643a63553b1df36b40c99cfbb85"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "getOrdersForKitchen",
+    "start": 958,
+    "end": 962,
+    "sha256": "239e1ef6e59b7d7fb8a933266b6d3b435fb022978747884a15c17d613680c496"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "start",
+    "start": 355,
+    "end": 367,
+    "sha256": "97a927bcaa5a273836bc6136dbfbdfc9adb871d311ec0e3742f469b7a064dbf4"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "start",
+    "start": 372,
+    "end": 382,
+    "sha256": "c41ae7ba65e866cae456c49b49ea2bcc485b1c1cd2a71f30918b724e28225863"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "start",
+    "start": 384,
+    "end": 395,
+    "sha256": "5bdfb53c28c86fd33d481b11411e2af881e7d46147261e48d5e3288ee3f0516e"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "complete",
+    "start": 398,
+    "end": 432,
+    "sha256": "d5ebfadadff88f3869368512d90397d8f34131ba9d13af6a3bacfc1e24120c40"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "getStocksWithFilter",
+    "start": 506,
+    "end": 518,
+    "sha256": "c9ff905dbb27d7de629018ff53abff89bfb5a9b372366c939d2e09f4e4bddef5"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "getStocksWithFilter",
+    "start": 530,
+    "end": 540,
+    "sha256": "ae92182e573b46e3448a481326140d7d5472e555b3cb994bb6c8eac39c2411b9"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "getStocksWithFilter",
+    "start": 545,
+    "end": 556,
+    "sha256": "25b5c628363fdce397897af753a2bf931f0c5424b3b08c86d5c9ffaf38e9c09b"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "recordPreparation",
+    "start": 141,
+    "end": 153,
+    "sha256": "c442869b6f1a7752068b6766b3b79feba2866ed9b764df219e5b61a8d1f602eb"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "recordPreparation",
+    "start": 158,
+    "end": 168,
+    "sha256": "325a676d4a379b1ec4dcdd0470c781dae831cb9c1a29334d7d01dbd706d5e7f4"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "recordPreparation",
+    "start": 403,
+    "end": 414,
+    "sha256": "074ba29a770f62d52491342e86c12245fff153b60d8f8be22f85f793a4ec85d1"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "recordImport",
+    "start": 616,
+    "end": 628,
+    "sha256": "3e83995c7bb0553e6dd4a6e6bd4b0a04fd005bec960a875ea17ae1f7b4e21645"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "recordImport",
+    "start": 631,
+    "end": 641,
+    "sha256": "3e2bab7cbbba87c10ce3be9310762e1ec0ad6df658f7de5ef66cac45783275bf"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "recordImport",
+    "start": 707,
+    "end": 718,
+    "sha256": "959bb9e2855e9e3deff9635cb93314958ff1acc72b39dd3af95ed07df949c1dd"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "recordWaste",
+    "start": 738,
+    "end": 750,
+    "sha256": "745d9442475a0885eccb39bdd92786cfced75c8f9fb7c15990fd3f137ed3c8a0"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "recordWaste",
+    "start": 752,
+    "end": 762,
+    "sha256": "b776a1e3d80d822c706816f7b0913db5f1e08dfd47ec44d064973c1165cb75d7"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "recordWaste",
+    "start": 799,
+    "end": 810,
+    "sha256": "c5ac5261b115958284fb1f4c68b9c98950cac80b441bb4cd51ef4d94b6b45a48"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "recordIncident",
+    "start": 950,
+    "end": 969,
+    "sha256": "34d00d39f7b5a74c3ed74bcac7da510a400478f1ab10f27554e8b73f2055c72d"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "recordAdditionalConsumption",
+    "start": 999,
+    "end": 1011,
+    "sha256": "5ea416039eff9056d7ecd80d353bfb7ee26994595efdb4122e2fcc64c0a9395b"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "recordAdditionalConsumption",
+    "start": 1018,
+    "end": 1028,
+    "sha256": "2f485d74773012f2f40a8eb181d65876e9b3e5901cd5f4561782736d2e23813a"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "recordAdditionalConsumption",
+    "start": 1030,
+    "end": 1041,
+    "sha256": "d3743f57e25665e0d18bc335971bde6de64b3410177ceb070e058f33188b3929"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "recordShiftSettlement",
+    "start": 1140,
+    "end": 1152,
+    "sha256": "56a7a74b917ee550076cb7d80a94db4b47e03b88569e9aff445c339951a5ac3c"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "recordShiftSettlement",
+    "start": 1154,
+    "end": 1164,
+    "sha256": "178386e8e52ee2e5845a7e9ba55deb697fd5a57dc4f0e566e8b3e1ad856eee28"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "recordShiftSettlement",
+    "start": 1254,
+    "end": 1265,
+    "sha256": "49f9517d64cb73d1ee0a34a962d9ac19b29aeeddecb73fd3412d8be0c2ed9e3a"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "listMovements",
+    "start": 920,
+    "end": 942,
+    "sha256": "84796505d899f98832523ccfb837060f96c1513240b3c76e85cb2f9171b2fef3"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/admin/AdminService.java",
+    "method": "createStaffAccount",
+    "start": 76,
+    "end": 99,
+    "sha256": "b4d73645696f83e7c6e15c226e2fb4975268eee9aae9b172eb60cf53c5818563"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/admin/AdminService.java",
+    "method": "toggleStaffStatus",
+    "start": 181,
+    "end": 218,
+    "sha256": "6a9093a3e9d27e3463adeeb09d81a0b3ea07964ac0d93dcec36c6f5465e9069c"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/admin/AdminService.java",
+    "method": "createCategory",
+    "start": 259,
+    "end": 271,
+    "sha256": "2314bcba9055bd87f0afb7030825ff6cc9b0d02a8fc6cf308548b40bfef3ee4a"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/admin/AdminService.java",
+    "method": "updateProduct",
+    "start": 381,
+    "end": 403,
+    "sha256": "63f5170435fb3fa73c2d373a72975ac80f3e1406c78cbab831e6abe0b28fee5c"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/media/ProductImageService.java",
+    "method": "uploadProductImage",
+    "start": 110,
+    "end": 122,
+    "sha256": "02dbe014dd07aa8e77f6b38cff62268bd0262c398ae3dc59e34363ea9083f77a"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/media/ProductImageService.java",
+    "method": "uploadProductImage",
+    "start": 133,
+    "end": 143,
+    "sha256": "7f5cb84be384ca1ad73230bf55c03e4c98d320a6b1f9a39d2e35a278bf2040ae"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/media/ProductImageService.java",
+    "method": "uploadProductImage",
+    "start": 167,
+    "end": 178,
+    "sha256": "b1b078146eabef41beebadde8bec30410355b6e2775a28bc3467b41920e9921e"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/admin/AdminService.java",
+    "method": "updateProductRecipe",
+    "start": 439,
+    "end": 468,
+    "sha256": "3eeda0c8541e02cab05e25d68a10938af3af5689e57cec48a029c7ec047ec4cb"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/admin/AdminService.java",
+    "method": "createTable",
+    "start": 500,
+    "end": 510,
+    "sha256": "b3df1c485f6859c978e7debb877404c045c23c69a6fa7af432c67754bb68f525"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/admin/AdminService.java",
+    "method": "createMaterial",
+    "start": 596,
+    "end": 613,
+    "sha256": "6f23df43699516e50533aaf5a404ed732d98314c7b4051136a27154b6041cb31"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/admin/AdminService.java",
+    "method": "createPreparationRecipe",
+    "start": 663,
+    "end": 675,
+    "sha256": "cefc3c0346a31d1bed6537c007dc2b9811f49359460ec2ec156eb4d5d32b4421"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/admin/AdminService.java",
+    "method": "createPreparationRecipe",
+    "start": 688,
+    "end": 698,
+    "sha256": "315b1825da5c85c2d0ee1a193d2dc5795b4160eefef67d9971300dfa8814da2d"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/admin/AdminService.java",
+    "method": "createPreparationRecipe",
+    "start": 700,
+    "end": 711,
+    "sha256": "947c20c8fe0a60ed2eb13458d754993a186bd69847592a8b43260b288e0ed53a"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "adjustRawMaterialStock",
+    "start": 813,
+    "end": 825,
+    "sha256": "a181c21e75725610e1a08fe2bbb5b5c732d6d2bbcbff687177b31ae9d5e57534"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "adjustRawMaterialStock",
+    "start": 832,
+    "end": 842,
+    "sha256": "ec77afb31c8fa23afb9a8636b99a011b0ba384e0bec8ada7ebadfb56ef239c5f"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "adjustRawMaterialStock",
+    "start": 890,
+    "end": 901,
+    "sha256": "16ee4bea7173b67cd05a28120f0e654b920f185bed6bc67c5979f511cb4030a3"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/inventory/InventoryService.java",
+    "method": "configureThreshold",
+    "start": 487,
+    "end": 492,
+    "sha256": "855e4ab3dbe0ea4b83ee451c52bf37a16bbc907e7b62ee6e67b759e6b18222db"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "getOrderWorkSummary",
+    "start": 965,
+    "end": 977,
+    "sha256": "4debc24a2a6e719b2cd76a10fa5d311aa3e369f1abd8fb65a06f9bc0d645a77b"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "getOrderWorkSummary",
+    "start": 980,
+    "end": 990,
+    "sha256": "08d3c03169e94600e225fbcdbd43b706efe38d3126e14cde25e8694d0a64228f"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/order/OrderService.java",
+    "method": "getOrderWorkSummary",
+    "start": 1024,
+    "end": 1035,
+    "sha256": "a4e96e1ea91ac4fe6afd94fdd9ef217d89ad58e2b972edd2d6799b4504b5c8e2"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/cancellation/RefundService.java",
+    "method": "decideRefund",
+    "start": 142,
+    "end": 154,
+    "sha256": "d4b994286f7e151c8b1b490dbb796f394c982a3429c9518bfd6f0f915266f5f9"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/cancellation/RefundService.java",
+    "method": "decideRefund",
+    "start": 156,
+    "end": 166,
+    "sha256": "73896903383c95f93492a62e858600a949316be63c3c2c251fd3f56921e99171"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/cancellation/RefundService.java",
+    "method": "decideRefund",
+    "start": 169,
+    "end": 180,
+    "sha256": "db9617223506dd4342ea137cd1132776bf37b88d9a4f80e558fa96bc9321deb4"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/settings/SettingsService.java",
+    "method": "updateSettings",
+    "start": 54,
+    "end": 66,
+    "sha256": "7b26b62b60f262c539726b650dc701392b7a0101ccc799e7ec6f86b3ceca33c1"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/settings/SettingsService.java",
+    "method": "updateSettings",
+    "start": 69,
+    "end": 79,
+    "sha256": "a83468dbe1f619e590435b32b699c92686ddc5c0186a93818512154020c8add5"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/settings/SettingsService.java",
+    "method": "updateSettings",
+    "start": 99,
+    "end": 110,
+    "sha256": "9ce86cb4fccf6c0aedbcb1d8302be45a797f24fa56d070352b4315d54b3a0be1"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/report/ReportService.java",
+    "method": "getRevenueReport",
+    "start": 116,
+    "end": 128,
+    "sha256": "b48f5c01dff35f5cdc0356d941ec947dbb146d8cb7bc0c778c0fb95c71312bd7"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/report/ReportService.java",
+    "method": "getRevenueReport",
+    "start": 141,
+    "end": 151,
+    "sha256": "dc78dbcd65a6f939f5a0d399a8f0cc026c64c02d41f938ae78f2f0a4836a023a"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/report/ReportService.java",
+    "method": "getRevenueReport",
+    "start": 162,
+    "end": 173,
+    "sha256": "a3d24d24160548d1158d11b6779a68ce437c828f317e0bb19c65bd4c61ad2407"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/report/ReportService.java",
+    "method": "getDashboard",
+    "start": 621,
+    "end": 651,
+    "sha256": "611a0de6c3d9d1c80a46cb01c10f639e056c24d74b0666a678b519d69a168f8f"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/media/ProductImageService.java",
+    "method": "uploadLogoImage",
+    "start": 184,
+    "end": 196,
+    "sha256": "1f13d7784ea4fdba2477acbf28dc2973848610b5809311c791c613fb2ca0a2d4"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/media/ProductImageService.java",
+    "method": "uploadLogoImage",
+    "start": 211,
+    "end": 221,
+    "sha256": "a42442567115d514da0176210d036f075593689a2de567dfbdb8aa9b14679c96"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/media/ProductImageService.java",
+    "method": "uploadLogoImage",
+    "start": 244,
+    "end": 255,
+    "sha256": "bff5dba2ba7c3165fe986b7e7dfd86e82157d5f9fc9ac11b9167c98e0bb1a27a"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/market/MarketService.java",
+    "method": "createShop",
+    "start": 51,
+    "end": 57,
+    "sha256": "87932ba8302c07d5a2808e775dca9c42c01ae20e72aff090b3849d241190efd0"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/market/MarketService.java",
+    "method": "assignManager",
+    "start": 66,
+    "end": 70,
+    "sha256": "b4d67b9720b6fea14fb0021bb6168c6d392ce6758552be00ad2bcbef90e45b59"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/market/MarketService.java",
+    "method": "saveProduct",
+    "start": 85,
+    "end": 97,
+    "sha256": "e90a7f1ba40a49e093b21e47979931d5b52666859c50565704042ea67a8381d3"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/market/MarketService.java",
+    "method": "saveVoucher",
+    "start": 109,
+    "end": 115,
+    "sha256": "38993c6c9e06b08c012ccd3ad6078d625c45ea285f2c3fbeefb0f3a2c53cd52a"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/market/MarketService.java",
+    "method": "customerAccess",
+    "start": 240,
+    "end": 243,
+    "sha256": "523ec1bb4ed406af594e228fc4b345109202d4c960f71b798906736492341f70"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/market/MarketService.java",
+    "method": "orders",
+    "start": 180,
+    "end": 184,
+    "sha256": "c1ff00aca36f0a6baefb50cfd9f67c680a1b42ffbc229b953f8f223791170c99"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/market/MarketService.java",
+    "method": "assignShipper",
+    "start": 186,
+    "end": 190,
+    "sha256": "15333cdfc49024baeeb250740be03ad62bc9c35496c086661d3e5e475a47f273"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/market/MarketService.java",
+    "method": "transition",
+    "start": 191,
+    "end": 222,
+    "sha256": "6303f5211e118cd373ed680fdca0e043f4a8238213e89fbb01bdddb7936454a0"
+  },
+  {
+    "source": "src/main/java/vn/edu/ute/milktea/service/market/VnpayService.java",
+    "method": "ipn",
+    "start": 42,
+    "end": 59,
+    "sha256": "08808d62ba8ecd8e318cfd51187f604f7759972a7ce4923e47fe33c6b9c2a7b4"
+  }
+]

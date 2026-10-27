@@ -1,12 +1,14 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:milkteademo;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MSSQLServer
+    # Keep demo carts/accounts/orders across IDE restarts.
+    # Tests can override this with an isolated in-memory DEMO_DB_URL.
+    url: ${DEMO_DB_URL:jdbc:h2:file:./data/ute-tea-demo;DB_CLOSE_ON_EXIT=FALSE;MODE=MSSQLServer}
     username: sa
     password: ""
     driver-class-name: org.h2.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
@@ -19,6 +21,9 @@ logging:
     org.springframework.security: WARN
 
 app:
+  # MarketplaceDemoData creates Campus as Shop 1 on the first demo initialization.
+  pos:
+    shop-id: 1
   admin:
     default-password: Password@123
   jwt:

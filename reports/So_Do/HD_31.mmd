@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Tìm invoice theo Order"]
+  D{"Thu ngân và hóa đơn hợp lệ?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Kiểm tra phạm vi cơ sở"]
+  D -- Đúng --> P1
+  P2["Trả khoản thu nếu trước đó đã xử lý"]
+  P1 --> P2
+  P3["Tạo yêu cầu BANK_TRANSFER với reference xác nhận"]
+  P2 --> P3
+  P4["Gọi chung recordReceipt"]
+  P3 --> P4
+  P4 --> F

@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Tìm sản phẩm"]
+  D{"Định lượng và nguyên liệu hợp lệ?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Kiểm tra danh sách nguyên liệu và định lượng"]
+  D -- Đúng --> P1
+  P2["Đối chiếu loại/vị trí sử dụng theo mã"]
+  P1 --> P2
+  P3["Cập nhật quan hệ ProductRecipe"]
+  P2 --> P3
+  P4["Trả công thức mới"]
+  P3 --> P4
+  P4 --> F

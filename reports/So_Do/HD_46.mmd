@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Lấy preview tồn sổ sách"]
+  D{"Số thực tế hợp lệ với sổ sách?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Kiểm tra key và dữ liệu từng nguyên liệu"]
+  D -- Đúng --> P1
+  P2["Khóa tồn và đối chiếu thực tế"]
+  P1 --> P2
+  P3["Tính chênh lệch, cập nhật tồn/movements"]
+  P2 --> P3
+  P4["Lưu biên bản kết ca và chi tiết"]
+  P3 --> P4
+  P4 --> F

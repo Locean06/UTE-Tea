@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Lấy DeliveryOrder có khóa"]
+  D{"Đơn đã xác nhận và shipper hợp lệ?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Kiểm tra scope"]
+  D -- Đúng --> P1
+  P2["Kiểm tra trạng thái CONFIRMED"]
+  P1 --> P2
+  P3["Tìm tài khoản SHIPPER hoạt động"]
+  P2 --> P3
+  P4["Gán shipper và trả OrderView"]
+  P3 --> P4
+  P4 --> F

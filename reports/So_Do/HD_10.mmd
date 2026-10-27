@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Tìm món nguồn"]
+  D{"Biến thể còn được phục vụ?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Gom các biến thể menu đang hoạt động"]
+  D -- Đúng --> P1
+  P2["Lấy các size cùng tên và danh sách topping"]
+  P1 --> P2
+  P3["Xác định allowTopping từ danh mục"]
+  P2 --> P3
+  P4["Trả MenuOptions cho modal"]
+  P3 --> P4
+  P4 --> F

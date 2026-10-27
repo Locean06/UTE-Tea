@@ -37,3 +37,6 @@ build/
 .env.*
 !.env.example
 *.log
+
+# Persistent local demo database / backups (not source code)
+/data/

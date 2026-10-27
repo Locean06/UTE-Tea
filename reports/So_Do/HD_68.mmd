@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Kiểm tra phạm vi Shop"]
+  D{"Ngày hết hạn và mã hợp lệ?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Kiểm tra thời gian bắt đầu/kết thúc"]
+  D -- Đúng --> P1
+  P2["Chuẩn hóa code và kiểm tra trùng"]
+  P1 --> P2
+  P3["Lưu các giới hạn lượt dùng"]
+  P2 --> P3
+  P4["Trả VoucherView"]
+  P3 --> P4
+  P4 --> F

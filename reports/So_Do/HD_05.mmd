@@ -1,0 +1,15 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Lấy accountId từ CurrentActor"]
+  D{"Có tài khoản cần vô hiệu?"}
+  E["Không cập nhật tài khoản; controller vẫn xóa cookie xác thực và CSRF."]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Tăng tokenVersion của tài khoản khi có"]
+  D -- Đúng --> P1
+  P2["Controller xóa cookie đăng nhập"]
+  P1 --> P2
+  P3["Xóa CSRF cũ để nhận phiên truy cập mới"]
+  P2 --> P3
+  P3 --> F

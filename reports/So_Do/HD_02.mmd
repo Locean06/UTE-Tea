@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Tìm tài khoản theo email chuẩn hóa"]
+  D{"OTP khớp và còn hiệu lực?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Nếu đã xác thực thì trả thông báo tương ứng"]
+  D -- Đúng --> P1
+  P2["Kiểm tra OTP theo purpose REGISTER_VERIFY"]
+  P1 --> P2
+  P3["Ghi emailVerified=true và lưu tài khoản"]
+  P2 --> P3
+  P4["Cho phép sử dụng chức năng đăng nhập"]
+  P3 --> P4
+  P4 --> F

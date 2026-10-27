@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Tìm Product và Category"]
+  D{"Món/danh mục tồn tại và giá hợp lệ?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Kiểm tra tên/size và dữ liệu giá"]
+  D -- Đúng --> P1
+  P2["Cập nhật các trường nghiệp vụ"]
+  P1 --> P2
+  P3["Lưu Product"]
+  P2 --> P3
+  P4["Trả thông tin hiển thị menu"]
+  P3 --> P4
+  P4 --> F

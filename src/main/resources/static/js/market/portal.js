@@ -63,7 +63,7 @@
  function applyRoles(){$('productMenuCode').readOnly=user.role!=='ADMIN';document.querySelectorAll('[data-roles]').forEach(e=>e.classList.toggle('d-none',!e.dataset.roles.split(' ').includes(user.role)));$('portalRole').textContent=user.fullName+' · '+user.role;}
  async function loadAccounts(){
   if(user.role!=='ADMIN')return;accounts=await MilkTeaApi.get(api+'/accounts');$('portalAccounts').replaceChildren();$('managerAccount').replaceChildren();
-  for(const a of accounts){if(a.role==='MANAGER')option($('managerAccount'),a.id,a.email+' · #'+a.id);const row=node('div',null,'border-bottom py-2 text-break');row.append(node('p','#'+a.id+' · '+a.email+' · '+a.role,'small mb-2'));
+  for(const a of accounts){if(['MANAGER','CASHIER','KITCHEN'].includes(a.role))option($('managerAccount'),a.id,a.email+' · '+a.role+' · #'+a.id);const row=node('div',null,'border-bottom py-2 text-break');row.append(node('p','#'+a.id+' · '+a.email+' · '+a.role,'small mb-2'));
    if(a.role!=='ADMIN'&&a.id!==user.id){const select=node('select',null,'form-select mb-2');select.setAttribute('aria-label','Vai trò của '+a.email);['CUSTOMER','VENDOR','MANAGER','SHIPPER','CASHIER','KITCHEN','ADMIN'].forEach(r=>option(select,r,r));select.value=a.role;
     row.append(select,button('Lưu vai trò',async()=>{await MilkTeaApi.put(api+'/accounts/'+a.id,{role:select.value,active:a.active});await loadAccounts();}),button(a.active?'Khóa tài khoản':'Mở khóa',async()=>{await MilkTeaApi.put(api+'/accounts/'+a.id,{role:a.role,active:!a.active});await loadAccounts();}));
    }$('portalAccounts').append(row);

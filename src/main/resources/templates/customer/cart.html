@@ -569,7 +569,7 @@
             document.addEventListener('DOMContentLoaded', async () => {
                 await CustomerApp.initContext();
 
-                const items = window.MilkTeaContext.sessionId ? CustomerApp.getServerCart() : CustomerApp.getLocalCart();
+                const items = CustomerApp.getLocalCart();
                 const total = items.reduce((acc, it) => acc + (it.lineTotal || ((it.price || it.unitPrice || 0) + (it.toppings ? it.toppings.reduce((s,t)=>s+(t.price||0),0) : 0)) * it.quantity), 0);
                 renderCartItems(items, total);
             });
@@ -594,7 +594,7 @@
                 if (list) list.classList.remove('d-none');
                 if (summary) summary.style.display = 'block';
                 const checkoutButton = document.getElementById('checkoutBtn');
-                if (checkoutButton) checkoutButton.textContent = 'Xác nhận đặt nhận tại quầy';
+                if (checkoutButton) checkoutButton.textContent = 'Gửi đơn hàng';
 
                 const playEntrance = !cartEntranceShown;
                 const currentQuantities = items.map(it => ({
@@ -644,7 +644,7 @@
                                 </div>
                                 <span class="fw-bold product-price ms-2" style="min-width: 85px; text-align: right;">${MilkTeaApi.formatVND(lineTotal)}</span>
                                 <button class="btn btn-sm btn-outline-secondary" type="button" onclick="MenuSelection.open(${it.productId}, ${idx}).catch(e => MilkTeaApi.showToast(e.message, 'error'))">Sửa</button>
-                                <button class="btn btn-sm btn-outline-danger border-0 p-1 ms-1" title="Xóa món" onclick="CustomerApp.removeItem(${idx})">
+                                <button type="button" class="btn btn-sm btn-outline-danger border-0 p-1 ms-1" title="Xóa món" onclick="CustomerApp.removeItem(${idx})">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </div>

@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Khóa yêu cầu hoàn"]
+  D{"Yêu cầu còn đủ điều kiện quyết định?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Kiểm tra trạng thái đã xử lý"]
+  D -- Đúng --> P1
+  P2["Lưu quyết định phê duyệt hoặc từ chối"]
+  P1 --> P2
+  P3["Ghi thông tin quản trị và thời gian"]
+  P2 --> P3
+  P4["Audit và phát sự kiện"]
+  P3 --> P4
+  P4 --> F

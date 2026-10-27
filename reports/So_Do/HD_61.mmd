@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Lấy GlobalSettings"]
+  D{"Mức giảm và dữ liệu cấu hình hợp lệ?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Kiểm tra loại/mức giảm"]
+  D -- Đúng --> P1
+  P2["Cập nhật thương hiệu, địa chỉ và dữ liệu ngân hàng"]
+  P1 --> P2
+  P3["Lưu modifiedBy/modifiedAt"]
+  P2 --> P3
+  P4["Phát SETTINGS_CHANGED sau commit"]
+  P3 --> P4
+  P4 --> F

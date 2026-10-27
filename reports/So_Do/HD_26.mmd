@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Xác định accountId"]
+  D{"Địa chỉ thuộc chủ tài khoản và còn giới hạn?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Tạo mới hoặc lấy đúng địa chỉ chủ sở hữu"]
+  D -- Đúng --> P1
+  P2["Kiểm tra giới hạn và thông tin"]
+  P1 --> P2
+  P3["Cập nhật thuộc tính/mặc định"]
+  P2 --> P3
+  P4["Lưu và trả AddressView"]
+  P3 --> P4
+  P4 --> F

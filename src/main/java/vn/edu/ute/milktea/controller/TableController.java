@@ -22,20 +22,13 @@ public class TableController {
     private final TableContextService tableContextService;
     private final TableSessionService tableSessionService;
     private final DiningTableRepository tableRepository;
+    private final vn.edu.ute.milktea.service.order.OrderBranchService branchService;
 
     @GetMapping({"/public/table-context", "/tables/context"})
     public ResponseEntity<ApiResponse<TableDto.TableContextResponse>> getTableContext(
             @RequestParam(value = "qrCode", required = false) String qrCode,
             @RequestParam(value = "table", required = false) String tableParam,
             @AuthenticationPrincipal CurrentActor actor) {
-
-        // QR ordering was retired. This legacy endpoint is for authenticated operations only.
-        if (actor == null || !(actor.hasRole(vn.edu.ute.milktea.entity.account.Role.CASHIER)
-                || actor.hasRole(vn.edu.ute.milktea.entity.account.Role.ADMIN))) {
-            throw vn.edu.ute.milktea.common.BusinessException.forbidden(
-                    vn.edu.ute.milktea.common.ErrorCode.ACCESS_DENIED,
-                    "Mã bàn chỉ được quản lý bởi nhân viên thu ngân");
-        }
 
         if (qrCode == null || qrCode.isBlank()) {
             // Never turn a predictable table ID into a QR/session access proof for an anonymous visitor.
@@ -64,9 +57,10 @@ public class TableController {
     }
 
     @GetMapping({"/cashier/tables", "/tables"})
-    public ResponseEntity<ApiResponse<List<TableDto.TableItem>>> getTables() {
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public ResponseEntity<ApiResponse<List<TableDto.TableItem>>> getTables(@AuthenticationPrincipal CurrentActor actor) {
         List<DiningTable> tables = tableRepository.findByActiveTrueOrderByIdAsc();
-        List<TableDto.TableItem> items = tables.stream().map(t -> TableDto.TableItem.builder()
+        List<TableDto.TableItem> items = tables.stream().filter(t -> actor != null && branchService.canAccess(t.getShop(), actor.getAccountId())).map(t -> TableDto.TableItem.builder()
                 .id(t.getId())
                 .name(t.getName())
                 .qrCode(t.getQrCode())

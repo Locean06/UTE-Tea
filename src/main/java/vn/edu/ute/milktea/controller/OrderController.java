@@ -18,6 +18,18 @@ import vn.edu.ute.milktea.service.order.OrderService;
 public class OrderController {
 
     private final OrderService orderService;
+    private final vn.edu.ute.milktea.service.order.OrderBranchService branchService;
+
+    @GetMapping("/public/checkout/branches")
+    public ApiResponse<java.util.List<java.util.Map<String,Object>>> branches() {
+        return ApiResponse.ok(branchService.options());
+    }
+
+    @PostMapping("/public/checkout/quote")
+    public ApiResponse<java.util.Map<String,Object>> quote(@Valid @RequestBody OrderDto.CreateCounterOrderRequest body,
+            @AuthenticationPrincipal CurrentActor actor) {
+        return ApiResponse.ok(orderService.quote(body, actor));
+    }
 
     @PostMapping({ "/orders/table", "/customer/orders" })
     public ResponseEntity<ApiResponse<OrderDto.OrderResponse>> createTableOrder(
