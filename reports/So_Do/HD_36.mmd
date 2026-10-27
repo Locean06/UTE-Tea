@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Khóa đơn và kiểm tra trạng thái hủy"]
+  D{"Đơn đã thu và chưa hoàn tiền?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Lấy invoice và Payment đã ghi thu"]
+  D -- Đúng --> P1
+  P2["Kiểm tra yêu cầu hoàn hiện có"]
+  P1 --> P2
+  P3["Lưu chứng từ hoàn tiền mặt và người thực hiện"]
+  P2 --> P3
+  P4["Ghi audit và sự kiện"]
+  P3 --> P4
+  P4 --> F

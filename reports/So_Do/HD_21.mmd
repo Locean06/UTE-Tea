@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Tìm Account hiện tại"]
+  D{"Tài khoản có tồn tại?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Chỉ cập nhật trường được DTO cho phép"]
+  D -- Đúng --> P1
+  P2["Chuẩn hóa nội dung nhập"]
+  P1 --> P2
+  P3["Lưu Account"]
+  P2 --> P3
+  P4["Trả UserInfo hiện tại"]
+  P3 --> P4
+  P4 --> F

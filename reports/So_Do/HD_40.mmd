@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Chọn tập tồn theo vị trí và loại nguyên liệu"]
+  D{"Có bản ghi tồn khớp bộ lọc?"}
+  E["Trả danh sách tồn kho rỗng theo bộ lọc."]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Chuẩn hóa từ khóa"]
+  D -- Đúng --> P1
+  P2["Tính trạng thái cảnh báo theo ngưỡng"]
+  P1 --> P2
+  P3["Ghép thông tin tên/đơn vị/giá trị tồn"]
+  P2 --> P3
+  P4["Trả StockSummaryResponse"]
+  P3 --> P4
+  P4 --> F

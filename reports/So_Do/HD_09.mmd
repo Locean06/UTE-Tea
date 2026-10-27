@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Kiểm tra bộ lọc và phân trang"]
+  D{"Bộ lọc và khoảng trang hợp lệ?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Chuẩn hóa tiếng Việt khi tìm tên món/danh mục"]
+  D -- Đúng --> P1
+  P2["Lọc theo cơ sở và danh mục nếu có"]
+  P1 --> P2
+  P3["Gom theo menuVariantIdentity để tránh lặp giữa cơ sở"]
+  P2 --> P3
+  P4["Lọc giá, sắp xếp và trả trang dữ liệu"]
+  P3 --> P4
+  P4 --> F

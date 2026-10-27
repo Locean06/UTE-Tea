@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Chuẩn hóa phạm vi ngày"]
+  D{"Có dữ liệu để tổng hợp?"}
+  E["Trả các chỉ số theo dữ liệu thực tế; tập rỗng có số lượng 0."]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Lấy summary và doanh thu từng ngày"]
+  D -- Đúng --> P1
+  P2["Lấy trạng thái đơn và top sản phẩm"]
+  P1 --> P2
+  P3["Lấy hao hụt nguyên liệu và cảnh báo tồn"]
+  P2 --> P3
+  P4["Trả DashboardResponse"]
+  P3 --> P4
+  P4 --> F

@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Kiểm tra tệp thực và cấu hình dịch vụ"]
+  D{"File và dịch vụ ảnh hợp lệ?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Upload ảnh mới"]
+  D -- Đúng --> P1
+  P2["Cập nhật URL/publicId trong Product"]
+  P1 --> P2
+  P3["Đăng ký xóa ảnh mới nếu DB rollback"]
+  P2 --> P3
+  P4["Sau commit dọn ảnh cũ khi không còn sử dụng"]
+  P3 --> P4
+  P4 --> F

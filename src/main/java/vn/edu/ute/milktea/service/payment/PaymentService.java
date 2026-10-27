@@ -28,6 +28,7 @@ import java.time.Instant;
 @RequiredArgsConstructor
 public class PaymentService {
 
+    private final vn.edu.ute.milktea.service.order.OrderBranchService branchService;
     private final InvoiceRepository invoiceRepository;
     private final vn.edu.ute.milktea.repository.table.DiningTableRepository tableRepository;
     private final vn.edu.ute.milktea.service.table.TableSessionService tableSessionService;
@@ -82,6 +83,8 @@ public class PaymentService {
                 .orElseThrow(() -> BusinessException.notFound(
                         ErrorCode.VALIDATION_FAILED,
                         "Không tìm thấy hóa đơn"));
+
+        branchService.assertStaff(order, cashierId);
 
         // 4. Xử lý request gửi lại với cùng idempotency key
         if (idempotencyKey != null
@@ -236,7 +239,12 @@ public class PaymentService {
 
     @Transactional
     public void createNotice(Long invoiceId, PaymentDto.PaymentNoticeRequest request, String idempotencyKey) {
-        Invoice invoice = invoiceRepository.findById(invoiceId)
+        // Match receipt/cancellation lock order: order first, then invoice.
+        var lookup = invoiceRepository.findById(invoiceId).orElseThrow(() ->
+                BusinessException.notFound(ErrorCode.VALIDATION_FAILED,"Không tìm thấy hóa đơn"));
+        orderRepository.findByIdWithLock(lookup.getOrder().getId()).orElseThrow(() ->
+                BusinessException.notFound(ErrorCode.ORDER_STATE_CONFLICT,"Không tìm thấy đơn hàng"));
+        Invoice invoice = invoiceRepository.findByIdWithLock(invoiceId)
                 .orElseThrow(() -> BusinessException.notFound(ErrorCode.VALIDATION_FAILED, "Không tìm thấy hóa đơn"));
 
         if (request == null || request.getMethod() == null)
@@ -271,6 +279,7 @@ public class PaymentService {
     public PaymentDto.PaymentResponse confirmTransferReceiptForOrder(Long orderId, Long cashierId, String idempotencyKey) {
         Invoice invoice = invoiceRepository.findByOrderId(orderId)
                 .orElseThrow(() -> BusinessException.notFound(ErrorCode.VALIDATION_FAILED, "Không tìm thấy hóa đơn cho đơn hàng #" + orderId));
+        branchService.assertStaff(invoice.getOrder(), cashierId);
         if (paymentRepository.existsByInvoiceId(invoice.getId())) {
             Payment existing = paymentRepository.findByInvoiceId(invoice.getId()).orElse(null);
             if (existing != null) {

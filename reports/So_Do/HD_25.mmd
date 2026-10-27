@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Tìm đánh giá và xác minh chủ sở hữu"]
+  D{"Tệp đúng định dạng và chủ đánh giá?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Kiểm tra dung lượng, MIME và nội dung tệp"]
+  D -- Đúng --> P1
+  P2["Upload Cloudinary theo loại media"]
+  P1 --> P2
+  P3["Lưu ReviewMedia"]
+  P2 --> P3
+  P4["Đăng ký dọn media nếu transaction không commit"]
+  P3 --> P4
+  P4 --> F

@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Kiểm tra thông tin nguyên liệu"]
+  D{"Nguyên liệu và loại/đơn vị hợp lệ?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Chuẩn hóa trường dữ liệu"]
+  D -- Đúng --> P1
+  P2["Lưu Material"]
+  P1 --> P2
+  P3["Tạo/đảm bảo tồn theo chính sách service"]
+  P2 --> P3
+  P4["Trả MaterialResponse"]
+  P3 --> P4
+  P4 --> F

@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Xác định actor và scope"]
+  D{"Có đơn lịch sử trong phạm vi?"}
+  E["Trả danh sách lịch sử rỗng trong phạm vi được phép."]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Lấy danh sách DeliveryOrder"]
+  D -- Đúng --> P1
+  P2["Lọc theo quyền/cơ sở"]
+  P1 --> P2
+  P3["Ánh xạ line, tiền và trạng thái"]
+  P2 --> P3
+  P4["Trả lịch sử cho màn hình"]
+  P3 --> P4
+  P4 --> F

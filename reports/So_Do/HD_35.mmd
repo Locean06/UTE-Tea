@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Khóa yêu cầu và Order"]
+  D{"Yêu cầu còn chờ và đơn chưa pha?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Kiểm tra đã xử lý và trạng thái bếp"]
+  D -- Đúng --> P1
+  P2["Nếu duyệt thì hủy Order và Invoice"]
+  P1 --> P2
+  P3["Lưu quyết định, người xử lý và thời gian"]
+  P2 --> P3
+  P4["Audit và thông báo client"]
+  P3 --> P4
+  P4 --> F

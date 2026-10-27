@@ -81,13 +81,6 @@ public class SecurityConfig {
                                 "/actuator/health",
                                 "/actuator/info"
                         ).permitAll()
-                        // Dine-in orders and the retired QR context require real POS credentials.
-                        .requestMatchers(org.springframework.http.HttpMethod.POST,
-                                "/api/v1/orders/table", "/api/v1/customer/orders")
-                            .hasAnyRole("ADMIN", "CASHIER")
-                        .requestMatchers(org.springframework.http.HttpMethod.GET,
-                                "/api/v1/public/table-context", "/api/v1/tables/context")
-                            .hasAnyRole("ADMIN", "CASHIER")
                         // 2. Role-based staff routes
                         // Listing customer history is account-only, including when a table QR exists.
                         .requestMatchers(org.springframework.http.HttpMethod.GET,

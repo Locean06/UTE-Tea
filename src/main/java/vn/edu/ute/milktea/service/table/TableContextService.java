@@ -19,6 +19,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TableContextService {
 
+    private final vn.edu.ute.milktea.service.order.OrderBranchService branchService;
     private final DiningTableRepository tableRepository;
     private final TableSessionRepository sessionRepository;
     private final GuestAccessService guestAccessService;
@@ -36,7 +37,10 @@ public class TableContextService {
             throw BusinessException.badRequest(ErrorCode.TABLE_NOT_FOUND, "Bàn đang ngừng hoạt động");
         }
 
+        var shop = branchService.tableBranch(table);
         TableDto.TableContextResponse.TableContextResponseBuilder builder = TableDto.TableContextResponse.builder()
+                .shopId(shop.getId())
+                .shopName(shop.getName())
                 .tableId(table.getId())
                 .tableName(table.getName())
                 .qrCode(table.getQrCode())

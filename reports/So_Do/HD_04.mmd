@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Chuẩn hóa email và tìm Account"]
+  D{"Thông tin, active và emailVerified hợp lệ?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Kiểm tra khóa quản trị"]
+  D -- Đúng --> P1
+  P2["So khớp mật khẩu bằng PasswordEncoder"]
+  P1 --> P2
+  P3["Từ chối email chưa xác thực"]
+  P2 --> P3
+  P4["Sinh JWT và trả UserInfo"]
+  P3 --> P4
+  P4 --> F

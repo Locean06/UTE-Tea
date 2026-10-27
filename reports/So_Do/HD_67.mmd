@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Xác minh scope"]
+  D{"Phạm vi và version còn khớp?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Tìm/tạo Product thuộc cơ sở"]
+  D -- Đúng --> P1
+  P2["So khớp version với catalogVersion"]
+  P1 --> P2
+  P3["Kiểm tra danh mục và menuCode"]
+  P2 --> P3
+  P4["Lưu giá/tồn/trạng thái và trả ProductView"]
+  P3 --> P4
+  P4 --> F

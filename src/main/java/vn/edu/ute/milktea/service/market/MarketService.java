@@ -68,7 +68,7 @@ public class MarketService {
  }
  public void assignManager(CurrentActor a,Long shopId,Long managerId,boolean enabled){
   if(!admin(a))throw denied();var s=scope(a,shopId);var m=accounts.findById(managerId).orElseThrow(this::denied);
-  if(m.getRole()!=Role.MANAGER)throw invalid("Tài khoản phải có vai trò MANAGER");
+  if(m.getRole()!=Role.MANAGER && m.getRole()!=Role.CASHIER && m.getRole()!=Role.KITCHEN)throw invalid("Chỉ phân công quản lý, thu ngân hoặc bếp cho cơ sở");
   if(enabled)s.getManagers().add(m);else s.getManagers().removeIf(x->x.getId().equals(managerId));
  }
  @Transactional(readOnly=true) public List<ShopView> shops(CurrentActor a,boolean publicOnly){

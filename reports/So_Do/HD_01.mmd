@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Chuẩn hóa email và khóa tài khoản trùng email"]
+  D{"Email có được phép đăng ký?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Từ chối email đã xác thực; chỉ tái sử dụng CUSTOMER chưa xác thực còn hoạt động"]
+  D -- Đúng --> P1
+  P2["BCrypt mật khẩu và lưu emailVerified=false"]
+  P1 --> P2
+  P3["Sinh OTP HMAC, lưu thời hạn và đăng ký gửi thư sau commit"]
+  P2 --> P3
+  P4["Trả email che bớt và thời gian chờ gửi lại"]
+  P3 --> P4
+  P4 --> F

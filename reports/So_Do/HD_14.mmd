@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Xác định cơ sở và quyền mua"]
+  D{"Menu cơ sở có phục vụ giỏ?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Ánh xạ món/topping về giá của cơ sở"]
+  D -- Đúng --> P1
+  P2["Nhân số lượng để cộng tạm tính"]
+  P1 --> P2
+  P3["Áp dụng cấu hình giảm giá và trả shippingFee=0"]
+  P2 --> P3
+  P4["Trả shopId, subtotal, discountAmount, totalAmount"]
+  P3 --> P4
+  P4 --> F

@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Khóa Account và kiểm tra chưa đánh giá món"]
+  D{"Có chứng từ mua hợp lệ và chưa đánh giá?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Tìm sản phẩm"]
+  D -- Đúng --> P1
+  P2["Phân biệt đơn POS và lịch sử giao hàng"]
+  P1 --> P2
+  P3["Xác minh chủ đơn, món, trạng thái và thu tiền"]
+  P2 --> P3
+  P4["Lưu ProductReview và trả dữ liệu"]
+  P3 --> P4
+  P4 --> F

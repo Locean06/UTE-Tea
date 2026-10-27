@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Chuẩn hóa email"]
+  D{"Tài khoản có tồn tại?"}
+  E["Trả thông báo chung; không tiết lộ việc email không tồn tại."]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Trả thông báo chung nếu không tồn tại"]
+  D -- Đúng --> P1
+  P2["Sinh OTP mục đích PASSWORD_RESET, hạn 15 phút"]
+  P1 --> P2
+  P3["Gửi thư qua MailService"]
+  P2 --> P3
+  P4["Trả thông báo không chứa mã"]
+  P3 --> P4
+  P4 --> F

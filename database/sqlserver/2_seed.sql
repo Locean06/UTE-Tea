@@ -49,16 +49,13 @@ IF NOT EXISTS (SELECT 1
             GiaTriGiam,
             SuaLuc
         )
-        VALUES                        (1, N'UTE Tea', N'Số 1 Võ Văn Ngân, P. Linh Chiểu, TP. Thủ Đức, TP. Hồ Chí Minh', N'MBBank - Chi nhánh Long Khánh', '08881706888', N'DANG NGUYEN MINH KHOA', 10.00, 'PERCENT', 10.00, SYSUTCDATETIME());
+        VALUES                        (1, N'UTE Tea', N'Số 1 Võ Văn Ngân, P. Linh Chiểu, TP. Thủ Đức, TP. Hồ Chí Minh', NULL, NULL, NULL, 10.00, 'PERCENT', 10.00, SYSUTCDATETIME());
     END
 ELSE
     BEGIN
         UPDATE dbo.CauHinhChung
         SET    TenQuan    = N'UTE Tea',
                DiaChi     = N'Số 1 Võ Văn Ngân, P. Linh Chiểu, TP. Thủ Đức, TP. Hồ Chí Minh',
-               NganHang   = N'MBBank - Chi nhánh Long Khánh',
-               SoTaiKhoan = '08881706888',
-               ChuTK      = N'DANG NGUYEN MINH KHOA',
                LoaiGiam   = 'PERCENT',
                GiaTriGiam = 10.00,
                TyLeGiam   = 10.00,

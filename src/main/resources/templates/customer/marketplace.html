@@ -1,10 +1,14 @@
 <!DOCTYPE html>
 <html xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main :: html(~{::content}, ~{::scripts})}"><body>
 <main th:fragment="content" class="container py-4">
+<<<<<<< HEAD
  <section class="ute-page-banner"><div><div class="ute-kicker">UTE TEA / GIAO TẬN NƠI</div><h1>Hương vị từ những cửa hàng bạn yêu</h1><p>Chọn món yêu thích, sau đó chọn địa chỉ và cơ sở phù hợp.</p></div></section>
  <div class="d-flex justify-content-end mb-3" sec:authorize="hasRole('CUSTOMER')">
    <a class="btn btn-outline-secondary" th:href="@{/my-orders}"><i class="bi bi-receipt me-1"></i> Xem đơn hàng đã đặt</a>
  </div>
+=======
+ <section class="ute-page-banner"><div><div class="ute-kicker">UTE TEA / ĐẶT MÓN</div><h1>Hương vị từ những cửa hàng bạn yêu</h1><p>Chọn món yêu thích và cơ sở nhận món, mang về hoặc dùng tại quán.</p></div></section>
+>>>>>>> ai/ute-tea-fixes
  <div id="marketMessage" role="status" class="alert d-none"></div>
  <form id="marketFilters" class="row g-2 mb-4">
   <div class="col-12 col-md-4"><label for="marketSearch" class="form-label">Tìm món</label><input id="marketSearch" name="q" class="form-control" maxlength="120" placeholder="Tên món uống"></div>
@@ -19,9 +23,9 @@
   <section class="col-12 col-xl-8" aria-label="Danh sách món"><div id="marketProducts" class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3"></div>
    <div class="d-flex justify-content-between align-items-center gap-2 my-4"><button id="marketPrevious" class="btn btn-outline-secondary" type="button">Trước</button><span id="marketPage" class="small" role="status"></span><button id="marketNext" class="btn btn-outline-secondary" type="button">Sau</button></div>
   </section>
-  <aside class="col-12 col-xl-4"><div class="card p-3 p-sm-4"><h2 class="h5">Giỏ hàng</h2><p class="small text-muted">Món chưa gắn với cơ sở. Chọn địa chỉ và cơ sở phục vụ toàn bộ giỏ trước khi xác nhận.</p><div id="deliveryCart"></div></div><th:block th:replace="~{fragments/delivery-checkout :: panel}"></th:block></aside>
+  <aside class="col-12 col-xl-4"><div class="card p-3 p-sm-4"><h2 class="h5">Giỏ hàng</h2><p class="small text-muted">Món chưa gắn với cơ sở. Chọn cơ sở phục vụ toàn bộ giỏ trước khi xác nhận.</p><div id="deliveryCart"></div></div><th:block th:replace="~{fragments/delivery-checkout :: panel}"></th:block></aside>
  </div>
- <section class="mt-4"><h2 class="h4">Đơn giao hàng của bạn</h2><div class="d-flex flex-wrap gap-2 my-3"><label for="deliveryStatus" class="visually-hidden">Lọc trạng thái</label><select id="deliveryStatus" class="form-select" style="max-width:260px"><option value="">Tất cả trạng thái</option><option value="NEW">Mới</option><option value="CONFIRMED">Đã xác nhận</option><option value="SHIPPING">Đang giao</option><option value="DELIVERED">Đã giao</option><option value="DELIVERY_FAILED">Giao thất bại</option><option value="CANCELLED">Đã hủy</option><option value="RETURN_REQUESTED">Yêu cầu trả hàng</option><option value="RETURNED">Đã trả hàng</option><option value="REFUNDED">Đã hoàn tiền</option></select><button id="refreshDeliveryOrders" class="btn btn-outline-secondary" type="button">Tải lại đơn</button></div><div id="deliveryOrders" class="row g-3"></div></section>
+ <section class="mt-4"><h2 class="h4">Lịch sử đơn giao hàng cũ</h2><div class="d-flex flex-wrap gap-2 my-3"><label for="deliveryStatus" class="visually-hidden">Lọc trạng thái</label><select id="deliveryStatus" class="form-select" style="max-width:260px"><option value="">Tất cả trạng thái</option><option value="NEW">Mới</option><option value="CONFIRMED">Đã xác nhận</option><option value="SHIPPING">Đang giao</option><option value="DELIVERED">Đã giao</option><option value="DELIVERY_FAILED">Giao thất bại</option><option value="CANCELLED">Đã hủy</option><option value="RETURN_REQUESTED">Yêu cầu trả hàng</option><option value="RETURNED">Đã trả hàng</option><option value="REFUNDED">Đã hoàn tiền</option></select><button id="refreshDeliveryOrders" class="btn btn-outline-secondary" type="button">Tải lại đơn</button></div><div id="deliveryOrders" class="row g-3"></div></section>
  <section id="productReviews" class="card p-3 p-sm-4 mt-4"><h2 class="h5">Đánh giá từ người đã mua</h2><div id="reviewList">Chọn tên món để xem nhận xét.</div>
   <form id="reviewForm" class="mt-3 d-none"><h3 class="h6" id="reviewProductLabel"></h3><input name="productId" type="hidden"><input name="orderId" type="hidden"><input name="reviewId" type="hidden">
    <label for="reviewStars" class="form-label">Số sao</label><select name="stars" id="reviewStars" class="form-select mb-2"><option value="5">5 sao</option><option value="4">4 sao</option><option value="3">3 sao</option><option value="2">2 sao</option><option value="1">1 sao</option></select>

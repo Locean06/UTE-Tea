@@ -1,0 +1,15 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Xác định accountId từ actor"]
+  D{"Có tài khoản xác thực?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Đọc hoặc tạo bản giỏ"]
+  D -- Đúng --> P1
+  P2["Tính lại dữ liệu hiển thị từ sản phẩm"]
+  P1 --> P2
+  P3["Trả items và version"]
+  P2 --> P3
+  P3 --> F

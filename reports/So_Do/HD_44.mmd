@@ -1,0 +1,17 @@
+flowchart TD
+  S((Bắt đầu))
+  P0["Tìm Order"]
+  D{"Đơn cần ghi sự cố có tồn tại?"}
+  E["Thông báo lỗi; không xác nhận thành công"]
+  F((Kết thúc))
+  S --> P0 --> D
+  D -- Sai --> E --> F
+  P1["Tạo thông tin sự cố theo request"]
+  D -- Đúng --> P1
+  P2["Ghi BusinessAudit liên quan đơn"]
+  P1 --> P2
+  P3["Trả IncidentResponse"]
+  P2 --> P3
+  P4["Khi xử lý dùng resolveIncident để ghi dấu vết tiếp theo"]
+  P3 --> P4
+  P4 --> F

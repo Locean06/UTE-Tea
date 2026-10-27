@@ -1,0 +1,263 @@
+- KIẾN TRÚC ỨNG DỤNG
+  - Sơ đồ kiến trúc ứng dụng
+  - Mô tả kiến trúc ứng dụng
+- SƠ ĐỒ HOẠT ĐỘNG CÁC CHỨC NĂNG
+  - Khách hàng
+    - Đăng ký tài khoản
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Đăng nhập và đăng xuất
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Quên mật khẩu bằng mã OTP
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Xem danh sách, tìm kiếm và lọc sản phẩm
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Xem chi tiết sản phẩm và tình trạng còn hàng theo chi nhánh
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Tra cứu và chọn chi nhánh
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Thêm sản phẩm vào giỏ hàng
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Cập nhật số lượng và xóa sản phẩm trong giỏ hàng
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Xem trước đơn hàng và áp mã khuyến mãi
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Đặt hàng (phân bổ nguồn hàng, tạo Order và Fulfillment)
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Thanh toán trực tuyến qua cổng mô phỏng
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Theo dõi đơn hàng
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Hủy đơn hàng
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Yêu cầu trả hàng sau khi nhận
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Đánh giá sản phẩm đã nhận
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Cập nhật thông tin tài khoản
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Đổi mật khẩu
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+  - Quản trị viên
+    - Quản lý tài khoản người dùng
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Phân công và chuyển chi nhánh cho nhân viên
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Quản lý chi nhánh
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Quản lý danh mục và thương hiệu
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Quản lý sản phẩm và giá bán
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Quản lý hình ảnh sản phẩm
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Quản lý tồn kho toàn chuỗi (gắn sản phẩm vào chi nhánh)
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Quản lý đơn hàng toàn chuỗi
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Xử lý ngoại lệ giao hàng thất bại
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Quản lý thanh toán ONLINE: đối soát, chốt cổng, hoàn tiền
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Duyệt hoặc từ chối yêu cầu trả hàng
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Quản lý khuyến mãi
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Kiểm duyệt đánh giá
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Xem dashboard và thống kê chuỗi
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+  - Nhân viên
+    - Đăng nhập khu vực nhân viên và xác định phạm vi chi nhánh
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Xem dashboard chi nhánh được phân công
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Xem hàng đợi phần giao hàng của chi nhánh
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Xử lý phần giao tận nơi (chuẩn bị, đóng gói, giao, hoàn tất, thất bại)
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Xử lý nhận hàng tại cửa hàng và xác minh mã nhận hàng
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Xem tồn kho chi nhánh và điều chỉnh tồn
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Xem lịch sử biến động kho
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Xử lý hàng khách trả (nhập lại kho hoặc xử lý)
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+    - Phản hồi đánh giá của khách
+      - Mô tả chức năng
+      - Sơ đồ hoạt động
+      - Code xử lý chức năng
+      - Giải thích code
+- GIAO DIỆN HỆ THỐNG
+  - Giao diện khách hàng
+    - Giao diện trang chủ (phần đầu trang)
+    - Giao diện trang chủ (sản phẩm nổi bật và thương hiệu)
+    - Giao diện trang chủ (hệ thống cửa hàng và chân trang)
+    - Giao diện đăng nhập
+    - Giao diện đăng ký tài khoản
+    - Giao diện quên mật khẩu (bước gửi mã OTP)
+    - Giao diện danh sách sản phẩm, tìm kiếm và bộ lọc
+    - Giao diện chi tiết sản phẩm
+    - Giao diện tra cứu hệ thống cửa hàng
+    - Giao diện giỏ hàng
+    - Giao diện xác nhận đặt hàng
+    - Giao diện kết quả đặt hàng
+    - Giao diện lịch sử đơn hàng
+    - Giao diện chi tiết đơn hàng nhiều chi nhánh (phần đầu)
+    - Giao diện chi tiết đơn hàng (đánh giá sản phẩm)
+    - Giao diện chi tiết đơn hàng đã hoàn tất (trả hàng)
+    - Giao diện yêu cầu trả hàng
+    - Giao diện thanh toán đơn hàng trực tuyến
+    - Giao diện thông tin tài khoản
+  - Giao diện quản trị viên
+    - Giao diện dashboard quản trị
+    - Giao diện quản lý người dùng
+    - Giao diện tạo tài khoản người dùng
+    - Giao diện phân công nhân viên cho chi nhánh
+    - Giao diện quản lý chi nhánh
+    - Giao diện thêm chi nhánh
+    - Giao diện quản lý danh mục
+    - Giao diện quản lý thương hiệu
+    - Giao diện quản lý sản phẩm
+    - Giao diện sửa sản phẩm và quản lý hình ảnh
+    - Giao diện sản phẩm theo chi nhánh
+    - Giao diện gắn sản phẩm vào chi nhánh
+    - Giao diện tồn kho toàn chuỗi
+    - Giao diện quản lý đơn hàng
+    - Giao diện chi tiết đơn hàng của quản trị viên
+    - Giao diện quản lý thanh toán trực tuyến
+    - Giao diện chi tiết thanh toán của một đơn
+    - Giao diện yêu cầu trả hàng của quản trị viên
+    - Giao diện quản lý khuyến mãi
+    - Giao diện thêm mã khuyến mãi
+    - Giao diện kiểm duyệt đánh giá
+  - Giao diện nhân viên
+    - Giao diện dashboard nhân viên
+    - Giao diện hàng đợi phần giao hàng
+    - Giao diện hàng đợi nhận tại cửa hàng
+    - Giao diện chi tiết phần giao đang giao (giao tận nơi)
+    - Giao diện chi tiết phần giao nhận tại cửa hàng (xác minh mã)
+    - Giao diện tồn kho chi nhánh
+    - Giao diện điều chỉnh tồn kho
+    - Giao diện nhật ký biến động tồn
+    - Giao diện lịch sử biến động tồn của một sản phẩm
+    - Giao diện hàng khách trả
+    - Giao diện đánh giá của chi nhánh
+    - Giao diện chi tiết đánh giá và phản hồi

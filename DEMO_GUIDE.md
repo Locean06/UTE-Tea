@@ -6,7 +6,9 @@ Tài liệu này được lập nhằm phục vụ buổi báo cáo và kiểm t
 
 ## 1. Môi Trường & Dữ Liệu Khởi Tạo Mẫu
 
-Khi ứng dụng được khởi chạy với profile `demo` (`--spring.profiles.active=demo`), hệ thống tự động kích hoạt `DataInitializer` nạp sẵn toàn bộ dữ liệu sạch phục vụ demo:
+Khi ứng dụng được khởi chạy với profile `demo` (`--spring.profiles.active=demo`), hệ thống dùng H2 lưu tại `data/ute-tea-demo.mv.db`. `DataInitializer` chỉ nạp dữ liệu mẫu khi database còn trống; tài khoản, giỏ và đơn được giữ qua các lần chạy lại IDE. Thư mục `data/` đã được loại khỏi Git. Có thể dùng `DEMO_DB_URL` để chọn database demo tách biệt khi kiểm thử.
+
+Chỉ chạy một phiên ứng dụng: nếu cổng 8080 đang có phiên UTE-Tea cũ, dừng đúng phiên đó trước khi chạy `bash mvnw spring-boot:run -Dspring-boot.run.profiles=demo`. Không cần đổi cổng của ứng dụng khách hàng.
 
 ### 1.1 Danh sách tài khoản demo
 | Vai trò | Email đăng nhập | Mật khẩu | Họ và tên | Số điện thoại |
