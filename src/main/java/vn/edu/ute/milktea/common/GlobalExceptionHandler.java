@@ -100,6 +100,27 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 
+    /** A missing page/static asset is HTTP 404, not an unhandled server crash. */
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public ResponseEntity<?> handleMissingResource(
+            org.springframework.web.servlet.resource.NoResourceFoundException ex,
+            HttpServletRequest request) {
+        log.warn("UTE Tea missing path (404): {}", request.getRequestURI());
+        String accept = request.getHeader("Accept");
+        if (accept != null && accept.contains("text/html") && !request.getRequestURI().startsWith("/api/")) {
+            String html = "<!doctype html><html lang=\"vi\"><head><meta charset=\"UTF-8\">"
+                    + "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
+                    + "<title>UTE Tea - Không tìm thấy trang</title></head>"
+                    + "<body style=\"font:16px system-ui,sans-serif;max-width:650px;margin:10vh auto;padding:25px;color:#303a2d\">"
+                    + "<h1>Không tìm thấy trang (404)</h1>"
+                    + "<p>Đường dẫn không tồn tại hoặc đã thay đổi.</p>"
+                    + "<p><a href=\"/\">Trang chủ</a> · <a href=\"/my-orders\">Đơn hàng của tôi</a>"
+                    + " · <a href=\"/cashier/delivery-orders\">Đơn giao hàng (nhân viên)</a></p></body></html>";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.TEXT_HTML).body(html);
+        }
+        return standardError(HttpStatus.NOT_FOUND, ErrorCode.INTERNAL_ERROR, "Không tìm thấy đường dẫn yêu cầu");
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGeneralException(Exception ex, HttpServletRequest request) {
         String traceId = UUID.randomUUID().toString();

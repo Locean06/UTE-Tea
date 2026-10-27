@@ -17,7 +17,14 @@
   const selected=shops.find(s=>s.id===shop());if(selected){fill($('shopForm'),selected);fill($('shopConfigForm'),selected);}
   const [summary,orders]=await Promise.all([MilkTeaApi.get(api+'/summary'+query()),MilkTeaApi.get(api+'/orders'+query())]);
   $('portalSummary').textContent=`${summary.orders} đơn · ${summary.delivered} đã giao · ${summary.failed} giao thất bại · Thực thu đơn đã giao: ${MilkTeaApi.formatVND(summary.paidRevenue)} · Chiết khấu: ${MilkTeaApi.formatVND(summary.platformCommission)}`;
-  renderOrders(orders);
+  const activeShippers = new Map();
+  if (['VENDOR', 'MANAGER', 'ADMIN'].includes(user.role)) {
+   const shopIds = [...new Set(orders.filter(o => o.status === 'CONFIRMED').map(o => o.shopId))];
+   await Promise.all(shopIds.map(async id => {
+    activeShippers.set(id, await MilkTeaApi.get(api + '/shops/' + id + '/shippers'));
+   }));
+  }
+  renderOrders(orders, activeShippers);
   if(shop()&&['VENDOR','MANAGER','ADMIN'].includes(user.role)){
    const [categories,products]=await Promise.all([MilkTeaApi.get(api+'/shops/'+shop()+'/categories'),MilkTeaApi.get(api+'/shops/'+shop()+'/products')]);
    $('portalCategories').replaceChildren();$('productCategory').replaceChildren();
@@ -30,7 +37,7 @@
    const carriers=await MilkTeaApi.get(api+'/carriers'+query());$('portalCarriers').replaceChildren();carriers.forEach(c=>{$('portalCarriers').append(button(c.name+' · '+MilkTeaApi.formatVND(c.fee)+(c.active?'':' · Ngừng dùng'),async()=>fill($('carrierForm'),c)));});
   }
  }
- function renderOrders(orders){
+ function renderOrders(orders, activeShippers){
   $('portalOrders').replaceChildren();if(!orders.length)$('portalOrders').append(node('p','Chưa có đơn trong phạm vi này.'));
   for(const o of orders){
    const col=node('div',null,'col-12 col-lg-6'),card=node('article',null,'card p-3 h-100 text-break');
@@ -44,7 +51,17 @@
    if(shipper&&o.status==='CONFIRMED')card.append(button('Bắt đầu giao',()=>transition('SHIPPING')));
    if(shipper&&o.status==='SHIPPING')card.append(button('Giao thành công',()=>transition('DELIVERED')),button('Giao thất bại',()=>transition('DELIVERY_FAILED')));
    if(seller&&o.status==='CONFIRMED'){
-    const form=node('form',null,'d-flex flex-wrap gap-2 mt-2'),input=node('input',null,'form-control');input.type='number';input.required=true;input.min='1';input.placeholder='Mã tài khoản Shipper';input.setAttribute('aria-label','Mã tài khoản Shipper');input.style.maxWidth='220px';const submit=node('button','Phân công','btn btn-outline-secondary');submit.type='submit';form.append(input,submit);form.onsubmit=async e=>{e.preventDefault();submit.disabled=true;try{await MilkTeaApi.put(api+'/orders/'+o.id+'/shipper',{accountId:Number(input.value),version:o.version});await refresh();}catch(error){message(error.message,true);}finally{submit.disabled=false;}};card.append(form,node('small',o.shipperId?'Shipper #'+o.shipperId:'Chưa phân công shipper','text-muted'));
+    const form=node('form',null,'d-flex flex-wrap gap-2 mt-2'),input=node('select',null,'form-select');
+    input.required=true;input.setAttribute('aria-label','Chọn nhân viên giao hàng');input.style.maxWidth='260px';
+    option(input,'','Chọn nhân viên giao hàng');
+    const available = activeShippers.get(o.shopId) || [];
+    available.forEach(a => option(input, a.id, a.name + ' · #' + a.id));
+    if (o.shipperId && available.some(a => a.id === o.shipperId)) input.value=String(o.shipperId);
+    const submit=node('button', o.shipperId ? 'Đổi phân công' : 'Phân công', 'btn btn-outline-secondary');
+    submit.type='submit';submit.disabled=!available.length;
+    form.append(input,submit);
+    form.onsubmit=async e=>{e.preventDefault();submit.disabled=true;try{await MilkTeaApi.put(api+'/orders/'+o.id+'/shipper',{accountId:Number(input.value),version:o.version});await refresh();message('Đã phân công nhân viên giao hàng.');}catch(error){message(error.message,true);}finally{submit.disabled=false;}};
+    card.append(form,node('small',!available.length?'Chưa có nhân viên giao hàng đang hoạt động':o.shipperId?'Đã phân công cho nhân viên #'+o.shipperId:'Chưa phân công shipper','text-muted'));
    }
    if(user.role==='ADMIN'&&o.paid&&['RETURNED','CANCELLED'].includes(o.status)){
     if(o.paymentMethod==='VNPAY')card.append(node('p','Hoàn tiền VNPAY: cần xác nhận từ cổng thanh toán; không đánh dấu hoàn bằng nút tiền mặt.','small text-muted'));

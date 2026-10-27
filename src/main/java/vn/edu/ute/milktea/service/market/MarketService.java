@@ -37,9 +37,12 @@ public class MarketService {
  private final vn.edu.ute.milktea.service.media.ProductImageService images;
  private final BranchSelectionService branches;
  private final CustomerDataService customerData;
+ private final vn.edu.ute.milktea.service.realtime.RealtimeEventPublisher realtime;
 
  private Long id(CurrentActor a){return CustomerDataService.accountId(a);}
  private boolean admin(CurrentActor a){return a!=null&&a.hasRole(Role.ADMIN);}
+ private boolean cashier(CurrentActor a){return a!=null&&a.hasRole(Role.CASHIER);}
+ private void requireDeliveryStaff(CurrentActor a){if(!(admin(a)||cashier(a)))throw denied();}
  private BusinessException invalid(String m){return BusinessException.badRequest(ErrorCode.VALIDATION_FAILED,m);}
  private BusinessException denied(){return BusinessException.forbidden(ErrorCode.ACCESS_DENIED,"Không có quyền với cửa hàng hoặc dữ liệu này");}
  private Account account(CurrentActor a){return accounts.findByIdWithLock(id(a)).orElseThrow(this::denied);}
@@ -152,7 +155,9 @@ public class MarketService {
   o.setTotalAmount(subtotal.subtract(o.getDiscountAmount()).add(o.getShippingFee()));
   if(input.expectedTotal()!=null&&input.expectedTotal().compareTo(o.getTotalAmount())!=0)throw BusinessException.conflict(ErrorCode.ORDER_STATE_CONFLICT,"Giá, phí hoặc ưu đãi đã thay đổi. Vui lòng xem lại tổng tiền và xác nhận lại.");
   plan.quantities().forEach((productId,quantity)->{var p=products.findById(productId).orElseThrow(this::denied);p.setDeliveryStock(p.getDeliveryStock()-quantity);});
-  return orderView(orders.saveAndFlush(o));
+  var created = orders.saveAndFlush(o);
+  notifyCashierDeliveryChanged(created);
+  return orderView(created);
  }
  private Map<String,Integer> selectionSignature(List<BuyLine> lines){
   Map<String,Integer> result=new TreeMap<>();for(var l:lines){var ids=l.toppingIds()==null?List.<Long>of():l.toppingIds().stream().sorted().toList();result.merge(l.productId()+"|"+ids+"|"+Objects.toString(l.note(),""),l.quantity(),Integer::sum);}return result;
@@ -174,8 +179,19 @@ public class MarketService {
  private String hash(String text){try{return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(text.getBytes(StandardCharsets.UTF_8)));}catch(Exception e){throw new IllegalStateException(e);}}
  private DeliveryOrder ownedOrder(CurrentActor a,Long orderId){
   id(a);var o=orders.lockId(orderId).orElseThrow(this::denied);
-  if(admin(a)||o.getAccount().getId().equals(a.getAccountId())||Objects.equals(o.getShipper()==null?null:o.getShipper().getId(),a.getAccountId()))return o;
+  if(admin(a)||cashier(a)||o.getAccount().getId().equals(a.getAccountId())||Objects.equals(o.getShipper()==null?null:o.getShipper().getId(),a.getAccountId()))return o;
   scope(a,o.getShop().getId());return o;
+ }
+ /** DeliveryOrder is independent of POS DonHang; never mix the tables or expose store-wide orders to customers. */
+ @Transactional(readOnly=true) public List<OrderView> cashierDeliveryOrders(CurrentActor a){
+  requireDeliveryStaff(a);
+  return orders.findAll().stream().sorted(Comparator.comparing(DeliveryOrder::getId).reversed()).map(this::orderView).toList();
+ }
+ @Transactional(readOnly=true) public List<ShipperOption> cashierActiveShippers(CurrentActor a){
+  requireDeliveryStaff(a);
+  return accounts.findAll().stream().filter(x->x.getRole()==Role.SHIPPER&&Boolean.TRUE.equals(x.getActive()))
+   .sorted(Comparator.comparing(Account::getFullName,Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)))
+   .map(x->new ShipperOption(x.getId(),x.getFullName()==null||x.getFullName().isBlank()?"Nhân viên #"+x.getId():x.getFullName())).toList();
  }
  @Transactional(readOnly=true) public List<OrderView> orders(CurrentActor a,Long shopId){
   id(a);if(shopId!=null){scope(a,shopId);return orders.findByShopIdOrderByIdDesc(shopId).stream().map(this::orderView).toList();}
@@ -183,16 +199,24 @@ public class MarketService {
   return all.stream().sorted(Comparator.comparing(DeliveryOrder::getId).reversed()).map(this::orderView).toList();
  }
  public OrderView order(CurrentActor a,Long orderId){return orderView(ownedOrder(a,orderId));}
+ @Transactional(readOnly=true) public List<ShipperOption> activeShippers(CurrentActor a,Long shopId){
+  scope(a,shopId);
+  return accounts.findAll().stream()
+   .filter(x->x.getRole()==Role.SHIPPER && Boolean.TRUE.equals(x.getActive()))
+   .sorted(Comparator.comparing(Account::getFullName,Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)))
+   .map(x->new ShipperOption(x.getId(),x.getFullName()==null||x.getFullName().isBlank()?"Nhân viên #"+x.getId():x.getFullName()))
+   .toList();
+ }
  public OrderView assignShipper(CurrentActor a,Long orderId,AssignShipper input){
-  var o=orders.lockId(orderId).orElseThrow(this::denied);scope(a,o.getShop().getId());version(o,input.version());
+  var o=orders.lockId(orderId).orElseThrow(this::denied);if(!cashier(a))scope(a,o.getShop().getId());version(o,input.version());
   if(o.getStatus()!=DeliveryOrder.Status.CONFIRMED)throw invalid("Chỉ phân công đơn đã xác nhận");
-  var shipper=accounts.findById(input.accountId()).filter(x->x.getRole()==Role.SHIPPER&&Boolean.TRUE.equals(x.getActive())).orElseThrow(()->invalid("Shipper không hoạt động"));o.setShipper(shipper);orders.flush();return orderView(o);
+  var shipper=accounts.findById(input.accountId()).filter(x->x.getRole()==Role.SHIPPER&&Boolean.TRUE.equals(x.getActive())).orElseThrow(()->invalid("Shipper không hoạt động"));o.setShipper(shipper);orders.flush();notifyCashierDeliveryChanged(o);return orderView(o);
  }
  public OrderView transition(CurrentActor a,Long orderId,Transition input){
   var o=ownedOrder(a,orderId);version(o,input.version());
   boolean buyer=o.getAccount().getId().equals(id(a));
   boolean shipper=a.hasRole(Role.SHIPPER)&&o.getShipper()!=null&&o.getShipper().getId().equals(id(a));
-  boolean seller=admin(a)||shops.findAccessible(id(a)).stream().anyMatch(s->s.getId().equals(o.getShop().getId())&&((a.hasRole(Role.VENDOR)&&s.getOwner().getId().equals(id(a)))||a.hasRole(Role.MANAGER)));
+  boolean seller=admin(a)||cashier(a)||shops.findAccessible(id(a)).stream().anyMatch(s->s.getId().equals(o.getShop().getId())&&((a.hasRole(Role.VENDOR)&&s.getOwner().getId().equals(id(a)))||a.hasRole(Role.MANAGER)));
   var before=o.getStatus();var next=input.status();boolean allowed=false;
   if(before==next)return orderView(o);
   switch(next){
@@ -218,7 +242,13 @@ public class MarketService {
   if(next==DeliveryOrder.Status.DELIVERED){o.setDeliveredAt(Instant.now());if(o.getPaymentMethod()==DeliveryOrder.Method.COD)o.setPaid(true);}
   if(next==DeliveryOrder.Status.DELIVERY_FAILED)o.setDeliveryFailed(true);
   if(next==DeliveryOrder.Status.REFUNDED)o.setRefundReference(input.reference().trim());
-  o.setStatus(next);orders.flush();return orderView(o);
+  o.setStatus(next);orders.flush();notifyCashierDeliveryChanged(o);return orderView(o);
+ }
+ /** Notify staff only after the database transaction commits; no customer data in the event. */
+ private void notifyCashierDeliveryChanged(DeliveryOrder order){
+  realtime.publishAfterCommit("/topic/cashier", "DELIVERY_ORDER_CHANGED",
+      String.valueOf(order.getId()), null, String.valueOf(order.getVersion()),
+      java.util.Map.of("orderId", order.getId(), "shopId", order.getShop().getId()));
  }
  private void version(DeliveryOrder o,Long expected){if(!Objects.equals(o.getVersion(),expected))throw BusinessException.conflict(ErrorCode.ORDER_STATE_CONFLICT,"Đơn đã thay đổi; vui lòng tải lại");}
  public OrderView orderView(DeliveryOrder o){return new OrderView(o.getId(),o.getShop().getId(),o.getShop().getName(),o.getAccount().getId(),o.getShipper()==null?null:o.getShipper().getId(),o.getStatus(),o.getPaymentMethod(),o.isPaid(),o.getRecipient(),o.getPhone(),o.getAddressLine(),o.getSubtotal(),o.getShippingFee(),o.getDiscountAmount(),o.getTotalAmount(),o.getCommissionPercent(),o.getCreatedAt(),o.isDeliveryFailed(),o.getVersion(),o.getLines().stream().map(l->new LineView(l.getProduct().getId(),l.getProductName(),l.getQuantity(),l.getUnitPrice(),l.getSnapshotSize(),l.getNote(),l.isTopping())).toList());}

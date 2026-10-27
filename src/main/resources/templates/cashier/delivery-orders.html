@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main :: html(~{::content}, ~{::scripts})}" lang="vi">
+<body>
+<main th:fragment="content" class="container-fluid px-3 px-lg-4 py-4 delivery-inbox-page">
+<link rel="stylesheet" th:href="@{/css/cashier/delivery-inbox.css}">
+<header class="delivery-inbox-hero">
+  <div><div class="delivery-inbox-eyebrow">UTE TEA / THU NGÂN / GIAO HÀNG</div>
+    <h1>Đơn giao hàng</h1>
+    <p>Tiếp nhận đơn từ khách, xác nhận và phân công nhân viên giao hàng.</p>
+  </div>
+  <nav class="delivery-inbox-links" aria-label="Chuyển khu vực">
+    <a th:href="@{/cashier}"><i class="bi bi-credit-card"></i> Thu ngân · POS</a>
+    <a th:href="@{/orders}"><i class="bi bi-receipt"></i> Đơn tại quầy</a>
+  </nav>
+</header>
+<section class="delivery-inbox-stats" aria-label="Tổng quan">
+  <div><span>Chờ xác nhận</span><strong id="deliveryStatNew">—</strong></div>
+  <div><span>Chờ nhân viên nhận giao</span><strong id="deliveryStatConfirmed">—</strong></div>
+  <div><span>Đang giao</span><strong id="deliveryStatShipping">—</strong></div>
+  <div><span>Giao thành công</span><strong id="deliveryStatDelivered">—</strong></div>
+</section>
+<section class="delivery-inbox-board" aria-label="Danh sách đơn giao hàng">
+  <div class="delivery-inbox-toolbar">
+    <div><h2>Đơn được đặt trực tuyến</h2><p>Dữ liệu trực tiếp từ hệ thống đơn giao hàng.</p></div>
+    <button id="deliveryInboxRefresh" type="button" class="delivery-inbox-button"><i class="bi bi-arrow-clockwise"></i> Làm mới</button>
+  </div>
+  <div class="delivery-inbox-controls">
+    <label class="delivery-inbox-search"><i class="bi bi-search"></i><input id="deliveryInboxSearch" type="search" placeholder="Mã đơn, người nhận, điện thoại..." aria-label="Tìm đơn"></label>
+    <select id="deliveryInboxStatus" class="form-select" aria-label="Lọc trạng thái">
+      <option value="">Tất cả trạng thái</option><option value="NEW">Chờ xác nhận</option>
+      <option value="CONFIRMED">Đã xác nhận</option><option value="SHIPPING">Đang giao</option>
+      <option value="DELIVERED">Đã giao</option><option value="DELIVERY_FAILED">Giao thất bại</option>
+      <option value="CANCELLED">Đã hủy</option>
+    </select>
+  </div>
+  <p id="deliveryInboxError" class="alert alert-danger d-none" role="alert"></p>
+  <div id="deliveryInboxList" class="delivery-inbox-list" aria-live="polite"><p class="text-muted">Đang tải đơn giao hàng...</p></div>
+</section>
+</main>
+<th:block th:fragment="scripts"><script th:src="@{/js/cashier/delivery-inbox.js}"></script></th:block>
+</body></html>

@@ -124,7 +124,7 @@ h4,h5,h6,.btn,.form-label,.navbar,.table{font-family:'Be Vietnam Pro',system-ui,
 .ute-olive-home .ute-story-photo{border-radius:100px 22px 100px 22px;overflow:hidden;min-height:245px;box-shadow:0 20px 40px rgba(57,65,41,.11);background:#c1c4aa}
 .ute-olive-home .ute-story-photo img{display:block;object-fit:cover;width:100%;height:300px}
 .ute-olive-home .ute-experience{padding:21px 0 60px;text-align:center}
-.ute-olive-home .ute-experience-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:24px}
+.ute-olive-home .ute-experience-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:24px}
 .ute-olive-home .ute-exp-item{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#4b5542;padding:23px 18px;border-right:1px solid #e6e4da}
 .ute-olive-home .ute-exp-item:last-child{border:0}
 .ute-olive-home .ute-exp-item i{font-size:1.7rem;margin-bottom:12px;color:#606952}
@@ -178,3 +178,8 @@ h4,h5,h6,.btn,.form-label,.navbar,.table{font-family:'Be Vietnam Pro',system-ui,
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}.ute-olive-home .ute-category-card,.ute-olive-home .product-card{transition:none!important;animation:none!important}}
 
 .ute-olive-footer .ute-footer-mark{filter:brightness(0) invert(.91)!important}
+
+/* With three customer shortcuts, keep the last tile balanced on small screens. */
+@media (max-width:767.98px) {
+  .ute-olive-home .ute-experience-grid > .ute-exp-item:last-child {grid-column:1 / -1;}
+}

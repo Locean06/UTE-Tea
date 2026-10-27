@@ -1,0 +1,40 @@
+/* Staff-only delivery dashboard; styles deliberately scoped to avoid affecting other roles. */
+.delivery-inbox-page{background:#f7f9f4;color:#304535;min-height:calc(100vh - 85px);font-family:'Be Vietnam Pro',sans-serif}
+.delivery-inbox-hero{border:1px solid #e0e9dc;border-radius:20px;padding:22px 26px;background:linear-gradient(110deg,#ecf3e9,#f9fbf7);display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.delivery-inbox-eyebrow{font-weight:800;font-size:10px;letter-spacing:.13em;color:#627a61;margin-bottom:9px}
+.delivery-inbox-hero h1{font-size:clamp(23px,3vw,30px);letter-spacing:-.035em;font-weight:800;margin:0 0 8px}
+.delivery-inbox-hero p{font-size:12px;margin:0;color:#697b6b}
+.delivery-inbox-links{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.delivery-inbox-links a,.delivery-inbox-button{display:inline-flex;align-items:center;gap:8px;border-radius:11px;padding:10px 14px;font-size:12px;font-weight:750;border:1px solid #dae5d7;text-decoration:none;background:#fff;color:#3f5b41;cursor:pointer}
+.delivery-inbox-links a:hover,.delivery-inbox-button:hover{background:#edf5ea}
+.delivery-inbox-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:20px 0}
+.delivery-inbox-stats>div{border:1px solid #e1e8de;border-radius:15px;padding:17px 20px;background:#fff}
+.delivery-inbox-stats span{display:block;font-size:11px;color:#718271;font-weight:650}
+.delivery-inbox-stats strong{font-size:26px;font-weight:850;color:#345137}
+.delivery-inbox-board{background:#fff;border:1px solid #e1e8de;border-radius:18px;padding:21px}
+.delivery-inbox-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.delivery-inbox-toolbar h2{font-size:16px;font-weight:800;margin:0 0 5px}
+.delivery-inbox-toolbar p{font-size:11px;color:#819080;margin:0}
+.delivery-inbox-controls{display:flex;gap:12px;flex-wrap:wrap;margin:19px 0}
+.delivery-inbox-search{display:flex;align-items:center;gap:9px;padding:0 13px;border:1px solid #dce6d9;border-radius:11px;flex:1 1 240px;min-height:43px}
+.delivery-inbox-search input{width:100%;outline:0;border:0;font-size:12px;background:transparent;min-width:0}
+.delivery-inbox-controls .form-select{width:min(100%,235px);border-color:#dce6d9;font-size:12px}
+.delivery-inbox-list{display:grid;gap:11px}
+.delivery-inbox-order{border:1px solid #e2e9df;border-radius:14px;padding:16px;background:#fdfefc}
+.delivery-inbox-order-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.delivery-inbox-order-top strong{font-size:14px}
+.delivery-inbox-pill{font-size:11px;font-weight:800;border-radius:99px;padding:5px 10px;color:#4d643f;background:#ecf4e7}
+.delivery-inbox-pill[data-status="NEW"]{background:#fff1d1;color:#806216}
+.delivery-inbox-pill[data-status="SHIPPING"]{background:#e8f2ff;color:#2b618c}
+.delivery-inbox-pill[data-status="CANCELLED"],.delivery-inbox-pill[data-status="DELIVERY_FAILED"]{background:#fcece9;color:#9a5044}
+.delivery-inbox-order-data{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.delivery-inbox-order-data small{display:block;font-size:10px;color:#859084;margin-bottom:4px}
+.delivery-inbox-order-data span{font-size:12px;font-weight:700;overflow-wrap:anywhere}
+.delivery-inbox-order-actions{border-top:1px solid #e9eee6;margin-top:13px;padding-top:13px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.delivery-inbox-order-actions button{border:0;border-radius:9px;background:#4d6449;color:#fff;font-size:12px;font-weight:800;padding:10px 13px}
+.delivery-inbox-order-actions button:disabled{opacity:.5;cursor:not-allowed}
+.delivery-inbox-order-actions select{width:min(100%,220px);padding:9px;border-radius:9px;border:1px solid #cfdbca;font-size:12px}
+.delivery-inbox-order-actions .btn-outline{background:#fff;color:#425e43;border:1px solid #cbdcc7}
+.delivery-inbox-items{font-size:11px;color:#6a796a;margin:10px 0 0}
+@media(max-width:800px){.delivery-inbox-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.delivery-inbox-order-data{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:450px){.delivery-inbox-hero,.delivery-inbox-board{padding:16px}.delivery-inbox-stats>div{padding:12px}.delivery-inbox-order-data{grid-template-columns:1fr}.delivery-inbox-controls .form-select{width:100%}}

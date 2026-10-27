@@ -57,15 +57,19 @@ public class SecurityConfig {
                         .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
                         .requestMatchers("/cashier", "/cashier/**").hasAnyRole("ADMIN", "CASHIER")
                         .requestMatchers("/kitchen", "/kitchen/**").hasAnyRole("ADMIN", "KITCHEN")
-                        .requestMatchers("/staff", "/staff/**").hasAnyRole("ADMIN", "CASHIER", "KITCHEN")
+                        .requestMatchers("/delivery", "/delivery/**").hasRole("SHIPPER")
+                        .requestMatchers("/api/v1/shipper/**").hasRole("SHIPPER")
+                        .requestMatchers("/staff", "/staff/**").hasAnyRole("ADMIN", "CASHIER", "KITCHEN", "SHIPPER")
+                        // The shared order-management page lists store-wide orders: staff only.
+                        .requestMatchers("/orders").hasAnyRole("ADMIN", "CASHIER")
                         // 1. Static resources, pages & websocket
                         .requestMatchers(
                                 "/",
                                 "/menu",
                                 "/marketplace",
                                 "/cart",
-                                "/orders",
                                 "/order-confirmation",
+                                "/my-orders",
                                 "/profile",
                                 "/login",
                                 "/error",
@@ -115,7 +119,8 @@ public class SecurityConfig {
                             boolean staffPage = uri.equals("/merchant") || uri.equals("/admin") || uri.startsWith("/admin/")
                                     || uri.equals("/cashier") || uri.startsWith("/cashier/")
                                     || uri.equals("/kitchen") || uri.startsWith("/kitchen/")
-                                    || uri.equals("/staff") || uri.startsWith("/staff/");
+                                    || uri.equals("/staff") || uri.startsWith("/staff/")
+                                    || uri.equals("/delivery") || uri.startsWith("/delivery/");
 
                             if (staffPage) {
                                 response.sendRedirect("/login?redirect=" + uri);
@@ -129,7 +134,8 @@ public class SecurityConfig {
                     boolean staffPage = uri.equals("/merchant") || uri.equals("/admin") || uri.startsWith("/admin/")
                             || uri.equals("/cashier") || uri.startsWith("/cashier/")
                             || uri.equals("/kitchen") || uri.startsWith("/kitchen/")
-                            || uri.equals("/staff") || uri.startsWith("/staff/");
+                            || uri.equals("/staff") || uri.startsWith("/staff/")
+                            || uri.equals("/delivery") || uri.startsWith("/delivery/");
                     boolean anonymous = authentication == null || authentication instanceof AnonymousAuthenticationToken;
 
                     if (staffPage && anonymous) {

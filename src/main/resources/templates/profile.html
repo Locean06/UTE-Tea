@@ -440,16 +440,6 @@
 
 
         <div class="row justify-content-center">
-            <div class="col-lg-8 col-md-10">
-                <a class="btn btn-outline-secondary mb-3" th:href="@{/api/v1/account/preferences}"><i class="bi bi-geo-alt me-2"></i>Sổ địa chỉ, yêu thích và lịch sử xem</a>
-                <div class="mb-3 d-flex justify-content-between align-items-center profile-back-bar">
-                    <a id="profileBackBtn"
-                       th:href="${backUrl != null ? backUrl : '/'}"
-                       class="btn">
-                        <i class="bi bi-arrow-left me-1"></i> Quay Lại
-                    </a>
-                    <span class="text-muted small">Hồ sơ người dùng hệ thống UTE Tea</span>
-                </div>
 
                 <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden profile-summary-card profile-anim profile-delay-0">
                     <div class="card-body p-4 bg-white">
@@ -463,7 +453,7 @@
                                     <h4 class="mb-0 fw-bold" id="profileDisplayFullName">Đang tải...</h4>
                                     <span class="badge rounded-pill bg-primary" id="profileRoleBadge">Tài khoản</span>
                                 </div>
-                                <p class="text-muted mb-0 small" id="profileDisplayEmail">email@milktea.vn</p>
+                                <p class="text-muted mb-0 small" id="profileDisplayEmail">email@utetea.vn</p>
                             </div>
                         </div>
                     </div>

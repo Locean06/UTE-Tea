@@ -1,18 +1,24 @@
-<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"><body>
 <section th:fragment="panel" id="branchCheckout" class="card border-0 shadow-sm rounded-4 p-3 p-sm-4 my-4">
- <h2 class="h5">Địa chỉ và cơ sở phục vụ</h2>
+ <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+   <h2 class="h5 mb-0">Địa chỉ và cơ sở phục vụ</h2>
+   <a sec:authorize="hasRole('CUSTOMER')" href="/my-orders" class="btn btn-sm btn-outline-secondary"><i class="bi bi-receipt me-1"></i> Đơn hàng đã đặt</a>
+ </div>
  <label class="form-label" for="fulfillmentMode">Hình thức nhận món</label>
  <select id="fulfillmentMode" class="form-select mb-3"><option value="DELIVERY">Giao tận nơi</option><option value="COUNTER">Nhận tại quầy / mang về</option></select>
  <div id="checkoutMessage" role="status" class="alert d-none text-break"></div>
  <div id="counterCheckout" class="d-none"><p class="small text-muted">Giữ quy trình thu ngân và chế biến tại quầy hiện có. Các món chỉ bán tại cơ sở giao hàng cần chọn giao tận nơi.</p><button id="checkoutBtn" type="button" class="btn btn-primary-custom w-100 py-3" onclick="CustomerApp.submitOrder()">Xác nhận đặt nhận tại quầy</button></div>
  <div id="deliveryFields">
   <p id="deliveryLogin" class="d-none">Vui lòng <a href="/login?redirect=/cart">đăng nhập</a> để chọn địa chỉ đã lưu và đặt giao hàng. Giỏ tạm vẫn được giữ.</p>
-  <p class="small text-muted">Chọn địa chỉ trước, sau đó tự chọn một cơ sở phục vụ toàn bộ giỏ. Giá món và tổng tiền được kiểm tra lại theo cơ sở; không tự chia đơn.</p>
+  <p class="small text-muted">Chọn địa chỉ trước, sau đó chọn một cơ sở phục vụ toàn bộ giỏ hàng. Nhân viên UTE Tea sẽ trực tiếp giao đơn từ cơ sở bạn chọn; phí giao hàng được tính tự động.</p>
   <form id="deliveryCheckout">
    <label class="form-label" for="checkoutAddress">Địa chỉ nhận hàng</label><select id="checkoutAddress" class="form-select mb-2" required><option value="">Chọn địa chỉ nhận hàng</option></select>
    <label class="form-label mt-3" for="checkoutShop">Cơ sở UTE Tea</label><select id="checkoutShop" class="form-select mb-2" required disabled><option value="">Chọn địa chỉ trước</option></select>
    <p id="branchRankingHelp" class="small text-muted"></p><div id="branchAvailability" role="status" class="small text-break mb-3"></div>
-   <label class="form-label" for="checkoutCarrier">Đơn vị giao hàng</label><select id="checkoutCarrier" class="form-select mb-2" required disabled></select>
+   <div id="checkoutDeliveryInfo" class="border rounded-3 p-3 mb-3 bg-light-subtle">
+    <div class="fw-semibold mb-1">Giao hàng bởi UTE Tea</div>
+    <p class="small text-muted mb-0">Chọn cơ sở để hệ thống tự tính phí giao hàng nội bộ và thời gian phục vụ phù hợp.</p>
+   </div>
    <label class="form-label" for="checkoutVoucher">Mã giảm giá</label><div class="d-flex gap-2 mb-3"><input id="checkoutVoucher" class="form-control" maxlength="32"><button id="applyCheckoutVoucher" class="btn btn-outline-secondary flex-shrink-0" type="button">Áp dụng</button></div>
    <label class="form-label" for="checkoutMethod">Thanh toán</label><select id="checkoutMethod" class="form-select mb-3"><option value="COD">COD · trả khi nhận hàng</option><option value="VNPAY">VNPAY sandbox</option></select>
    <div id="branchQuote" class="border rounded-3 p-3 mb-3" aria-live="polite"><p class="small mb-0">Chọn cơ sở để xem tổng tiền chính xác.</p></div>

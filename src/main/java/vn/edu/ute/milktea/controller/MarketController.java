@@ -17,7 +17,10 @@ public class MarketController {
  private final CatalogSearchService catalog;
  private final BranchSelectionService branches;
  @GetMapping("/marketplace") public ModelAndView page(){return new ModelAndView("customer/marketplace");}
- @GetMapping("/merchant") public ModelAndView merchant(){return new ModelAndView("market/portal");}
+ @GetMapping("/merchant") public ModelAndView merchant(@AuthenticationPrincipal CurrentActor actor){
+  if(actor!=null && actor.hasRole(vn.edu.ute.milktea.entity.account.Role.SHIPPER))return new ModelAndView("redirect:/delivery");
+  return new ModelAndView("market/portal");
+ }
  @GetMapping("/api/v1/public/market/catalog") public ApiResponse<CatalogPage> catalog(
   @RequestParam(required=false) String q,@RequestParam(required=false) Long category,@RequestParam(required=false) Long shop,
   @RequestParam(required=false) BigDecimal min,@RequestParam(required=false) BigDecimal max,
@@ -49,6 +52,7 @@ public class MarketController {
  @GetMapping("/api/v1/market/orders") public ApiResponse<List<OrderView>> orders(@AuthenticationPrincipal CurrentActor a,@RequestParam(required=false) Long shopId){return ApiResponse.ok(service.orders(a,shopId));}
  @GetMapping("/api/v1/market/orders/{id}") public ApiResponse<OrderView> order(@AuthenticationPrincipal CurrentActor a,@PathVariable Long id){return ApiResponse.ok(service.order(a,id));}
  @PutMapping("/api/v1/market/orders/{id}/status") public ApiResponse<OrderView> status(@AuthenticationPrincipal CurrentActor a,@PathVariable Long id,@Valid @RequestBody Transition input){return ApiResponse.ok(service.transition(a,id,input));}
+ @GetMapping("/api/v1/market/shops/{id}/shippers") public ApiResponse<List<ShipperOption>> shippers(@AuthenticationPrincipal CurrentActor a,@PathVariable Long id){return ApiResponse.ok(service.activeShippers(a,id));}
  @PutMapping("/api/v1/market/orders/{id}/shipper") public ApiResponse<OrderView> shipper(@AuthenticationPrincipal CurrentActor a,@PathVariable Long id,@Valid @RequestBody AssignShipper input){return ApiResponse.ok(service.assignShipper(a,id,input));}
  @GetMapping("/api/v1/market/summary") public ApiResponse<Summary> summary(@AuthenticationPrincipal CurrentActor a,@RequestParam(required=false) Long shopId){return ApiResponse.ok(service.summary(a,shopId));}
  @GetMapping("/api/v1/market/accounts") public ApiResponse<List<AccountView>> accounts(@AuthenticationPrincipal CurrentActor a){return ApiResponse.ok(service.accounts(a));}

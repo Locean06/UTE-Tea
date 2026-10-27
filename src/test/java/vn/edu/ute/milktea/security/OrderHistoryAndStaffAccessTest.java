@@ -17,6 +17,7 @@ import vn.edu.ute.milktea.entity.account.Role;
 import vn.edu.ute.milktea.entity.order.Order;
 import vn.edu.ute.milktea.entity.table.TableSession;
 import vn.edu.ute.milktea.repository.order.OrderRepository;
+import vn.edu.ute.milktea.repository.settings.GlobalSettingsRepository;
 import vn.edu.ute.milktea.service.order.OrderService;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,12 +32,29 @@ class OrderHistoryAndStaffAccessTest {
     @InjectMocks TableController tableController;
     @Mock TableContextService tableContextService;
     @Mock OrderRepository orderRepository;
+    @Mock GlobalSettingsRepository settingsRepository;
     // Use the real access-checking service instance, with its repository set through Mockito.
     @InjectMocks OrderService guardedOrderService;
 
     @Test void anonymousBrowserDoesNotSeeOrderHistoryPage() {
         String result = customerPages.ordersPage(null, "1", null, null, null, new ExtendedModelMap());
         assertEquals("redirect:/login?redirect=/orders", result);
+    }
+
+    @Test void customerCannotOpenStoreWideOrderDashboard() {
+        String result = customerPages.ordersPage(null, null, null, null,
+                CurrentActor.authenticated(4L, Role.CUSTOMER), new ExtendedModelMap());
+        assertEquals("redirect:/", result);
+    }
+
+    @Test void cashierAndAdminKeepStoreWideOrderDashboard() {
+        when(settingsRepository.findById(1)).thenReturn(Optional.empty());
+        for (Role staffRole : new Role[]{Role.CASHIER, Role.ADMIN}) {
+            var model = new ExtendedModelMap();
+            var actor = CurrentActor.authenticated(2L, staffRole);
+            assertEquals("customer/orders", customerPages.ordersPage(null, null, null, null, actor, model));
+            assertEquals(actor, model.get("actor"));
+        }
     }
 
     @Test void tableGuestCannotListHistoryEvenWithValidSessionToken() {

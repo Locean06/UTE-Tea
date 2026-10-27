@@ -53,6 +53,7 @@ public class MarketDto {
  public record AssignShipper(@NotNull Long accountId,@NotNull Long version) {}
  public record RoleInput(@NotNull Role role,boolean active) {}
  public record AccountView(Long id,String email,String name,Role role,boolean active) {}
+ public record ShipperOption(Long id,String name) {}
  public record Summary(long orders,long delivered,long failed,BigDecimal paidRevenue,BigDecimal platformCommission) {}
  public record ReviewInput(@NotNull Long orderId,boolean delivery,@Min(1) @Max(5) int stars,@NotBlank @Size(min=50,max=3000) String comment) {}
  public record MediaView(Long id,String type,String url) {}

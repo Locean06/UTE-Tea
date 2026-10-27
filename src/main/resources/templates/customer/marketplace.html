@@ -1,7 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main :: html(~{::content}, ~{::scripts})}"><body>
+<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main :: html(~{::content}, ~{::scripts})}"><body>
 <main th:fragment="content" class="container py-4">
  <section class="ute-page-banner"><div><div class="ute-kicker">UTE TEA / GIAO TẬN NƠI</div><h1>Hương vị từ những cửa hàng bạn yêu</h1><p>Chọn món yêu thích, sau đó chọn địa chỉ và cơ sở phù hợp.</p></div></section>
+ <div class="d-flex justify-content-end mb-3" sec:authorize="hasRole('CUSTOMER')">
+   <a class="btn btn-outline-secondary" th:href="@{/my-orders}"><i class="bi bi-receipt me-1"></i> Xem đơn hàng đã đặt</a>
+ </div>
  <div id="marketMessage" role="status" class="alert d-none"></div>
  <form id="marketFilters" class="row g-2 mb-4">
   <div class="col-12 col-md-4"><label for="marketSearch" class="form-label">Tìm món</label><input id="marketSearch" name="q" class="form-control" maxlength="120" placeholder="Tên món uống"></div>

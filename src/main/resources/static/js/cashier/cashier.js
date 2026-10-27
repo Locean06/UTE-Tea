@@ -1,5 +1,5 @@
 /**
- * MilkTea Cashier POS & Table Management Logic
+ * UTE Tea Cashier POS · Menu, checkout & table selector
  * Tuân thủ frontend_rule.md và acceptance_tests.md
  */
 
@@ -94,63 +94,51 @@ const CashierApp = (() => {
         try {
             const tables = await MilkTeaApi.get('/api/v1/cashier/tables');
             currentTables = tables || [];
-            renderTablesGrid();
+            renderTableSelect();
         } catch (e) {
             console.warn('Lỗi nạp danh sách bàn:', e);
         }
     }
 
-    function renderTablesGrid() {
-        const grid = document.getElementById('tablesGrid');
-        if (!grid) return;
-
-        let html = '';
-        currentTables.forEach(t => {
-            const isBusy = t.status === 'CO_KHACH';
-            html += `
-                <div class="pos-table-card ${t.status}" data-table-id="${t.id}">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="fw-bold mb-0">${MilkTeaReceipts.esc(t.name)}</h6>
-                            <span class="badge ${isBusy ? 'bg-danger' : 'bg-success'} rounded-pill">
-                                ${isBusy ? 'Có khách' : t.status === 'BAO_TRI' ? 'Bảo trì' : 'Trống'}
-                            </span>
-                        </div>
-                        <div class="small text-muted mb-3">
-                            ${isBusy ? `Phiên #${t.activeSessionId}` : 'Sẵn sàng phục vụ'}
-                        </div>
-                        <div class="d-grid gap-1">
-                            ${t.status === 'BAO_TRI' ? '<span class="text-muted small">Tạm ngừng phục vụ</span>' : !isBusy ? `
-                                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill" onclick="CashierApp.openSession(${t.id})">
-                                    <i class="bi bi-box-arrow-in-right me-1"></i> Mở Bàn
-                                </button>
-                            ` : `
-                                <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" onclick="CashierApp.closeSession(${t.activeSessionId})">
-                                    <i class="bi bi-door-closed me-1"></i> Đóng Phiên
-                                </button>
-                            `}
-                        </div>
-                </div>
-            `;
-        });
-        grid.innerHTML = html;
+    // Không còn sơ đồ bàn: chỉ đồng bộ dropdown và nút quản lý phiên nhỏ gọn.
+    function renderTableSelect() {
         const select = document.getElementById('counterTableId');
-        const selected = select.value;
-        select.innerHTML = '<option value="">Quầy / mang về</option>' + currentTables.filter(t => t.status !== 'BAO_TRI').map(t => `<option value="${t.id}">${MilkTeaReceipts.esc(t.name)}</option>`).join('');
-        select.value = currentTables.some(tb => String(tb.id) === selected && tb.status !== 'BAO_TRI') ? selected : '';
-        const syncTableSelection = () => {
-            grid.querySelectorAll('[data-table-id]').forEach(card => {
-                card.classList.toggle('selected', !!select.value && card.dataset.tableId === select.value);
-            });
+        if (!select) return;
+
+        const previousValue = select.value;
+        const available = currentTables.filter(t => t.status !== 'BAO_TRI');
+        select.innerHTML = '<option value="">Tại quầy / Mang về</option>' +
+            available.map(t => `<option value="${t.id}">${MilkTeaReceipts.esc(t.name)}${t.status === 'CO_KHACH' ? ' · Đang phục vụ' : ''}</option>`).join('');
+        select.value = available.some(t => String(t.id) === previousValue) ? previousValue : '';
+
+        const syncSelection = () => {
+            const table = currentTables.find(t => String(t.id) === select.value);
             const help = document.getElementById('posTableAssignmentHelp');
-            if (help) help.setAttribute('data-assignment', select.value ? 'dine-in' : 'takeaway');
+            if (help) {
+                help.setAttribute('data-assignment', table ? 'dine-in' : 'takeaway');
+                help.innerHTML = table
+                    ? '<i class="bi bi-info-circle" aria-hidden="true"></i> Đơn sẽ được phục vụ tại ' + MilkTeaReceipts.esc(table.name) + '.'
+                    : '<i class="bi bi-info-circle" aria-hidden="true"></i> Chọn bàn nếu khách dùng tại quán. Để trống nếu khách mua mang về.';
+            }
+
+            const sessionBtn = document.getElementById('posTableSessionBtn');
+            if (!sessionBtn) return;
+            if (!table) {
+                sessionBtn.hidden = true;
+                sessionBtn.onclick = null;
+                return;
+            }
+            sessionBtn.hidden = false;
+            if (table.activeSessionId) {
+                sessionBtn.innerHTML = '<i class="bi bi-door-closed" aria-hidden="true"></i> Đóng phiên';
+                sessionBtn.onclick = () => closeSession(table.activeSessionId);
+            } else {
+                sessionBtn.innerHTML = '<i class="bi bi-box-arrow-in-right" aria-hidden="true"></i> Mở phiên';
+                sessionBtn.onclick = () => openSession(table.id);
+            }
         };
-        select.onchange = syncTableSelection;
-        syncTableSelection();
-        grid.querySelectorAll('[data-table-id]').forEach(card => card.addEventListener('click', event => {
-            if (event.target.closest('button') || currentTables.find(t => String(t.id) === card.dataset.tableId)?.status === 'BAO_TRI') return;
-            select.value = card.dataset.tableId;
-            syncTableSelection();
-        }));
+        select.onchange = syncSelection;
+        syncSelection();
     }
 
     async function openSession(tableId) {
@@ -322,10 +310,15 @@ const CashierApp = (() => {
         const container = document.getElementById('counterCartList');
         if (!container) return;
 
-        document.getElementById('counterItemCount').textContent = '(' + counterCart.reduce((n, i) => n + i.quantity, 0) + ')';
+        const itemCount = counterCart.reduce((n, i) => n + i.quantity, 0);
+        document.getElementById('counterItemCount').textContent = '(' + itemCount + ')';
+        const mobileCount = document.getElementById('posMobileItemCount');
+        if (mobileCount) mobileCount.textContent = itemCount + ' món';
         if (counterCart.length === 0) {
-            container.innerHTML = '<div class="text-center text-muted small py-4">Chưa chọn món nào</div>';
+            container.innerHTML = '<div class="pos-empty-cart"><i class="bi bi-bag" aria-hidden="true"></i><strong>Giỏ hàng đang trống</strong><span>Chọn món ở phần thực đơn để bắt đầu tạo đơn.</span></div>';
             document.getElementById('counterCartTotal').textContent = '0 ₫';
+            const mobileTotal = document.getElementById('posMobileCartTotal');
+            if (mobileTotal) mobileTotal.textContent = '0 ₫';
             return;
         }
 
@@ -417,6 +410,8 @@ const CashierApp = (() => {
         });
         container.innerHTML = html;
         document.getElementById('counterCartTotal').textContent = MilkTeaApi.formatVND(total);
+        const mobileTotal = document.getElementById('posMobileCartTotal');
+        if (mobileTotal) mobileTotal.textContent = MilkTeaApi.formatVND(total);
     }
 
     function adjustCounterCart(lineId, delta) {
@@ -490,10 +485,7 @@ const CashierApp = (() => {
             };
         });
         if (!filtersReady) {
-            ['quickProductSearch', 'posProductSearch'].forEach(id => document.getElementById(id).addEventListener('input', event => {
-                ['quickProductSearch', 'posProductSearch'].forEach(other => document.getElementById(other).value = event.target.value);
-                renderProducts();
-            }));
+            document.getElementById('posProductSearch').addEventListener('input', renderProducts);
             document.getElementById('posCategories').addEventListener('click', event => {
                 const b = event.target.closest('[data-category]'); if (!b) return;
                 selectedCategory = b.dataset.category;

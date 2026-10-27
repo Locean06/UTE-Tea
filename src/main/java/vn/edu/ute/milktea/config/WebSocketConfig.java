@@ -37,6 +37,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final AccountRepository accountRepository;
     private final GuestAccessService guestAccessService;
 
+    @org.springframework.beans.factory.annotation.Value("${app.base-url:http://localhost:8080}")
+    private String baseUrl;
+    @org.springframework.beans.factory.annotation.Value("${app.websocket.allowed-origin:http://localhost:8080}")
+    private String allowedOrigin;
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         org.springframework.web.socket.server.HandshakeInterceptor cookieInterceptor = new org.springframework.web.socket.server.HandshakeInterceptor() {
@@ -67,12 +72,19 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             }
         };
 
+        // Do not expose authenticated staff topics to arbitrary cross-origin pages.
+        java.util.Set<String> origins = new java.util.LinkedHashSet<>();
+        if (baseUrl != null && !baseUrl.isBlank()) origins.add(baseUrl.trim());
+        if (allowedOrigin != null && !allowedOrigin.isBlank()) origins.add(allowedOrigin.trim());
+        origins.add("http://localhost:8080");
+        origins.add("http://127.0.0.1:8080");
+        String[] originPatterns = origins.toArray(String[]::new);
         registry.addEndpoint("/ws")
                 .addInterceptors(cookieInterceptor)
-                .setAllowedOriginPatterns("*");
+                .setAllowedOriginPatterns(originPatterns);
         registry.addEndpoint("/ws")
                 .addInterceptors(cookieInterceptor)
-                .setAllowedOriginPatterns("*")
+                .setAllowedOriginPatterns(originPatterns)
                 .withSockJS();
     }
 
@@ -214,42 +226,33 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             }
         }
 
-        // Kiểm tra quyền theo bảng 2 trong realtime_rule.md
-        if (destination.startsWith("/topic/cashier")) {
-            if (actor == null || (actor.getRole() != Role.CASHIER && actor.getRole() != Role.ADMIN)) {
-                log.warn("Từ chối SUBSCRIBE /topic/cashier từ principal không hợp lệ");
-                throw new IllegalArgumentException("Không có quyền truy cập kênh Thu Ngân");
-            }
-        } else if (destination.startsWith("/topic/kitchen")) {
-            if (actor == null || (actor.getRole() != Role.KITCHEN && actor.getRole() != Role.ADMIN)) {
-                log.warn("Từ chối SUBSCRIBE /topic/kitchen từ principal không hợp lệ");
-                throw new IllegalArgumentException("Không có quyền truy cập kênh Bếp");
-            }
-        } else if (destination.startsWith("/topic/stock")) {
-            if (actor == null || (actor.getRole() != Role.KITCHEN && actor.getRole() != Role.ADMIN)) {
-                log.warn("Từ chối SUBSCRIBE /topic/stock từ principal không hợp lệ");
-                throw new IllegalArgumentException("Không có quyền truy cập kênh Kho");
-            }
-        } else if (destination.startsWith("/topic/admin")) {
-            if (actor == null || actor.getRole() != Role.ADMIN) {
-                log.warn("Từ chối SUBSCRIBE /topic/admin từ principal không hợp lệ");
-                throw new IllegalArgumentException("Không có quyền truy cập kênh Quản trị");
-            }
-        } else if (destination.startsWith("/topic/table-sessions/")) {
-            String sessionIdStr = destination.substring("/topic/table-sessions/".length());
-            try {
-                Long targetSessionId = Long.parseLong(sessionIdStr);
-                // Được phép nếu là ADMIN, CASHIER, hoặc khách của đúng sessionId này
-                boolean allowed = actor != null && (
-                        actor.getRole() == Role.ADMIN ||
-                        actor.getRole() == Role.CASHIER ||
-                        (actor.getSessionId() != null && actor.getSessionId().equals(targetSessionId))
-                );
-                if (!allowed) {
-                    log.warn("Từ chối SUBSCRIBE {} từ actor={}", destination, actor != null ? actor.getEmail() : "anonymous");
-                    throw new IllegalArgumentException("Không có quyền truy cập phiên bàn này");
+        if (!isAllowedSubscription(destination, actor)) {
+            log.warn("Từ chối STOMP SUBSCRIBE destination={}", destination);
+            throw new IllegalArgumentException("Không có quyền truy cập kênh realtime");
+        }
+    }
+
+    /** Allow only published application channels, never arbitrary broker destinations. */
+    static boolean isAllowedSubscription(String destination, CurrentActor actor) {
+        if (destination == null || actor == null) return false;
+        Role role = actor.getRole();
+        switch (destination) {
+            case "/topic/cashier": return role == Role.CASHIER || role == Role.ADMIN;
+            case "/topic/kitchen", "/topic/stock": return role == Role.KITCHEN || role == Role.ADMIN;
+            case "/topic/admin": return role == Role.ADMIN;
+            default: {
+                final String prefix = "/topic/table-sessions/";
+                if (!destination.startsWith(prefix)) return false;
+                String id = destination.substring(prefix.length());
+                // Reject paths, suffixes, malformed IDs and zero/negative session IDs.
+                if (!id.matches("[1-9][0-9]{0,18}")) return false;
+                try {
+                    long session = Long.parseLong(id);
+                    return role == Role.ADMIN || role == Role.CASHIER ||
+                           (actor.getSessionId() != null && actor.getSessionId().equals(session));
+                } catch (NumberFormatException exception) {
+                    return false;
                 }
-            } catch (NumberFormatException ignored) {
             }
         }
     }

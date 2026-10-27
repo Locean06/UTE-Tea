@@ -1,0 +1,48 @@
+.ute-myorders {
+  --mo-olive:#565c45;--mo-deep:#354331;--mo-border:#e2e7d9;--mo-muted:#778071;
+  --mo-mist:#f6f8f2;--mo-cream:#fcfbf7;--mo-ink:#303b30;
+  color:var(--mo-ink);font-family:'Be Vietnam Pro',sans-serif;max-width:1270px;
+}
+.ute-myorders-hero{background:linear-gradient(105deg,#f0f5ea 0%,#fafbf6 75%);border:1px solid #e0e9d7;border-radius:23px;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:28px 32px}
+.ute-myorders-eyebrow{font-size:11px;font-weight:800;letter-spacing:.10em;color:#617356;margin-bottom:7px}
+.ute-myorders-hero h1{font-family:'Playfair Display',Georgia,serif;font-size:clamp(26px,3.2vw,38px);font-weight:700;color:var(--mo-deep);margin:0 0 8px}
+.ute-myorders-hero p:last-child{font-size:13px;line-height:1.7;color:#62715c;margin:0}
+.ute-myorders-hero-icon{height:76px;width:76px;border-radius:20px;background:#e7eedf;color:var(--mo-olive);display:grid;place-items:center;flex-shrink:0;font-size:32px}
+.ute-myorders-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:22px 0}
+.ute-myorders-stats>div{padding:20px 22px;border-radius:17px;border:1px solid var(--mo-border);background:white;display:flex;flex-direction:column;gap:9px;box-shadow:0 4px 18px #29332908}
+.ute-myorders-stats span{font-size:12px;color:#687563;font-weight:600}.ute-myorders-stats strong{font-size:27px;color:var(--mo-deep);line-height:1.1}
+.ute-myorders-board{background:#fff;border:1px solid var(--mo-border);border-radius:22px;padding:24px;box-shadow:0 5px 22px #29332909}
+.ute-myorders-board-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px}
+.ute-myorders-board-head h2{font-family:'Playfair Display',Georgia,serif;font-size:24px;font-weight:700;color:var(--mo-deep);margin:0 0 5px}
+.ute-myorders-board-head p{color:var(--mo-muted);font-size:12px;margin:0}
+.ute-myorders-tabs{display:flex;gap:8px;border-bottom:1px solid var(--mo-border);padding-bottom:13px;overflow-x:auto}
+.ute-myorders-tabs button{border:1px solid transparent;background:#f5f6ef;color:#566452;border-radius:12px;padding:11px 15px;white-space:nowrap;font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px}
+.ute-myorders-tabs button.active{background:var(--mo-olive);color:#fff}.ute-myorders-tabs span{background:#ffffff30;border-radius:12px;padding:1px 7px;font-size:11px}
+.ute-myorders-filterbar{display:flex;gap:10px;align-items:center;justify-content:space-between;margin:17px 0 20px}
+.ute-myorders-search{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--mo-border);border-radius:12px;flex:1;max-width:460px;background:#fff;color:var(--mo-olive)}
+.ute-myorders-search:focus-within{border-color:#899880;box-shadow:0 0 0 3px #8b9d801c}
+.ute-myorders-search input{font-size:13px;border:0;outline:none;background:transparent;min-width:0;flex:1;color:var(--mo-ink)}
+.ute-myorders-filterbar select{max-width:220px;border-color:var(--mo-border);border-radius:12px;min-height:43px;font-size:13px;color:var(--mo-ink)}
+.ute-myorders-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.ute-myorders-card{border:1px solid var(--mo-border);border-radius:17px;overflow:hidden;background:#fff;display:flex;flex-direction:column;min-width:0}
+.ute-myorders-card.highlight{border-color:#6e8664;box-shadow:0 0 0 2px #cbd8bd}
+.ute-myorders-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:17px 18px 14px}
+.ute-myorders-card-code{display:block;font-weight:800;color:var(--mo-deep);font-size:15px}.ute-myorders-card-date{font-size:11px;color:var(--mo-muted);margin-top:5px}
+.ute-myorders-pill{white-space:nowrap;font-size:11px;font-weight:700;border-radius:100px;padding:6px 10px;background:#eef2e6;color:#556b4d}
+.ute-myorders-pill.pending{background:#fef4df;color:#916b20}.ute-myorders-pill.other{background:#fbebe8;color:#9f5347}
+.ute-myorders-card-name{font-size:13px;color:#465841;font-weight:700;padding:0 18px;overflow-wrap:anywhere}
+.ute-myorders-card-items{font-size:12px;color:var(--mo-muted);padding:7px 18px 13px;line-height:1.55;overflow-wrap:anywhere}
+.ute-myorders-card-foot{border-top:1px solid #edf0e9;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto}
+.ute-myorders-card-total span{font-size:11px;color:var(--mo-muted);display:block}.ute-myorders-card-total strong{font-size:16px;color:var(--mo-olive)}
+.ute-myorders-card-foot button{border-radius:10px;font-size:12px;padding:9px 12px}
+.ute-myorders-details{border-top:1px solid var(--mo-border);background:#fafbf7;padding:15px 18px}
+.ute-myorders-detail-line{font-size:12px;display:flex;justify-content:space-between;gap:12px;padding:5px 0;overflow-wrap:anywhere}
+.ute-myorders-detail-line span:first-child{color:#64725d}.ute-myorders-detail-line strong{text-align:right;color:var(--mo-deep);font-weight:650}
+.ute-myorders-detail-items{border-top:1px dashed #d5ddce;margin-top:7px;padding-top:8px}
+.ute-myorders-detail-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.ute-myorders-detail-actions button{font-size:12px;padding:8px 12px;border-radius:9px}
+.ute-myorders-empty{text-align:center;padding:45px 16px;color:#778071;font-size:13px;display:flex;align-items:center;justify-content:center;gap:9px;flex-direction:column;min-height:160px}
+.ute-myorders-empty i{font-size:30px;color:#98aa8a}.ute-myorders-empty h3{font-weight:700;color:var(--mo-deep);font-size:17px}.ute-myorders-empty p{max-width:310px;line-height:1.65}
+@media (max-width:950px){.ute-myorders-list{grid-template-columns:1fr}}
+@media (max-width:600px){.ute-myorders{padding-left:12px!important;padding-right:12px!important}.ute-myorders-hero{padding:22px 18px}.ute-myorders-hero-icon{height:52px;width:52px;font-size:23px}.ute-myorders-stats{gap:7px}.ute-myorders-stats>div{padding:14px 11px;border-radius:13px}.ute-myorders-stats span{font-size:10px;min-height:30px}.ute-myorders-stats strong{font-size:22px}.ute-myorders-board{padding:17px 13px}.ute-myorders-board-head{align-items:center}.ute-myorders-board-head h2{font-size:21px}.ute-myorders-filterbar{flex-direction:column;align-items:stretch}.ute-myorders-search,.ute-myorders-filterbar select{max-width:none;width:100%}.ute-myorders-card-head{flex-wrap:wrap}.ute-myorders-hero h1{font-size:27px}}
+@media (prefers-reduced-motion:reduce){.ute-myorders *{scroll-behavior:auto!important;animation:none!important}}

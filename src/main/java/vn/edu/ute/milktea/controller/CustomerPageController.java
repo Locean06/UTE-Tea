@@ -91,7 +91,12 @@ public class CustomerPageController {
             @AuthenticationPrincipal CurrentActor actor, Model model) {
 
         if (actor != null && actor.hasRole(vn.edu.ute.milktea.entity.account.Role.CASHIER)) return "redirect:/cashier";
-        GlobalSettings settings = settingsRepository.findById(1).orElse(null);
+        GlobalSettings settings = null;
+        try {
+            settings = settingsRepository.findById(1).orElse(null);
+        } catch (org.springframework.dao.DataAccessException ex) {
+            log.warn("Cart page: optional settings unavailable", ex);
+        }
         DiningTable table = null; // Dine-in tables are assigned at the authenticated POS.
 
         model.addAttribute("settings", settings);
@@ -115,15 +120,35 @@ public class CustomerPageController {
         if (actor == null || !actor.isAuthenticated()) {
             return "redirect:/login?redirect=/orders";
         }
-        GlobalSettings settings = settingsRepository.findById(1).orElse(null);
+        // The orders dashboard includes every store order and is strictly staff-only.
+        if (!actor.hasRole(vn.edu.ute.milktea.entity.account.Role.CASHIER)
+                && !actor.hasRole(vn.edu.ute.milktea.entity.account.Role.ADMIN)) {
+            return "redirect:/";
+        }
+        // This page renders a client-side order list; it must not fail with HTTP 500
+        // just because optional CauHinhChung is missing or its schema is out of sync.
+        // GlobalModelAttributes supplies settings when available (and safely falls back).
         DiningTable table = null; // Dine-in tables are assigned at the authenticated POS.
 
-        model.addAttribute("settings", settings);
         model.addAttribute("actor", actor);
         model.addAttribute("currentTable", table);
         model.addAttribute("tableQr", null);
 
         return "customer/orders";
+    }
+
+    // Customer-only private order history; unlike /orders it never exposes store-wide data.
+    @GetMapping("/my-orders")
+    public String myOrdersPage(@AuthenticationPrincipal CurrentActor actor, Model model) {
+        if (actor == null || !actor.isAuthenticated()) {
+            return "redirect:/login?redirect=/my-orders";
+        }
+        if (!actor.hasRole(vn.edu.ute.milktea.entity.account.Role.CUSTOMER)) {
+            return "redirect:/";
+        }
+        // Do not query optional store settings while opening customer order history.
+        model.addAttribute("pageTitle", "Đơn hàng của tôi");
+        return "customer/my-orders";
     }
 
     @GetMapping("/order-confirmation")

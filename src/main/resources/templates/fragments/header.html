@@ -3,7 +3,7 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
     <div th:fragment="navbar">
-        <style sec:authorize="hasAnyRole('ADMIN', 'CHEF', 'KITCHEN')">
+        <style sec:authorize="hasAnyRole('ADMIN', 'CHEF', 'KITCHEN', 'CASHIER', 'SHIPPER')">
             .navbar-milktea #navbarContent {
                 display: flex !important;
                 flex-basis: auto;
@@ -443,8 +443,21 @@
                 </a>
 
                 <a class="navbar-brand d-flex align-items-center gap-2"
+                   th:href="@{/delivery}"
+                   sec:authorize="hasRole('SHIPPER')">
+                    <span class="milktea-logo-frame">
+                        <img th:src="@{/images/ute-tea-olive-mark.png}" src="/images/ute-tea-olive-mark.png" alt="UTE Tea" class="navbar-shop-logo">
+                    </span>
+                    <span class="ute-wordmark d-none d-sm-flex flex-column">
+                        <span class="navbar-shop-name">UTE TEA</span>
+                        <span class="ute-wordmark-year">SINCE 2026</span>
+                    </span>
+                    <span class="badge bg-danger rounded-pill fw-semibold small">Giao hàng</span>
+                </a>
+
+                <a class="navbar-brand d-flex align-items-center gap-2"
                    th:href="@{/}"
-                   sec:authorize="!hasAnyRole('ADMIN', 'CASHIER', 'KITCHEN', 'CHEF')">
+                   sec:authorize="!hasAnyRole('ADMIN', 'CASHIER', 'KITCHEN', 'CHEF', 'SHIPPER')">
                     <span class="milktea-logo-frame">
                         <img th:src="@{/images/ute-tea-olive-mark.png}"
                              src="/images/ute-tea-olive-mark.png"
@@ -459,9 +472,10 @@
                 </a>
 
                 <div class="ute-mobile-primary"
-                     sec:authorize="!hasAnyRole('ADMIN', 'CASHIER', 'KITCHEN', 'CHEF')">
+                     sec:authorize="!hasAnyRole('ADMIN', 'CASHIER', 'KITCHEN', 'CHEF', 'SHIPPER')">
                     <a th:href="@{/}">Trang chủ</a>
                     <a th:href="@{/#uteCatalog}">Thực đơn</a>
+                    <a th:href="@{/my-orders}" sec:authorize="hasRole('CUSTOMER')">Đơn hàng của tôi</a>
                     <a th:href="@{/cart}" class="position-relative">
                         Giỏ hàng
                         <span data-cart-count class="ute-mobile-cart-count" style="display: none;">0</span>
@@ -478,10 +492,7 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <div class="collapse navbar-collapse" id="navbarContent">
-                    <!-- Đã bỏ nhãn "Không gian nhân viên UTE Tea" để header gọn hơn. -->
-
-                    <ul sec:authorize="!hasAnyRole('ADMIN', 'CASHIER', 'KITCHEN', 'CHEF')"
+                    <ul sec:authorize="!hasAnyRole('ADMIN', 'CASHIER', 'KITCHEN', 'CHEF', 'SHIPPER')"
                         class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3 gap-1">
                         <li class="nav-item">
                             <a class="nav-link fw-semibold ute-desktop-primary" th:href="@{/}">
@@ -493,15 +504,10 @@
                                 Thực đơn
                             </a>
                         </li>
-                        <li class="nav-item" sec:authorize="hasRole('CUSTOMER')">
-                            <a class="nav-link fw-semibold" th:href="@{/orders}">
-                                <i class="bi bi-receipt me-1"></i> Đơn Hàng
-                            </a>
-                        </li>
                     </ul>
 
                     <div class="d-flex align-items-center gap-2">
-                        <a sec:authorize="!hasAnyRole('CASHIER', 'ADMIN', 'CHEF', 'KITCHEN')"
+                        <a sec:authorize="!hasAnyRole('CASHIER', 'ADMIN', 'CHEF', 'KITCHEN', 'SHIPPER')"
                            th:href="@{/cart}"
                            class="btn btn-outline-secondary position-relative header-cart-btn ute-desktop-primary">
                             <i class="bi bi-bag-heart-fill me-1"></i>
@@ -524,16 +530,14 @@
                             <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 header-account-dropdown">
                                 <!-- Dropdown chỉ giữ tác vụ cá nhân; màn hình quản trị/POS/bếp đã có menu riêng. -->
                                 <li><h6 class="dropdown-header">Tài khoản</h6></li>
-                                <li sec:authorize="hasRole('CUSTOMER') and !hasAnyRole('ADMIN','CASHIER','KITCHEN','CHEF')">
+                                <li sec:authorize="hasRole('CUSTOMER') and !hasAnyRole('ADMIN','CASHIER','KITCHEN','CHEF','SHIPPER')">
                                     <a class="dropdown-item" th:href="@{/api/v1/account/preferences}">
                                         <i class="bi bi-heart me-2"></i> Địa chỉ &amp; yêu thích
                                     </a>
                                 </li>
-                                <!-- Desktop đã có mục Đơn hàng; mobile giữ đường dẫn nhanh trong dropdown. -->
-                                <li class="ute-mobile-orders"
-                                    sec:authorize="hasRole('CUSTOMER') and !hasAnyRole('ADMIN','CASHIER','KITCHEN','CHEF')">
-                                    <a class="dropdown-item" th:href="@{/orders}">
-                                        <i class="bi bi-receipt me-2"></i> Đơn hàng
+                                <li sec:authorize="hasRole('CUSTOMER')">
+                                    <a class="dropdown-item" th:href="@{/my-orders}">
+                                        <i class="bi bi-receipt me-2"></i> Đơn hàng của tôi
                                     </a>
                                 </li>
                                 <li>

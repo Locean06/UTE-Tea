@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest @ActiveProfiles("test") @Transactional
 class MarketIntegrationTest {
  @Autowired MarketService market;
+ @Autowired DeliveryWorkspaceService delivery;
  @Autowired CatalogSearchService search;
  @Autowired CustomerDataService data;
  @Autowired ReviewService reviews;
@@ -47,6 +48,15 @@ class MarketIntegrationTest {
   assertThrows(BusinessException.class,()->market.shopProducts(manager,otherShop));
   assertThrows(BusinessException.class,()->market.saveProduct(other,otherShop,product,new ProductInput(category,"Hijack","M",null,BigDecimal.ONE,1,true)));
  }
+ @Test void customerHistoryOnlyShowsOwnOrdersAndBlocksForeignDetails(){
+  var stranger=actor("stranger-customer",Role.CUSTOMER);
+  var mine=market.checkout(buyer,input(null),"customer-history-test");
+  assertEquals(1,market.orders(buyer,null).size());
+  assertEquals(mine.id(),market.orders(buyer,null).getFirst().id());
+  assertTrue(market.orders(stranger,null).isEmpty());
+  assertThrows(BusinessException.class,()->market.order(stranger,mine.id()));
+  assertThrows(BusinessException.class,()->market.orders(buyer,shop));
+ }
  @Test void voucherCheckoutIsIdempotentAndPricesAreServerOwned(){
   market.saveVoucher(vendor,shop,new VoucherInput("TEST10",new BigDecimal("10000.00"),new BigDecimal("40000"),Instant.now().minusSeconds(60),Instant.now().plusSeconds(600),2,1,true));
   var first=market.checkout(buyer,input("TEST10"),"checkout-key-1");
@@ -68,6 +78,36 @@ class MarketIntegrationTest {
   assertEquals(5,review.stars());assertEquals(1,reviews.list(product,0).size());
   assertEquals(new BigDecimal("5000.00"),market.summary(vendor,shop).platformCommission());
   assertTrue(search.search(null,null,shop,null,null,"rating",0,20).items().getFirst().rating()>0);
+ }
+ @Test void courierWorkspaceOnlyListsAssignedOrdersAndProtectsTransitions(){
+  var alternate=actor("alternate-courier",Role.SHIPPER);
+  var first=market.checkout(buyer,input(null),"courier-1");
+  var second=market.checkout(buyer,input(null),"courier-2");
+  first=market.transition(vendor,first.id(),new Transition(DeliveryOrder.Status.CONFIRMED,first.version(),null));
+  second=market.transition(vendor,second.id(),new Transition(DeliveryOrder.Status.CONFIRMED,second.version(),null));
+  first=market.assignShipper(vendor,first.id(),new AssignShipper(shipper.getAccountId(),first.version()));
+  second=market.assignShipper(vendor,second.id(),new AssignShipper(alternate.getAccountId(),second.version()));
+  assertThrows(BusinessException.class,()->delivery.workspace(buyer));
+  assertEquals(1,delivery.workspace(shipper).statistics().assigned());
+  assertEquals(first.id(),delivery.workspace(shipper).orders().getFirst().id());
+  assertEquals(1,delivery.workspace(alternate).statistics().assigned());
+  var firstAssigned=first;
+  assertThrows(BusinessException.class,()->delivery.updateStatus(alternate,firstAssigned.id(),
+      new Transition(DeliveryOrder.Status.SHIPPING,firstAssigned.version(),null)));
+  assertThrows(BusinessException.class,()->delivery.updateStatus(shipper,firstAssigned.id(),
+      new Transition(DeliveryOrder.Status.CANCELLED,firstAssigned.version(),null)));
+  var shipping=delivery.updateStatus(shipper,first.id(),new Transition(DeliveryOrder.Status.SHIPPING,first.version(),null));
+  assertEquals(1,delivery.workspace(shipper).statistics().shipping());
+  assertThrows(BusinessException.class,()->delivery.updateStatus(shipper,shipping.id(),
+      new Transition(DeliveryOrder.Status.DELIVERED,firstAssigned.version(),null)));
+  var delivered=delivery.updateStatus(shipper,shipping.id(),new Transition(DeliveryOrder.Status.DELIVERED,shipping.version(),null));
+  assertEquals(DeliveryOrder.Status.DELIVERED,delivered.status());
+  var stats=delivery.workspace(shipper).statistics();
+  assertEquals(1,stats.delivered());
+  assertEquals(0,stats.failed());
+  assertEquals(100.0,stats.successRate());
+  assertEquals(1,stats.codDelivered());
+  assertEquals(0,new BigDecimal("60000.00").compareTo(stats.codCollected()));
  }
  @Test void cancelledOrderRestocksExactlyOnceAndStaleTransitionsFail(){
   var o=market.checkout(buyer,input(null),"checkout-key-3");Long initialVersion=o.version();
