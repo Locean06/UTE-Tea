@@ -44,7 +44,7 @@ public class BusinessAudit {
     @Column(name = "LyDo", length = 1000)
     private String reason;
 
-    @Column(name = "DuLieu", columnDefinition = "NVARCHAR(MAX)")
+    @Column(name = "DuLieu", columnDefinition = "text")
     private String dataJson;
 
     @Column(name = "TaoLuc", nullable = false)
