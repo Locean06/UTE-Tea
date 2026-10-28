@@ -139,7 +139,10 @@ public class StaffPageController {
         GlobalSettings settings = settingsRepository.findById(1).orElse(null);
         model.addAttribute("settings", settings);
         model.addAttribute("actor", actor);
-        model.addAttribute("categories", categoryRepository.findAllByActiveTrue().stream().filter(cat -> cat.getShop() == null).toList());
+        model.addAttribute("categories", categoryRepository.findAllByActiveTrue().stream()
+                .filter(cat -> cat.getShop() == null)
+                .sorted(java.util.Comparator.comparing(vn.edu.ute.milktea.entity.catalog.Category::getId))
+                .toList());
         model.addAttribute(
             "products",
             productRepository.findAllByActiveTrue().stream().filter(product -> product.getShop() == null).toList()
