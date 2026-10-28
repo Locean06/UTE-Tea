@@ -13,6 +13,8 @@ import vn.edu.ute.milktea.entity.payment.Payment;
 import vn.edu.ute.milktea.repository.cancellation.RefundRequestRepository;
 import vn.edu.ute.milktea.repository.order.InvoiceRepository;
 import vn.edu.ute.milktea.repository.order.OrderRepository;
+import vn.edu.ute.milktea.repository.market.DeliveryOrderRepository;
+import vn.edu.ute.milktea.entity.market.DeliveryOrder;
 import vn.edu.ute.milktea.repository.payment.PaymentRepository;
 
 import java.math.BigDecimal;
@@ -44,6 +46,7 @@ import java.time.LocalDateTime;
 public class ReportService {
 
     private final OrderRepository orderRepository;
+    private final DeliveryOrderRepository deliveryOrderRepository;
     private final InvoiceRepository invoiceRepository;
     private final PaymentRepository paymentRepository;
     private final RefundRequestRepository refundRepository;
@@ -192,11 +195,28 @@ public class ReportService {
             counts.put(stName, counts.getOrDefault(stName, 0L) + 1L);
         }
 
+        deliveryOrderRepository.findAll().stream()
+                .filter(o -> within(o.getCreatedAt(), startInstant, endInstant))
+                .forEach(o -> counts.merge("DELIVERY_" + o.getStatus().name(), 1L, Long::sum));
         return ReportDto.OrderReportView.builder()
                 .counts(counts)
                 .build();
     }
     
+    private boolean within(Instant time, Instant start, Instant end) {
+        return time != null && (start == null || !time.isBefore(start)) && (end == null || time.isBefore(end));
+    }
+    private boolean deliveryEarned(DeliveryOrder o) {
+        return o.isPaid() && o.getStatus() == DeliveryOrder.Status.DELIVERED;
+    }
+    private BigDecimal deliveryRevenue(Instant start, Instant end) {
+        return deliveryOrderRepository.findAll().stream()
+                .filter(this::deliveryEarned)
+                .filter(o -> within(o.getDeliveredAt(), start, end))
+                .map(DeliveryOrder::getTotalAmount)
+                .filter(java.util.Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
     @Transactional(readOnly = true)
     public ReportDto.DashboardSummary getDashboardSummary(
             LocalDate fromDate,
@@ -235,6 +255,7 @@ public class ReportService {
         BigDecimal received = revenue.getReceived();
         BigDecimal refunded = revenue.getRefunded();
 
+        received = received.add(deliveryRevenue(startInstant, endInstant));
         BigDecimal netRevenue = received.subtract(refunded);
 
         // 3. Tổng số đơn hàng trong khoảng ngày
@@ -366,6 +387,12 @@ public class ReportService {
             refundedByDay.merge(day, refund.getAmount(), BigDecimal::add);
         }
 
+        for (DeliveryOrder o : deliveryOrderRepository.findAll()) {
+            if (!deliveryEarned(o) || !within(o.getDeliveredAt(), start, end)) continue;
+            LocalDate day = o.getDeliveredAt().atZone(VIETNAM_ZONE).toLocalDate();
+            if (receivedByDay.containsKey(day) && o.getTotalAmount() != null)
+                receivedByDay.merge(day, o.getTotalAmount(), BigDecimal::add);
+        }
         List<ReportDto.RevenueByDay> result = new ArrayList<>();
 
         for (LocalDate day : receivedByDay.keySet()) {
@@ -423,6 +450,17 @@ public class ReportService {
                     .build());
         }
 
+        java.util.Map<DeliveryOrder.Status, Long> deliveryCounts = new LinkedHashMap<>();
+        for (DeliveryOrder.Status st : DeliveryOrder.Status.values()) deliveryCounts.put(st, 0L);
+        for (DeliveryOrder o : deliveryOrderRepository.findAll()) {
+            if (within(o.getCreatedAt(), start, end)) deliveryCounts.merge(o.getStatus(), 1L, Long::sum);
+        }
+        for (var entry : deliveryCounts.entrySet()) {
+            result.add(ReportDto.OrderStatusStatistic.builder()
+                    .status("DELIVERY_" + entry.getKey().name())
+                    .statusLabel("Giao hàng: " + entry.getKey().name())
+                    .count(entry.getValue()).build());
+        }
         return result;
     }
 //top 5 món bán chạy 

@@ -585,6 +585,17 @@
                     </a>
                 </div>
 
+                <section class="card border-0 shadow-sm rounded-4 p-3 mb-4" id="adminDeliveryOverview">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5>Đơn hàng giao tận nơi (Delivery)</h5>
+                        <button type="button" id="adminDeliveryRefresh" class="btn btn-sm btn-outline-success">Làm mới</button>
+                    </div>
+                    <div class="table-responsive"><table class="table table-sm align-middle">
+                        <thead><tr><th>Mã</th><th>Chi nhánh</th><th>Người nhận</th><th>Trạng thái</th><th>Thanh toán</th><th>Tổng tiền</th></tr></thead>
+                        <tbody id="adminDeliveryRows"><tr><td colspan="6">Đang tải...</td></tr></tbody>
+                    </table></div>
+                    <div class="small text-muted" id="adminDeliverySummary"></div>
+                </section>
                 <form id="adminOrderFilters" class="card border-0 shadow-sm rounded-4 p-3 mb-3">
                     <div class="row g-3 align-items-end">
                         <div class="col-xl-6 col-md-12">
@@ -1061,6 +1072,36 @@
                     MilkTeaRealtime.connect();
                     loadOrders();
                 });
+            })();
+        </script>
+        <script>
+            (() => {
+                const rows = document.getElementById('adminDeliveryRows');
+                const summary = document.getElementById('adminDeliverySummary');
+                if (!rows || !summary) return;
+                const money = n => new Intl.NumberFormat('vi-VN', {style:'currency',currency:'VND'}).format(Number(n)||0);
+                const cell = (tr, value) => { const td = document.createElement('td'); td.textContent=String(value??'—'); tr.appendChild(td); };
+                async function refresh() {
+                    try {
+                        const data = await MilkTeaApi.get('/api/v1/admin/orders/delivery');
+                        if (!Array.isArray(data)) throw new Error('Dữ liệu API không hợp lệ');
+                        rows.replaceChildren();
+                        for(const o of data) {
+                            const tr=document.createElement('tr');
+                            cell(tr,'#'+o.id); cell(tr,o.shopName); cell(tr,o.recipient);
+                            cell(tr,o.status); cell(tr,(o.paid?'Đã thu':'Chưa thu')+' / '+o.paymentMethod);
+                            cell(tr,money(o.totalAmount)); rows.appendChild(tr);
+                        }
+                        if (!data.length) { const tr=document.createElement('tr'); const td=document.createElement('td'); td.colSpan=6; td.textContent='Chưa có đơn Delivery'; tr.appendChild(td); rows.appendChild(tr); }
+                        summary.textContent='Tổng '+data.length+' đơn giao hàng (bảng POS hiện ở dưới).';
+                    } catch(e) {
+                        rows.replaceChildren(); const tr=document.createElement('tr'); const td=document.createElement('td');
+                        td.colSpan=6; td.textContent='Không tải được Delivery: '+(e.message||'Lỗi'); tr.appendChild(td); rows.appendChild(tr);
+                    }
+                }
+                document.getElementById('adminDeliveryRefresh')?.addEventListener('click',refresh);
+                if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',refresh); else refresh();
+                setInterval(()=>{if(!document.hidden)refresh()},30000);
             })();
         </script>
     </th:block>
