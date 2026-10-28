@@ -665,17 +665,10 @@
                     </div>
 
                     <div class="d-flex gap-2">
-                        <div class="d-flex flex-wrap align-items-center gap-3">
-                            <label class="d-flex align-items-center gap-2 small mb-0" for="showHiddenCategories">
-                                <input type="checkbox" id="showHiddenCategories" class="form-check-input mt-0"
-                                       onchange="toggleHiddenCategories()">
-                                Hiện danh mục đã xóa
-                            </label>
-                            <button type="button" class="btn btn-outline-primary rounded-pill px-3" data-bs-toggle="modal"
-                                    data-bs-target="#createCategoryModal">
-                                <i class="bi bi-folder-plus me-1"></i> Thêm Danh Mục
-                            </button>
-                        </div>
+                        <button type="button" class="btn btn-outline-primary rounded-pill px-3" data-bs-toggle="modal"
+                                data-bs-target="#createCategoryModal">
+                            <i class="bi bi-folder-plus me-1"></i> Thêm Danh Mục
+                        </button>
 
                         <button type="button" class="btn btn-primary-custom rounded-pill px-3" data-bs-toggle="modal"
                             data-bs-target="#createProductModal">
@@ -693,10 +686,6 @@
                             </p>
                         </div>
 
-                        <button type="button" class="btn btn-outline-primary rounded-pill px-3" data-bs-toggle="modal"
-                            data-bs-target="#createCategoryModal">
-                            <i class="bi bi-folder-plus me-1"></i> Thêm Danh Mục
-                        </button>
                     </div>
 
                     <div class="table-responsive">
@@ -1480,13 +1469,6 @@
                 const allowTopping = document.getElementById('editCatAllowTopping').checked;
 
                 AdminApp.updateCategory(id, name, active, allowTopping);
-            }
-
-            function toggleHiddenCategories() {
-                const checked = document.getElementById('showHiddenCategories')?.checked === true;
-                document.querySelectorAll('#categoryTableBody tr[data-category-hidden="true"]').forEach(row => {
-                    row.classList.toggle('d-none', !checked);
-                });
             }
 
             function deactivateCategory(button) {
