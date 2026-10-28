@@ -823,6 +823,47 @@
                     transform: none;
                 }
             }
+            /* Câu chuyện UTE Tea được gộp vào khung nổi bật */
+            .milk-menu-page .ute-story-banner {
+                min-height: 290px;
+                padding: clamp(25px, 3.5vw, 42px);
+                gap: clamp(20px, 3vw, 48px);
+            }
+            .milk-menu-page .ute-story-banner .ute-offer-copy {
+                flex: 1 1 60%;
+                min-width: 0;
+            }
+            .milk-menu-page .ute-story-banner h2 {
+                font-size: clamp(1.65rem, 2.7vw, 2.65rem);
+                line-height: 1.25;
+                margin-bottom: 14px;
+            }
+            .milk-menu-page .ute-story-banner p {
+                max-width: 610px;
+                font-size: .82rem;
+                line-height: 1.85;
+                margin-bottom: 18px;
+            }
+            .milk-menu-page .ute-story-banner > img {
+                flex: 0 0 39%;
+                width: 39%;
+                height: 250px;
+                max-height: none;
+                border-radius: 90px 20px 90px 20px;
+                object-fit: cover;
+                opacity: 1;
+            }
+            @media (max-width: 767.98px) {
+                .milk-menu-page .ute-story-banner { gap: 22px; }
+                .milk-menu-page .ute-story-banner .ute-offer-copy { flex-basis: auto; }
+                .milk-menu-page .ute-story-banner > img {
+                    flex: auto;
+                    width: 100%;
+                    height: 210px;
+                    max-height: none;
+                    border-radius: 55px 16px 55px 16px;
+                }
+            }
         </style>
         <!-- UTE Tea | Customer storefront (server-rendered Thymeleaf, original cart flow intact) -->
         <section class="ute-hero ute-olive-hero" aria-label="Giới thiệu UTE Tea">
@@ -949,27 +990,22 @@
         </div>
 
         </section>
-        <section id="uteOffers" class="ute-offer-wrap" aria-label="Ưu đãi tại UTE Tea">
-            <div class="ute-offer-banner">
-                <div class="ute-offer-copy"><div class="ute-section-label">DÀNH CHO NGÀY CỦA BẠN</div>
-                  <h2 class="ute-serif">Thêm một ly trà,<br>thêm một niềm vui.</h2>
-                  <p>Đừng bỏ lỡ ưu đãi đang được áp dụng tại cửa hàng. Xem thực đơn để chọn món hợp gu nhé!</p>
-                  <a href="#uteCatalog" class="ute-link-action">Chọn món ngay <i class="bi bi-arrow-up-right"></i></a>
+        <!-- Gộp ưu đãi và câu chuyện UTE Tea vào một khung duy nhất -->
+        <section id="uteOffers" class="ute-offer-wrap" aria-labelledby="uteStoryTitle">
+            <div class="ute-offer-banner ute-story-banner" id="uteStory">
+                <div class="ute-offer-copy">
+                    <div class="ute-section-label">CÂU CHUYỆN UTE TEA</div>
+                    <h2 class="ute-serif" id="uteStoryTitle">Từ những lá trà tốt nhất<br>đến những khoảnh khắc đẹp nhất</h2>
+                    <p>Chúng mình tin rằng một thức uống ngon không chỉ nằm ở công thức, mà còn ở cảm giác khi thưởng thức. UTE Tea mang đến những lựa chọn trà thân quen, được pha chế theo sở thích của bạn.</p>
+                    <a href="#uteCatalog" class="ute-link-action">Tìm hương vị của bạn <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
                 </div>
-                <img th:src="@{/images/ute-tea-bright-hero.webp}" src="/images/ute-tea-bright-hero.webp" loading="lazy" width="450" height="270" alt="Những món trà tại UTE Tea">
+                <img th:src="@{/images/ute-tea-bright-leaves.webp}"
+                     src="/images/ute-tea-bright-leaves.webp"
+                     loading="lazy" width="800" height="470"
+                     alt="Lá trà xanh tươi được tuyển chọn để pha chế thức uống UTE Tea">
             </div>
-
-
         </section>
 
-        <section id="uteStory" class="ute-brand-story" aria-labelledby="uteStoryTitle">
-            <div class="ute-story-text"><div class="ute-section-label">CÂU CHUYỆN UTE TEA</div>
-              <h2 class="ute-serif" id="uteStoryTitle">Từ những lá trà tốt nhất<br>đến những khoảnh khắc đẹp nhất</h2>
-              <p>Chúng mình tin rằng một thức uống ngon không chỉ nằm ở công thức, mà còn ở cảm giác khi thưởng thức. UTE Tea mang đến những lựa chọn trà thân quen, được pha chế theo sở thích của bạn.</p>
-              <a href="#uteCatalog" class="ute-link-action">Tìm hương vị của bạn <i class="bi bi-arrow-right"></i></a>
-            </div>
-            <div class="ute-story-photo"><img th:src="@{/images/ute-tea-bright-leaves.webp}" src="/images/ute-tea-bright-leaves.webp" loading="lazy" alt="Lá trà và nguyên liệu tự nhiên" width="800" height="470"></div>
-        </section>
         <section class="ute-experience" aria-label="Tiện ích của UTE Tea">
             <div class="ute-section-label">TRẢI NGHIỆM CÙNG UTE TEA</div>
             <h2 class="ute-serif ute-centered-title">Thưởng thức theo cách của bạn</h2>
