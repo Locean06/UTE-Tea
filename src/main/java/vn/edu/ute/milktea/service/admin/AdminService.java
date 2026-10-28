@@ -289,12 +289,27 @@ public class AdminService {
     public void deleteCategory(Long id) {
         Category c = categoryRepository.findById(id)
                 .orElseThrow(() -> BusinessException.notFound(ErrorCode.VALIDATION_FAILED, "Không tìm thấy danh mục"));
-        c.setActive(false);
-        categoryRepository.save(c);
-        realtimeEventPublisher.publishAfterCommit("/topic/admin", "CATALOG_CHANGED", c.getId().toString(), null, "1",
-                java.util.Map.of("type", "CATEGORY", "action", "DEACTIVATE", "id", c.getId()));
-        realtimeEventPublisher.publishAfterCommit("/topic/cashier", "CATALOG_CHANGED", c.getId().toString(), null, "1",
-                java.util.Map.of("type", "CATEGORY", "action", "DEACTIVATE", "id", c.getId()));
+        if (c.getShop() != null) {
+            throw BusinessException.badRequest(ErrorCode.VALIDATION_FAILED,
+                    "Danh mục của chi nhánh phải được quản lý trong phần chi nhánh");
+        }
+
+        // Xóa hẳn danh mục trống. Danh mục có sản phẩm chỉ được ẩn để
+        // giữ nguyên công thức, đơn hàng, menu chi nhánh và khóa ngoại.
+        boolean hasProducts = productRepository.existsByCategoryId(id);
+        String action;
+        if (hasProducts) {
+            c.setActive(false);
+            categoryRepository.save(c);
+            action = "DEACTIVATE";
+        } else {
+            categoryRepository.delete(c);
+            action = "DELETE";
+        }
+        realtimeEventPublisher.publishAfterCommit("/topic/admin", "CATALOG_CHANGED", id.toString(), null, "1",
+                java.util.Map.of("type", "CATEGORY", "action", action, "id", id));
+        realtimeEventPublisher.publishAfterCommit("/topic/cashier", "CATALOG_CHANGED", id.toString(), null, "1",
+                java.util.Map.of("type", "CATEGORY", "action", action, "id", id));
     }
 
     // ==========================================
