@@ -239,7 +239,10 @@ public class AdminService {
     // ==========================================
     @Transactional(readOnly = true)
     public List<AdminDto.CategoryResponse> listCategories() {
-        return categoryRepository.findAll().stream().filter(c -> c.getShop() == null && Boolean.TRUE.equals(c.getActive())).map(c -> AdminDto.CategoryResponse.builder()
+        return categoryRepository.findAll().stream()
+                .filter(c -> c.getShop() == null && Boolean.TRUE.equals(c.getActive()))
+                .sorted(java.util.Comparator.comparing(Category::getId))
+                .map(c -> AdminDto.CategoryResponse.builder()
                 .id(c.getId())
                 .name(c.getName())
                 .active(c.getActive())
