@@ -46,6 +46,9 @@ public class OrderDto {
         private String note;
     }
 
+    /** The same product/topping snapshot and shop discount used by order creation. */
+    public record CounterQuoteResponse(BigDecimal subtotal, BigDecimal discountAmount, BigDecimal totalAmount) {}
+
     @Data
     @Builder
     @NoArgsConstructor

@@ -6,815 +6,332 @@
 </head>
 
 <body>
-    <div th:fragment="content" class="container-fluid pos-workspace py-3 px-lg-4">
-        <div th:replace="~{fragments/staff-navigation :: navigation}"></div>
+    <div th:fragment="content" class="container-fluid pos-workspace pos-refresh py-3 px-lg-4">
 
 
-        <link rel="stylesheet" th:href="@{/css/staff-ui.css}">
 
         <style>
-            .pos-workspace {
-                --pos-primary: #565c45;
-                --pos-primary-hover: #3e4837;
-                --pos-primary-light: #f0f0e8;
-                --pos-secondary: #717763;
-                --pos-secondary-hover: #3c4735;
-                --pos-secondary-light: #f3f2e9;
-                --pos-accent: #c6ab80;
-                --pos-border: #e4e4d9;
-                --pos-muted: #777a6f;
-                --pos-background: #faf9f5;
-                --pos-surface: #ffffff;
-                --pos-surface-soft: #faf9f3;
-                --pos-text: #303a2d;
-                background: var(--pos-background);
-                color: var(--pos-text);
-                font-family: 'Be Vietnam Pro', sans-serif;
-                min-height: calc(100vh - 76px);
-            }
-
-            .pos-workspace *,
-            .pos-workspace *::before,
-            .pos-workspace *::after {
-                box-sizing: border-box;
-            }
-
-            @keyframes posFadeUp {
-                from {
-                    opacity: 0;
-                    transform: translateY(18px);
-                }
-
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-
-            @keyframes posCartSlide {
-                from {
-                    opacity: 0;
-                    transform: translateX(-18px);
-                }
-
-                to {
-                    opacity: 1;
-                    transform: translateX(0);
-                }
-            }
-
-            @keyframes posTotalHighlight {
-                0% {
-                    background-color: transparent;
-                    box-shadow: 0 0 0 0 rgba(8, 127, 112, 0);
-                }
-
-                45% {
-                    background-color: #f0f0e8;
-                    box-shadow: 0 0 0 7px rgba(8, 127, 112, .08);
-                }
-
-                100% {
-                    background-color: transparent;
-                    box-shadow: 0 0 0 0 rgba(8, 127, 112, 0);
-                }
-            }
-
-            @keyframes posTableSelect {
-                0% {
-                    transform: scale(.975);
-                }
-
-                60% {
-                    transform: scale(1.018);
-                }
-
-                100% {
-                    transform: scale(1);
-                }
-            }
-
-            @keyframes posPaymentSuccess {
-                0% {
-                    opacity: 0;
-                    transform: scale(.88);
-                }
-
-                65% {
-                    opacity: 1;
-                    transform: scale(1.06);
-                }
-
-                100% {
-                    opacity: 1;
-                    transform: scale(1);
-                }
-            }
-
-            .pos-workspace .pos-layout {
-                display: grid;
-                grid-template-columns: minmax(280px, 1.05fr) minmax(380px, 1.9fr) minmax(280px, 1fr);
-                gap: 18px;
-                align-items: start;
-            }
-
-            .pos-workspace .pos-panel {
-                min-width: 0;
-                background: var(--pos-surface);
-                border: 1px solid var(--pos-border);
-                border-radius: 18px;
-                box-shadow: 0 4px 18px rgba(23, 77, 70, .045);
-                padding: 20px;
-            }
-
-            .pos-workspace .pos-panel h4 {
-                font-size: 17px;
-                font-weight: 700;
-                line-height: 1.5;
-                color: var(--pos-secondary-hover);
-                margin-bottom: 20px;
-            }
-
-            .pos-workspace .pos-panel h4 i {
-                color: var(--pos-primary);
-                font-size: 19px;
-                margin-right: 8px;
-            }
-
-            .pos-workspace .text-muted {
-                color: var(--pos-muted) !important;
-            }
-
-            .pos-workspace .text-danger {
-                color: #B85045 !important;
-            }
-
-            .pos-workspace .text-success {
-                color: #198754 !important;
-            }
-
-            .pos-workspace .text-primary {
-                color: var(--pos-primary) !important;
-            }
-
-            .pos-workspace .pos-search {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                width: 100%;
-                max-width: 100%;
-                min-height: 42px;
-                padding: 10px 13px;
-                border: 1px solid var(--pos-border);
-                border-radius: 12px;
-                background: #fff;
-                color: #A58A74;
-            }
-
-            .pos-workspace .pos-search:focus-within {
-                border-color: var(--pos-primary);
-                box-shadow: 0 0 0 3px rgba(8, 127, 112, .1);
-            }
-
-            .pos-workspace .pos-search i {
-                flex-shrink: 0;
-                color: var(--pos-primary);
-                font-size: 15px;
-            }
-
-            .pos-workspace .pos-search input {
-                width: 100%;
-                min-width: 0;
-                border: none;
-                outline: none;
-                background: transparent;
-                color: var(--pos-text);
-                font-size: 13px;
-                padding: 0;
-            }
-
-            .pos-workspace .pos-search input::placeholder {
-                color: #A58A74;
-                opacity: .85;
-            }
-
-            .pos-workspace .form-control,
-            .pos-workspace .form-select {
-                min-height: 42px;
-                padding: 10px 13px;
-                background-color: #fff;
-                border: 1px solid var(--pos-border);
-                border-radius: 10px;
-                color: var(--pos-text);
-                font-size: 13px;
-                box-shadow: none;
-            }
-
-            .pos-workspace .form-control:focus,
-            .pos-workspace .form-select:focus {
-                border-color: var(--pos-primary);
-                box-shadow: 0 0 0 3px rgba(8, 127, 112, .1);
-                outline: none;
-            }
-
-            .pos-workspace label.small {
-                display: inline-block;
-                font-size: 12px;
-                font-weight: 600;
-                color: var(--pos-secondary) !important;
-            }
-
-            .pos-workspace .btn {
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                gap: 5px;
-                border-radius: 10px;
-                padding: 9px 15px;
-                font-size: 13px;
-                font-weight: 600;
-                box-shadow: none !important;
-                transition: background-color .15s ease,
-                    border-color .15s ease,
-                    color .15s ease,
-                    transform .14s ease;
-            }
-
-            .pos-workspace .btn:active:not(:disabled),
-            .pos-workspace .pos-submit:active:not(:disabled),
-            .pos-workspace .pos-sizes button:active:not(:disabled),
-            .pos-workspace .pos-categories button:active:not(:disabled),
-            .pos-workspace .pos-qty button:active:not(:disabled) {
-                transform: scale(.97);
-            }
-
-            .pos-workspace .btn-primary,
-            .pos-workspace .btn-primary-custom {
-                background: var(--pos-primary) !important;
-                border: 1px solid var(--pos-primary) !important;
-                color: #fff !important;
-            }
-
-            .pos-workspace .btn-primary:hover,
-            .pos-workspace .btn-primary-custom:hover {
-                background: var(--pos-primary-hover) !important;
-                border-color: var(--pos-primary-hover) !important;
-                color: #fff !important;
-            }
-
-            .pos-workspace .btn-outline-secondary {
-                background: #fff;
-                border: 1px solid #d5e5df;
-                color: var(--pos-secondary);
-            }
-
-            .pos-workspace .btn-outline-secondary:hover {
-                background: var(--pos-secondary-light);
-                border-color: #C99261;
-                color: var(--pos-secondary-hover);
-            }
-
-            .pos-workspace .btn.text-danger {
-                color: #B85045 !important;
-                border: 1px solid transparent;
-                background: transparent;
-            }
-
-            .pos-workspace .btn.text-danger:hover {
-                background: #FBEDE8;
-                color: #A54239 !important;
-            }
-
-            .pos-workspace .pos-checkout>.d-flex b {
-                color: var(--pos-secondary-hover);
-                font-size: 12px;
-                font-weight: 700;
-                letter-spacing: .02em;
-            }
-
-            .pos-workspace #counterItemCount {
-                color: var(--pos-primary);
-                font-weight: 700;
-            }
-
-            .pos-workspace .pos-cart-list {
-                min-height: 220px;
-                max-height: 38vh;
-                overflow-y: auto;
-                overflow-x: hidden;
-                padding-right: 3px;
-                scrollbar-width: thin;
-                scrollbar-color: #d5e5df transparent;
-            }
-
-            .pos-workspace .pos-cart-item {
-                display: flex;
-                align-items: flex-start;
-                gap: 10px;
-                padding: 12px;
-                margin-bottom: 10px;
-                background: #fff;
-                border: 1px solid var(--pos-border);
-                border-radius: 13px;
-                transition: background-color .18s ease,
-                    border-color .18s ease;
-            }
-
-            .pos-workspace .pos-cart-item.pos-cart-enter {
-                animation: posCartSlide .26s ease-out both;
-            }
-
-            .pos-workspace .pos-cart-item:hover {
-                background: var(--pos-primary-light);
-                border-color: #bce0d1;
-            }
-
-            .pos-workspace .pos-cart-item img {
-                width: 54px;
-                height: 64px;
-                flex-shrink: 0;
-                object-fit: cover;
-                border-radius: 9px;
-                background: var(--pos-surface-soft);
-            }
-
-            .pos-workspace .pos-cart-info {
-                flex: 1;
-                min-width: 0;
-            }
-
-            .pos-workspace .pos-cart-info strong {
-                display: block;
-                font-size: 13px;
-                font-weight: 700;
-                color: var(--pos-text);
-            }
-
-            .pos-workspace .pos-cart-price {
-                color: var(--pos-primary);
-                font-size: 13px;
-                font-weight: 700;
-            }
-
-            .pos-workspace .pos-qty {
-                display: inline-flex;
-                align-items: center;
-                overflow: hidden;
-                border: 1px solid #d5e5df;
-                border-radius: 9px;
-                background: #fff;
-            }
-
-            .pos-workspace .pos-qty button {
-                background: transparent;
-                border: none;
-                color: var(--pos-secondary);
-                padding: 5px 10px;
-                transition: background-color .15s ease,
-                    color .15s ease,
-                    transform .14s ease;
-            }
-
-            .pos-workspace .pos-qty button:hover {
-                background: var(--pos-primary-light);
-                color: var(--pos-primary);
-            }
-
-            .pos-workspace .pos-qty span {
-                min-width: 22px;
-                text-align: center;
-                font-size: 13px;
-                font-weight: 600;
-                color: var(--pos-text);
-            }
-
-            .pos-workspace .pos-checkout-bottom {
-                border-top: 1px solid var(--pos-border);
-                margin-top: 15px;
-            }
-
-            .pos-workspace .pos-total {
-                display: inline-block;
-                color: var(--pos-primary);
-                font-size: 21px;
-                font-weight: 800;
-                letter-spacing: -.02em;
-                border-radius: 8px;
-            }
-
-            .pos-workspace .pos-total.pos-total-updated {
-                animation: posTotalHighlight .48s ease-out both;
-            }
-
-            .pos-workspace .pos-submit {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                width: 100%;
-                min-height: 46px;
-                padding: 13px 16px;
-                background: var(--pos-primary);
-                border: 1px solid var(--pos-primary);
-                border-radius: 14px;
-                color: #fff;
-                font-size: 14px;
-                font-weight: 700;
-                box-shadow: none;
-                cursor: pointer;
-                transition: background-color .15s ease,
-                    border-color .15s ease,
-                    transform .14s ease;
-            }
-
-            .pos-workspace .pos-submit:hover {
-                background: var(--pos-primary-hover);
-                border-color: var(--pos-primary-hover);
-                color: #fff;
-            }
-
-            .pos-workspace .pos-submit:disabled {
-                opacity: .55;
-                cursor: not-allowed;
-            }
-
-            .pos-workspace .pos-categories {
-                display: flex;
-                gap: 8px;
-                overflow-x: auto;
-                overflow-y: hidden;
-                padding: 3px 0 14px;
-                margin-bottom: 5px;
-                scrollbar-width: thin;
-                scrollbar-color: #d5e5df transparent;
-            }
-
-            .pos-workspace .pos-categories button {
-                flex-shrink: 0;
-                white-space: nowrap;
-                padding: 9px 16px;
-                background: var(--pos-secondary-light);
-                border: 1px solid var(--pos-border);
-                border-radius: 24px;
-                color: var(--pos-secondary);
-                font-size: 12px;
-                font-weight: 600;
-                cursor: pointer;
-                transition: background-color .16s ease,
-                    border-color .16s ease,
-                    color .16s ease,
-                    transform .14s ease;
-            }
-
-            .pos-workspace .pos-categories button:hover {
-                background: var(--pos-primary-light);
-                border-color: #bce0d1;
-                color: var(--pos-primary-hover);
-            }
-
-            .pos-workspace .pos-categories button.active {
-                background: var(--pos-primary);
-                border-color: var(--pos-primary);
-                color: #fff;
-            }
-
-            .pos-workspace #posToppingModeBanner {
-                background: var(--pos-primary-light);
-                border: 1px solid #bce0d1 !important;
-                border-radius: 12px !important;
-                color: var(--pos-secondary-hover);
-                box-shadow: none !important;
-                gap: 12px;
-            }
-
-            .pos-workspace #posToppingModeBanner strong {
-                color: var(--pos-primary);
-            }
-
-            .pos-workspace #posToppingModeBanner .btn {
-                flex-shrink: 0;
-            }
-
-            .pos-workspace .pos-product-grid {
-                display: grid;
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-                gap: 13px;
-                max-height: calc(100vh - 235px);
-                overflow-y: auto;
-                overflow-x: hidden;
-                padding: 3px;
-                scrollbar-width: thin;
-                scrollbar-color: #d5e5df transparent;
-            }
-
-            .pos-workspace .pos-product {
-                display: flex;
-                flex-direction: column;
-                min-width: 0;
-                background: #fff;
-                border: 1px solid var(--pos-border);
-                border-radius: 14px;
-                overflow: hidden;
-                box-shadow: 0 3px 12px rgba(23, 77, 70, .04);
-            }
-
-            .pos-workspace .pos-product.pos-product-enter {
-                animation: posFadeUp .35s ease-out both;
-            }
-
-            .pos-workspace .pos-product img {
-                display: block;
-                width: 100%;
-                aspect-ratio: 1.15;
-                object-fit: cover;
-                background: var(--pos-surface-soft);
-            }
-
-            .pos-workspace .pos-product-body {
-                display: flex;
-                flex-direction: column;
-                flex: 1;
-                min-width: 0;
-                padding: 12px;
-            }
-
-            .pos-workspace .pos-product h6 {
-                min-height: 2.6em;
-                margin: 0 0 7px;
-                color: var(--pos-text);
-                font-size: 13px;
-                line-height: 1.4;
-                font-weight: 700;
-                overflow-wrap: anywhere;
-            }
-
-            .pos-workspace .pos-product-price {
-                color: var(--pos-primary);
-                font-size: 14px;
-                font-weight: 700;
-                margin-bottom: 10px;
-            }
-
-            .pos-workspace .pos-sizes {
-                display: flex;
-                gap: 6px;
-                margin-top: auto;
-            }
-
-            .pos-workspace .pos-sizes button {
-                flex: 1;
-                min-width: 0;
-                padding: 8px 4px;
-                background: var(--pos-secondary-light);
-                border: 1px solid var(--pos-border);
-                border-radius: 9px;
-                color: var(--pos-secondary-hover);
-                font-size: 12px;
-                font-weight: 700;
-                cursor: pointer;
-                transition: background-color .15s ease,
-                    border-color .15s ease,
-                    color .15s ease,
-                    transform .14s ease;
-            }
-
-            .pos-workspace .pos-sizes button:hover {
-                background: var(--pos-primary-hover);
-                border-color: var(--pos-primary-hover);
-                color: #fff;
-            }
-
-            .pos-workspace .pos-tables-grid {
-                display: grid;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 10px;
-            }
-
-            .pos-workspace .pos-table-card {
-                min-width: 0;
-                background: var(--pos-surface-soft);
-                border: 1px solid var(--pos-border);
-                border-radius: 14px;
-                padding: 14px 12px;
-            }
-
-            .pos-workspace .pos-table-card.TRONG {
-                background: #faf9f3;
-                border-color: var(--pos-border);
-            }
-
-            .pos-workspace .pos-table-card.CO_KHACH {
-                background: var(--pos-primary-light);
-                border-color: #bce0d1;
-            }
-
-            .pos-workspace .pos-table-card.selected {
-                outline: 2px solid var(--pos-primary);
-                outline-offset: 0;
-                animation: posTableSelect .26s ease-out;
-            }
-
-            .pos-workspace .pos-table-card h6 {
-                color: var(--pos-secondary-hover);
-                font-size: 13px;
-                font-weight: 700;
-                margin-bottom: 8px;
-            }
-
-            .pos-workspace .pos-table-card .small {
-                font-size: 12px;
-                color: var(--pos-muted);
-            }
-
-            .pos-workspace .pos-table-card .badge {
-                border-radius: 20px;
-                font-size: 10px;
-                font-weight: 600;
-                padding: 5px 9px;
-            }
-
-            .pos-workspace .pos-table-card .btn {
-                border-radius: 9px;
-                font-size: 11px;
-                padding: 7px 10px;
-            }
-
-            .pos-workspace .pos-tables .bi-circle-fill {
-                font-size: 10px;
-                margin-right: 4px;
-            }
-
-            .pos-workspace .alert-info {
-                background: var(--pos-primary-light);
-                border-color: #bce0d1;
-                color: var(--pos-secondary-hover);
-            }
-
-            .pos-workspace .modal-content {
-                background: #fff;
-                border: 1px solid var(--pos-border);
-                border-radius: 18px !important;
-                box-shadow: 0 12px 32px rgba(23, 77, 70, .12);
-                overflow: hidden;
-            }
-
-            .pos-workspace .modal-header {
-                padding: 20px 24px;
-                border-bottom: 1px solid var(--pos-border);
-            }
-
-            .pos-workspace .modal-header h5 {
-                margin: 0;
-                color: var(--pos-secondary-hover);
-                font-size: 17px;
-                font-weight: 700;
-            }
-
-            .pos-workspace .modal-body {
-                padding: 22px 24px;
-                color: var(--pos-text);
-                font-size: 13px;
-            }
-
-            .pos-workspace .modal-footer {
-                padding: 14px 24px;
-                border-top: 1px solid var(--pos-border);
-            }
-
-            .pos-workspace .modal .btn-close:focus {
-                box-shadow: 0 0 0 3px rgba(8, 127, 112, .15);
-            }
-
-            .pos-payment-success {
-                animation: posPaymentSuccess .42s ease-out both;
-            }
-
-            .pos-payment-success .bi-check-circle-fill,
-            .pos-payment-success .bi-check-circle {
-                color: #198754;
-            }
-
-            @media (min-width: 1600px) {
-                .pos-workspace .pos-product-grid {
-                    grid-template-columns: repeat(4, minmax(0, 1fr));
-                }
-            }
-
-            @media (max-width: 1199.98px) {
-                .pos-workspace .pos-layout {
-                    grid-template-columns: minmax(280px, 1fr) minmax(400px, 1.6fr);
-                }
-
-                .pos-workspace .pos-tables {
-                    grid-column: 1 / -1;
-                }
-
-                .pos-workspace .pos-tables-grid {
-                    grid-template-columns: repeat(4, minmax(0, 1fr));
-                }
-            }
-
-            @media (max-width: 767.98px) {
-                .pos-workspace {
-                    padding-left: 12px !important;
-                    padding-right: 12px !important;
-                }
-
-                .pos-workspace .pos-layout {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 16px;
-                }
-
-                .pos-workspace .pos-panel {
-                    width: 100%;
-                    padding: 16px;
-                    border-radius: 16px;
-                }
-
-                .pos-workspace .pos-menu {
-                    order: 0;
-                }
-
-                .pos-workspace .pos-checkout {
-                    order: 1;
-                }
-
-                .pos-workspace .pos-tables {
-                    order: 2;
-                }
-
-                .pos-workspace .pos-product-grid {
-                    grid-template-columns: repeat(2, minmax(0, 1fr));
-                    max-height: none;
-                }
-
-                .pos-workspace .pos-tables-grid {
-                    grid-template-columns: repeat(2, minmax(0, 1fr));
-                }
-
-                .pos-workspace .pos-menu>div:first-child {
-                    flex-wrap: wrap;
-                }
-
-                .pos-workspace .pos-menu .pos-search {
-                    flex: 1 1 100%;
-                }
-
-                .pos-workspace .pos-panel h4 {
-                    font-size: 16px;
-                }
-
-                .pos-workspace #posToppingModeBanner {
-                    flex-wrap: wrap;
-                }
-            }
-
-            @media (max-width: 359.98px) {
-                .pos-workspace .pos-panel {
-                    padding: 12px;
-                }
-
-                .pos-workspace .pos-product-grid {
-                    gap: 9px;
-                }
-
-                .pos-workspace .pos-product-body {
-                    padding: 9px;
-                }
-
-                .pos-workspace .pos-product h6 {
-                    font-size: 12px;
-                }
-
-                .pos-workspace .pos-product-price {
-                    font-size: 13px;
-                }
-
-                .pos-workspace .pos-sizes button {
-                    font-size: 11px;
-                    padding: 7px 3px;
-                }
-            }
-
-            @media (prefers-reduced-motion: reduce) {
-
-                .pos-workspace *,
-                .pos-workspace *::before,
-                .pos-workspace *::after {
-                    animation: none !important;
-                    transition: none !important;
-                    scroll-behavior: auto !important;
-                }
-
-                .pos-workspace .btn:active,
-                .pos-workspace .pos-submit:active,
-                .pos-workspace .pos-sizes button:active,
-                .pos-workspace .pos-categories button:active,
-                .pos-workspace .pos-qty button:active {
-                    transform: none !important;
-                }
-            }
-        </style>
+/* UTE TEA · Cashier POS redesign: intentionally scoped to the cashier page. */
+.pos-workspace.pos-refresh {
+    --pos-primary: #506447;
+    --pos-primary-hover: #344a34;
+    --pos-primary-light: #edf4e9;
+    --pos-border: #e1e8dd;
+    --pos-text: #283b2f;
+    --pos-muted: #748073;
+    --pos-background: #f7f9f4;
+    --pos-paper: #ffffff;
+    background: var(--pos-background) !important;
+    color: var(--pos-text);
+    font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+    min-height: calc(100vh - 78px);
+    padding-bottom: 48px !important;
+}
+.pos-workspace.pos-refresh *, .pos-workspace.pos-refresh *::before,
+.pos-workspace.pos-refresh *::after { box-sizing: border-box; }
+.pos-workspace.pos-refresh .pos-heading {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 16px; margin: 12px 0 20px;
+    padding: 21px 26px; background: linear-gradient(112deg,#ecf2e8 0%,#f9faf5 72%);
+    border: 1px solid #e0e8d9; border-radius: 21px;
+}
+.pos-workspace.pos-refresh .pos-eyebrow {
+    display: inline-flex; align-items: center; gap: 7px; margin: 0 0 8px;
+    font-size: 10px; font-weight: 800; letter-spacing: .13em;
+    color: #587251; text-transform: uppercase;
+}
+.pos-workspace.pos-refresh .pos-heading h1 {
+    font-family: 'Be Vietnam Pro', sans-serif !important;
+    color: #2e4937; font-weight: 800 !important; letter-spacing: -.045em !important;
+    font-size: clamp(23px,2.45vw,31px); line-height: 1.3; margin: 0 0 8px;
+}
+.pos-workspace.pos-refresh .pos-heading p {
+    margin: 0; color: #748071; font-size: 12px; line-height: 1.75;
+}
+.pos-workspace.pos-refresh .pos-shortcut {
+    flex: 0 0 auto; display: inline-flex; align-items: center; gap: 9px;
+    color: #415940; background: #fff; text-decoration: none;
+    border: 1px solid #dae4d8; border-radius: 12px; min-height: 42px;
+    font-weight: 750; font-size: 12px; padding: 10px 15px;
+    box-shadow: 0 3px 10px rgba(28,64,32,.035);
+}
+.pos-workspace.pos-refresh .pos-shortcut:hover,
+.pos-workspace.pos-refresh .pos-shortcut:focus-visible { background: #f0f5ed; border-color: #b3cab0; }
+.pos-workspace.pos-refresh .pos-layout {
+    display: grid !important; grid-template-columns: minmax(0,1fr) minmax(335px,385px) !important;
+    gap: 18px !important; align-items: start !important; max-width: 100% !important;
+}
+.pos-workspace.pos-refresh .pos-layout > * { min-width: 0 !important; max-width: 100%; }
+.pos-workspace.pos-refresh .pos-layout .pos-menu,
+.pos-workspace.pos-refresh .pos-layout .pos-checkout {
+    grid-row: auto !important; grid-column: auto !important;
+}
+.pos-workspace.pos-refresh .pos-panel {
+    background: #fff !important; border: 1px solid #e1e8de !important;
+    border-radius: 19px !important; padding: 22px !important;
+    box-shadow: 0 7px 25px rgba(26,58,34,.035) !important;
+    min-width: 0; overflow: visible !important;
+}
+.pos-workspace.pos-refresh .pos-checkout { position: sticky; top: 16px; }
+.pos-workspace.pos-refresh .pos-panel-top {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap; margin-bottom: 20px;
+}
+.pos-workspace.pos-refresh .pos-panel-identity { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.pos-workspace.pos-refresh .pos-panel-icon {
+    display: grid; place-items: center; flex: 0 0 40px;
+    width: 40px; height: 40px; border-radius: 13px;
+    color: #4b6548; background: #ecf3e9; font-size: 19px;
+}
+.pos-workspace.pos-refresh .pos-panel-top h2 {
+    margin: 0 0 3px; font: 800 17px/1.45 'Be Vietnam Pro', sans-serif;
+    letter-spacing: -.03em; color: #294635;
+}
+.pos-workspace.pos-refresh .pos-panel-top p { margin: 0; font-size: 11px; line-height: 1.5; color: #879186; }
+.pos-workspace.pos-refresh .pos-count {
+    border-radius: 99px; padding: 6px 10px; background: #f2f6ef;
+    border: 1px solid #e0e9da; color: #4a6549; font-size: 11px; font-weight: 750;
+    white-space: nowrap !important;
+}
+.pos-workspace.pos-refresh .pos-search {
+    width: 100%; max-width: 100%; display: flex; align-items: center; gap: 10px;
+    border: 1px solid #dce5dc; border-radius: 13px; padding: 0 15px;
+    min-height: 49px; background: #fafbf8; color: #789078;
+    transition: border-color .18s, box-shadow .18s;
+}
+.pos-workspace.pos-refresh .pos-search:focus-within { border-color:#72936d; box-shadow:0 0 0 3px #eaf2e7; }
+.pos-workspace.pos-refresh .pos-search input {
+    width: 100%; height: 47px; min-width: 0; outline: none; border: none;
+    background: transparent; font: 500 12px/1.5 'Be Vietnam Pro',sans-serif;
+    color: #2a4031; box-shadow: none;
+}
+.pos-workspace.pos-refresh .pos-search input::placeholder { color: #9ca89c; }
+.pos-workspace.pos-refresh .pos-categories {
+    display: flex; flex-wrap: nowrap; gap: 8px; overflow-x: auto;
+    margin: 13px 0 17px; padding: 3px 0 7px;
+    scrollbar-width: thin; scrollbar-color: #dae5d5 transparent;
+}
+.pos-workspace.pos-refresh .pos-categories button {
+    white-space: nowrap !important; flex: 0 0 auto; border-radius: 99px;
+    min-height: 35px; padding: 7px 15px; background: #f6f8f4;
+    color: #5e705e; border: 1px solid #e1e8df;
+    font-size: 11px; font-weight: 700; cursor: pointer;
+    transition: background .15s, border-color .15s, color .15s;
+}
+.pos-workspace.pos-refresh .pos-categories button:hover { background:#ebf2e9; border-color:#bccfba; }
+.pos-workspace.pos-refresh .pos-categories button.active { background:#4c6549; border-color:#4c6549; color:#fff; }
+.pos-workspace.pos-refresh .pos-product-grid {
+    display:grid !important; grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap: 14px !important; max-height: calc(100vh - 300px); min-height: 200px;
+    overflow-y:auto; padding: 1px 4px 8px 1px;
+    scrollbar-color:#d8e4d4 transparent; scrollbar-width:thin;
+}
+.pos-workspace.pos-refresh .pos-product {
+    background:#fff; min-width:0; overflow:hidden;
+    border:1px solid #e5ebe1 !important; border-radius:13px;
+    box-shadow: none; transition: border-color .16s, transform .16s, box-shadow .16s;
+}
+.pos-workspace.pos-refresh .pos-product:hover { border-color:#bcd0b9 !important; transform:translateY(-2px); box-shadow:0 6px 16px #304e3010; }
+.pos-workspace.pos-refresh .pos-product img {
+    width:100%; aspect-ratio:1.45 !important; display:block;
+    object-fit:cover !important; background:#f0f4ed;
+}
+.pos-workspace.pos-refresh .pos-product-body {padding: 11px !important; display:flex;flex-direction:column;flex:1;}
+.pos-workspace.pos-refresh .pos-product h6 {
+    margin:0 0 7px; font-weight:750; font-size:12px !important;
+    color:#2c3f2e; min-height:2.9em !important; line-height:1.45 !important;
+}
+.pos-workspace.pos-refresh .pos-product-price { margin:0 0 11px; font-size:13px !important; font-weight:800; color:#476947; }
+.pos-workspace.pos-refresh .pos-sizes { display:flex; gap:6px; margin-top:auto; flex-wrap:wrap; }
+.pos-workspace.pos-refresh .pos-sizes button {
+    min-width:36px !important; flex:1 1 34px !important; border:1px solid #e0e7dd;
+    padding: 7px 5px !important; border-radius:9px; background:#f1f5ef; color:#496348;
+    font-weight:750; font-size:11px !important; cursor:pointer;
+}
+.pos-workspace.pos-refresh .pos-sizes button:hover,
+.pos-workspace.pos-refresh .pos-sizes button:focus-visible {background:#4a6247;color:#fff;border-color:#4a6247;}
+.pos-workspace.pos-refresh #posToppingModeBanner {
+    border:1px solid #d6e6ce !important;border-radius:12px !important;
+    background:#f1f7ed;color:#415c3c;flex-wrap:wrap;gap:9px;
+}
+.pos-workspace.pos-refresh .pos-cart-actions { display:flex;align-items:center;gap:8px; }
+.pos-workspace.pos-refresh .pos-clear-btn {
+    background:transparent; border:0; padding:7px 8px;
+    color:#af615b; font-size:11px; font-weight:700; border-radius:8px;
+}
+.pos-workspace.pos-refresh .pos-clear-btn:hover {background:#fff0ed;color:#984b45;}
+.pos-workspace.pos-refresh .pos-cart-list {
+    max-height: min(38vh,360px); min-height:185px;
+    overflow:auto; padding: 1px 3px 5px 1px;
+    scrollbar-color:#dae5d5 transparent; scrollbar-width:thin;
+}
+.pos-workspace.pos-refresh .pos-empty-cart {
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    min-height: 174px; color:#778678; text-align:center;
+    border:1px dashed #d9e5d8; background:#fbfcf9; border-radius:13px;
+    padding:18px;
+}
+.pos-workspace.pos-refresh .pos-empty-cart i {font-size:30px;color:#9eafa0;margin-bottom:11px;}
+.pos-workspace.pos-refresh .pos-empty-cart strong {display:block;font-size:12px;font-weight:750;color:#475f4c;}
+.pos-workspace.pos-refresh .pos-empty-cart span {font-size:11px;line-height:1.7;margin-top:5px;}
+.pos-workspace.pos-refresh .pos-cart-item {
+    display:flex !important; flex-wrap:nowrap !important; align-items:flex-start;
+    gap:11px; padding:12px; margin-bottom:9px;
+    border:1px solid #e4ebe2;border-radius:12px;
+    background:#fff;
+}
+.pos-workspace.pos-refresh .pos-cart-item img {
+    flex:0 0 51px; width:51px;height:57px;object-fit:cover;border-radius:9px;background:#eef3ed;
+}
+.pos-workspace.pos-refresh .pos-cart-info {min-width:0; flex:1 1 auto;}
+.pos-workspace.pos-refresh .pos-cart-info strong {font-size:12px;font-weight:750;color:#2c4232;}
+.pos-workspace.pos-refresh .pos-cart-info .btn-link {color:#4f704d !important;font-size:11px !important;}
+.pos-workspace.pos-refresh .pos-cart-price {font-size:12px;font-weight:800;color:#496947;}
+.pos-workspace.pos-refresh .pos-qty {
+    display:inline-flex;align-items:center;border:1px solid #dce6d8;
+    border-radius:9px;overflow:hidden;background:#fff;
+}
+.pos-workspace.pos-refresh .pos-qty button {border:0;background:#f4f7f2;color:#4a6247;padding:6px 10px;}
+.pos-workspace.pos-refresh .pos-qty span {min-width:26px;text-align:center;font-size:12px;font-weight:700;}
+.pos-workspace.pos-refresh .pos-cart-separator {height:1px;background:#e9eee7;margin:14px 0 18px;}
+.pos-workspace.pos-refresh .pos-form-title {
+    display:flex;align-items:center;gap:7px;font-size:11px;letter-spacing:.035em;
+    color:#607363;font-weight:800;margin:0 0 14px;text-transform:uppercase;
+}
+.pos-workspace.pos-refresh .pos-field-line {
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px;
+    margin:0 0 7px;
+}
+.pos-workspace.pos-refresh .pos-field-label {font-size:12px;font-weight:700;color:#425b48;margin:0;}
+.pos-workspace.pos-refresh .pos-session-btn {
+    background:#f0f5ed;border:1px solid #dce8d8;border-radius:8px;
+    color:#50724c;font-size:10px;font-weight:750;padding:5px 9px;cursor:pointer;
+}
+.pos-workspace.pos-refresh .pos-session-btn:hover {background:#e4f0df;}
+.pos-workspace.pos-refresh .pos-session-btn[hidden] {display:none !important;}
+.pos-workspace.pos-refresh .form-select,.pos-workspace.pos-refresh .form-control {
+    border:1px solid #dce6da;border-radius:11px;min-height:44px;
+    padding:10px 12px;color:#364b3b;background-color:#fff;
+    font:550 12px/1.4 'Be Vietnam Pro',sans-serif; box-shadow:none;
+}
+.pos-workspace.pos-refresh .form-select:focus,.pos-workspace.pos-refresh .form-control:focus {
+    border-color:#8faf8a;box-shadow:0 0 0 3px #eaf2e6;
+}
+.pos-workspace.pos-refresh #posTableAssignmentHelp {
+    display:flex;gap:7px;align-items:start;margin:7px 0 16px;
+    color:#8a978a;font-size:10px;line-height:1.65;
+}
+.pos-workspace.pos-refresh #posTableAssignmentHelp i {flex:0 0 auto;margin-top:2px;}
+.pos-workspace.pos-refresh #posTableAssignmentHelp[data-assignment="dine-in"] {
+    background:#f0f6ec;color:#557051;border-radius:9px;padding:7px 9px;
+}
+.pos-workspace.pos-refresh .pos-summary {
+    margin-top:18px; border:1px solid #dfebd8; background:#eff5ea;
+    border-radius:14px;padding:15px 16px;
+}
+.pos-workspace.pos-refresh .pos-summary-label {color:#5e7659;font-size:11px;font-weight:700;}
+.pos-workspace.pos-refresh .pos-summary-value {font-size:23px !important;color:#2f5639 !important; font-weight:850;letter-spacing:-.03em;}
+.pos-workspace.pos-refresh .pos-summary-note {margin-top:6px;font-size:10px;color:#789076;}
+.pos-workspace.pos-refresh .pos-submit {
+    width:100%; display:flex;align-items:center;justify-content:center;gap:9px;
+    padding:13px;border-radius:12px;min-height:49px;
+    border:1px solid #456746 !important;background:#456746 !important;color:#fff !important;
+    font-size:13px !important;font-weight:800;
+    transition: background .16s;
+}
+.pos-workspace.pos-refresh .pos-submit:hover { background:#2e5033 !important; }
+.pos-workspace.pos-refresh .pos-submit:disabled {opacity:.6;cursor:not-allowed;}
+.pos-workspace.pos-refresh .pos-smallprint {
+    color:#98a397;font-size:10px;line-height:1.6;text-align:center;margin:9px 0 0;
+}
+@media (min-width:1500px) {
+    .pos-workspace.pos-refresh .pos-layout {grid-template-columns:minmax(0,1fr) minmax(365px,405px) !important;}
+    .pos-workspace.pos-refresh .pos-product-grid {grid-template-columns:repeat(4,minmax(0,1fr)) !important;}
+}
+@media (max-width:1099px) {
+    .pos-workspace.pos-refresh .pos-layout {grid-template-columns:minmax(0,1fr) minmax(300px,340px) !important;}
+    .pos-workspace.pos-refresh .pos-product-grid {grid-template-columns:repeat(2,minmax(0,1fr)) !important;}
+}
+@media (max-width:900px) {
+    .pos-workspace.pos-refresh .pos-layout {grid-template-columns:minmax(0,1fr) !important;}
+    .pos-workspace.pos-refresh .pos-checkout {position:static;}
+    .pos-workspace.pos-refresh .pos-product-grid {grid-template-columns:repeat(3,minmax(0,1fr)) !important;max-height:unset;}
+    .pos-workspace.pos-refresh .pos-cart-list {max-height:300px;}
+}
+@media (max-width:650px) {
+    .pos-workspace.pos-refresh .pos-heading {padding:18px;border-radius:17px;margin-top:8px;}
+    .pos-workspace.pos-refresh .pos-shortcut {width:100%;justify-content:center;}
+    .pos-workspace.pos-refresh .pos-panel {padding:15px !important;border-radius:15px !important;}
+    .pos-workspace.pos-refresh .pos-product-grid {grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:10px !important;}
+    .pos-workspace.pos-refresh .pos-product-body {padding:10px !important;}
+    .pos-workspace.pos-refresh .pos-panel-top {margin-bottom:14px;}
+}
+@media (max-width:360px) {
+    .pos-workspace.pos-refresh .pos-product-body {padding:8px !important;}
+    .pos-workspace.pos-refresh .pos-cart-item {padding:9px;gap:8px;}
+    .pos-workspace.pos-refresh .pos-cart-item img {width:42px;flex-basis:42px;height:49px;}
+    .pos-workspace.pos-refresh .pos-panel-top h2 {font-size:15px;}
+}
+@media (prefers-reduced-motion:reduce) {
+    .pos-workspace.pos-refresh *, .pos-workspace.pos-refresh *::before,
+    .pos-workspace.pos-refresh *::after {transition:none !important;animation:none !important;}
+}
+
+
+/* Quick access to checkout on narrow touch screens. */
+.pos-workspace.pos-refresh .pos-mobile-cart { display:none; }
+@media (max-width:900px) {
+    .pos-workspace.pos-refresh {padding-bottom:96px !important;}
+    .pos-workspace.pos-refresh .pos-mobile-cart {
+        position:fixed;left:12px;right:12px;bottom:12px;z-index:1000;
+        display:flex;align-items:center;justify-content:space-between;gap:10px;
+        padding:13px 16px;min-height:55px;border-radius:14px;
+        background:#38543b;color:#fff;text-decoration:none;
+        box-shadow:0 8px 24px rgba(24,56,29,.22);
+        font-size:12px;font-weight:750;
+    }
+    .pos-workspace.pos-refresh .pos-mobile-cart span {display:inline-flex;align-items:center;gap:7px;white-space:nowrap;}
+    .pos-workspace.pos-refresh .pos-mobile-cart small {font-size:10px;color:#d6e4d2;font-weight:600;}
+    .pos-workspace.pos-refresh .pos-mobile-cart strong {color:#fff;font-size:13px;white-space:nowrap;}
+    .pos-workspace.pos-refresh #cashierCheckout {scroll-margin-top:18px;}
+}
+
+        
+.pos-workspace.pos-refresh .pos-shortcut-active {background:#4e6348;color:#fff;border-color:#4e6348;cursor:default;box-shadow:none}
+.pos-workspace.pos-refresh .pos-delivery-live {margin-top:18px;padding:18px 22px;border:1px solid #e1e8dd;background:#fff;border-radius:18px}
+.pos-workspace.pos-refresh .pos-delivery-live h2 {font-size:15px;font-weight:800;color:#355039;margin:0}
+.pos-workspace.pos-refresh .pos-delivery-live-item {padding:10px 0;border-bottom:1px solid #edf0eb;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.pos-workspace.pos-refresh .pos-delivery-live-item:last-child {border-bottom:0}
+.pos-workspace.pos-refresh .pos-delivery-live-item small {display:block;color:#738472;font-size:11px;margin-top:3px}
+/* POS take-away: service choice, clear invoice breakdown, accessible payment state */
+.pos-workspace.pos-refresh .pos-delivery-live { margin: 0 0 18px; padding: 10px 16px; }
+.pos-workspace.pos-refresh .pos-delivery-summary { display:flex; align-items:center; gap:8px; font-weight:750; color:#3d573e; cursor:pointer; font-size:12px; list-style:none; }
+.pos-workspace.pos-refresh .pos-delivery-summary::-webkit-details-marker { display:none; }
+.pos-workspace.pos-refresh .pos-delivery-summary::before { content:'▸'; color:#688469; }
+.pos-workspace.pos-refresh details[open] > .pos-delivery-summary::before { content:'▾'; }
+.pos-workspace.pos-refresh .pos-service-toggle { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.pos-workspace.pos-refresh .pos-service-toggle label { cursor:pointer; margin:0; }
+.pos-workspace.pos-refresh .pos-service-toggle input { position:absolute; opacity:0; }
+.pos-workspace.pos-refresh .pos-service-toggle span { display:flex; align-items:center; justify-content:center; gap:8px; border:1px solid #d8e4d6; border-radius:11px; min-height:46px; font-weight:750; font-size:12px; color:#527052; background:#fff; }
+.pos-workspace.pos-refresh .pos-service-toggle input:checked + span { background:#edf5e9; border:2px solid #597954; color:#324d32; }
+.pos-workspace.pos-refresh .pos-service-toggle input:focus-visible + span { outline:3px solid #b2cfae; outline-offset:2px; }
+.pos-workspace.pos-refresh [hidden] { display:none !important; }
+.pos-workspace.pos-refresh .pos-form-title { margin-bottom:10px; }
+.pos-workspace.pos-refresh .pos-summary { margin-top:14px; }
+.pos-workspace.pos-refresh .pos-price-line { display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:6px 0; font-size:12px; }
+.pos-workspace.pos-refresh .pos-price-line > strong { color:#344c36; white-space:nowrap; }
+.pos-workspace.pos-refresh .pos-price-grand { border-top:1px solid #ceddca; margin-top:7px; padding-top:12px; font-weight:800; }
+.pos-workspace.pos-refresh .pos-price-grand strong { font-size:21px !important; }
+.pos-workspace.pos-refresh .pos-change-row { display:flex; justify-content:space-between; gap:12px; margin:9px 0 12px; color:#536c53; font-size:12px; }
+.pos-workspace.pos-refresh .pos-change-row strong { font-size:15px; }
+.pos-workspace.pos-refresh .pos-transfer-confirm { display:flex; gap:10px; align-items:start; padding:12px; margin-top:12px; background:#f7f9f3; border:1px solid #dbe8d7; border-radius:10px; font-size:12px; }
+.pos-workspace.pos-refresh .pos-transfer-confirm input { width:18px; height:18px; flex:none; accent-color:#4d744c; }
+.pos-workspace.pos-refresh .pos-success-modal { border:0; border-radius:22px; }
+.pos-workspace.pos-refresh .pos-success-icon { display:grid; place-items:center; width:64px; height:64px; margin:auto; border-radius:50%; background:#e3f2dd; color:#417445; font-size:30px; }
+.pos-workspace.pos-refresh .pos-success-details { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:17px; border-radius:12px; background:#f5f8f2; text-align:left; font-size:12px; }
+.pos-workspace.pos-refresh .pos-success-details strong { text-align:right; color:#294b32; }
+
+</style>
 
         <span id="posRole" hidden th:attr="data-role=${actor.role}"></span>
 
@@ -831,153 +348,157 @@
         </div>
 
         
-        <section class="ute-page-banner ute-ops" aria-label="Giới thiệu khu vực làm việc">
-          <div><div class="ute-kicker">UTE TEA / POS</div>
-            <h1>Thu ngân · POS</h1><p>Chọn bàn, tạo đơn, thu tiền. Món đã xác nhận tự chuyển tới bếp.</p></div>
-          <span class="ute-page-icon" aria-hidden="true"><i class="bi bi-calculator-fill"></i></span>
-        </section>
+        <header class="pos-heading" aria-label="Khu vực thu ngân">
+            <div>
+                <span class="pos-eyebrow"><i class="bi bi-leaf"></i> UTE TEA <span aria-hidden="true">/</span> ĐIỂM BÁN HÀNG</span>
+                <h1>Quầy thu ngân</h1>
+                <p>Ưu tiên bán mang đi: chọn món → kiểm tra hóa đơn → thu tiền → in phiếu.</p>
+            </div>
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <span class="pos-shortcut pos-shortcut-active"><i class="bi bi-credit-card-2-front" aria-hidden="true"></i> Thu ngân · POS</span>
+                <a class="pos-shortcut" th:href="@{/cashier/delivery-orders}">
+                    <i class="bi bi-receipt-cutoff" aria-hidden="true"></i> Đơn giao hàng <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
+                </a>
+            </div>
+        </header>
+
+        <details class="pos-delivery-live" aria-labelledby="posDeliveryHeading">
+            <summary class="pos-delivery-summary"><i class="bi bi-truck me-2"></i> Đơn giao hàng trực tuyến <span id="posDeliveryNewCount" class="badge rounded-pill text-bg-warning">0</span><span class="small text-muted ms-auto">Bấm để xem đơn mới</span></summary>
+            <h2 id="posDeliveryHeading" class="visually-hidden">Đơn giao hàng mới</h2>
+            <div id="posDeliveryNewList" class="small text-muted mt-2" aria-live="polite">Đang kiểm tra đơn giao hàng...</div>
+        </details>
+
         <div class="pos-layout">
-
-            <section class="pos-panel pos-checkout">
-
-                <h4>
-                    <i class="bi bi-cart3"></i>
-                    Tạo đơn tại quầy / bàn
-                </h4>
-
-                <label class="pos-search">
-                    <i class="bi bi-search"></i>
-                    <input id="quickProductSearch" placeholder="Tìm món nhanh..." aria-label="Tìm món nhanh">
+            <!-- Menu bên trái: giữ nguyên API renderProducts và topping mode. -->
+            <section class="pos-panel pos-menu" aria-labelledby="posMenuTitle">
+                <div class="pos-panel-top">
+                    <div class="pos-panel-identity">
+                        <span class="pos-panel-icon"><i class="bi bi-cup-straw" aria-hidden="true"></i></span>
+                        <div>
+                            <h2 id="posMenuTitle">Thực đơn</h2>
+                            <p>Chọn món và kích cỡ để thêm vào đơn</p>
+                        </div>
+                    </div>
+                </div>
+                <label class="pos-search" for="posProductSearch">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                    <input id="posProductSearch" type="search" autocomplete="off"
+                           placeholder="Tìm món: trà sữa, matcha, cà phê..." aria-label="Tìm món">
                 </label>
-
-                <div class="d-flex justify-content-between align-items-center my-3">
-                    <b class="small">
-                        MÓN ĐÃ CHỌN
-                        <span id="counterItemCount">(0)</span>
-                    </b>
-
-                    <button class="btn btn-sm text-danger" onclick="CashierApp.clearCart()">
-                        <i class="bi bi-trash3"></i>
-                        Xóa tất cả
+                <nav class="pos-categories" id="posCategories" aria-label="Danh mục món">
+                    <button type="button" class="active" data-category="">Tất cả</button>
+                    <button type="button" th:each="c : ${categories}"
+                            th:attr="data-category=${c.id}" th:text="${c.name}">Danh mục</button>
+                </nav>
+                <div id="posToppingModeBanner"
+                     class="alert alert-info d-none d-flex justify-content-between align-items-center px-3 py-2 mb-3">
+                    <div class="small">
+                        <i class="bi bi-pin-angle-fill me-1" aria-hidden="true"></i>
+                        Đang chọn topping cho <strong id="toppingTargetLineName">Trà sữa</strong>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-primary-custom" onclick="CashierApp.exitToppingMode()">
+                        <i class="bi bi-check-lg" aria-hidden="true"></i> Xong topping
                     </button>
                 </div>
+                <div id="posProductGrid" class="pos-product-grid" aria-live="polite"></div>
+            </section>
 
-                <div id="counterCartList" class="pos-cart-list">
-                    <div class="text-muted text-center py-5">
-                        Chưa chọn món nào
+            <!-- Đơn mới bên phải: giữ nguyên ID và endpoint thanh toán. -->
+            <section id="cashierCheckout" class="pos-panel pos-checkout" aria-labelledby="posCheckoutTitle">
+                <div class="pos-panel-top">
+                    <div class="pos-panel-identity">
+                        <span class="pos-panel-icon"><i class="bi bi-bag-check" aria-hidden="true"></i></span>
+                        <div>
+                            <h2 id="posCheckoutTitle">Đơn hàng mới</h2>
+                            <p>Món đã chọn <span id="counterItemCount">(0)</span></p>
+                        </div>
+                    </div>
+                    <button type="button" class="pos-clear-btn" onclick="CashierApp.clearCart()">
+                        <i class="bi bi-trash3" aria-hidden="true"></i> Xóa giỏ
+                    </button>
+                </div>
+                <div id="counterCartList" class="pos-cart-list" aria-live="polite">
+                    <div class="pos-empty-cart">
+                        <i class="bi bi-bag" aria-hidden="true"></i>
+                        <strong>Giỏ hàng đang trống</strong>
+                        <span>Chọn món ở phần thực đơn để bắt đầu tạo đơn.</span>
                     </div>
                 </div>
-
-                <div class="pos-checkout-bottom">
-
-                    <div class="d-flex justify-content-between align-items-center py-3">
-                        <span class="text-muted">Tạm tính</span>
-                        <strong class="pos-total" id="counterCartTotal">0 ₫</strong>
+                <div class="pos-cart-separator"></div>
+                <h3 class="pos-form-title"><i class="bi bi-bag" aria-hidden="true"></i> 1. Hình thức nhận món</h3>
+                <div class="pos-service-toggle" role="group" aria-label="Hình thức phục vụ">
+                    <label><input type="radio" name="posServiceType" value="TAKEAWAY" checked><span><i class="bi bi-bag-check"></i> Mang đi</span></label>
+                    <label><input type="radio" name="posServiceType" value="DINE_IN"><span><i class="bi bi-shop"></i> Tại bàn</span></label>
+                </div>
+                <div id="posDineInOptions" hidden>
+                    <div class="pos-field-line mt-3">
+                        <label class="pos-field-label" for="counterTableId">Bàn phục vụ</label>
+                        <button type="button" id="posTableSessionBtn" class="pos-session-btn" hidden>
+                            <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i> Mở phiên
+                        </button>
                     </div>
-
-                    <label for="counterTableId" class="small text-muted fw-semibold mb-1">
-                        Bàn phục vụ <span class="text-muted fw-normal">(thu ngân xác nhận bàn thực tế)</span>
-                    </label>
-
-                    <select id="counterTableId" class="form-select mb-3">
-                        <option value="">Quầy / mang về</option>
+                    <select id="counterTableId" class="form-select">
+                        <option value="">Chọn bàn</option>
                         <option th:each="t : ${tables}" th:value="${t.id}" th:text="${t.name}"></option>
                     </select>
-                    <p id="posTableAssignmentHelp" class="ute-pos-field-help" data-assignment="takeaway">
-                        <i class="bi bi-info-circle"></i> Khách ngồi tại quán: chọn đúng bàn hoặc chọn thẻ bàn ở sơ đồ bên phải. Khách mua mang về: để “Quầy / mang về”.
+                    <p id="posTableAssignmentHelp" data-assignment="dine-in">
+                        <i class="bi bi-info-circle" aria-hidden="true"></i> Chọn đúng bàn của khách trước khi thu tiền.
                     </p>
-
-                    <label for="counterPayMethod" class="small text-muted mb-1">
-                        Phương thức thanh toán
-                    </label>
-
-                    <select id="counterPayMethod" class="form-select mb-3">
-                        <option value="CASH">Tiền mặt</option>
-                        <option value="BANK_TRANSFER">Chuyển khoản</option>
-                    </select>
-
-                    <button id="counterSubmitBtn" type="button" class="pos-submit"
-                        onclick="CashierApp.submitCounterOrder()">
-                        <i class="bi bi-check-circle-fill me-2"></i>
-                        Thanh toán
-                    </button>
-
-                    <small class="d-block text-muted text-center mt-2">
-                        Giá và giảm giá được tính lại khi lập hóa đơn.
-                    </small>
-
                 </div>
-
+                <h3 class="pos-form-title mt-3 mb-2"><i class="bi bi-wallet2" aria-hidden="true"></i> 2. Thu tiền</h3>
+                <div class="pos-field-line">
+                    <label class="pos-field-label" for="counterPayMethod">Phương thức thanh toán</label>
+                </div>
+                <select id="counterPayMethod" class="form-select">
+                    <option value="CASH">Tiền mặt</option>
+                    <option value="BANK_TRANSFER">Chuyển khoản</option>
+                </select>
+                <div id="posCashTender" class="mt-2">
+                    <label class="pos-field-label mb-2" for="counterCashReceived">Tiền khách đưa (₫)</label>
+                    <input id="counterCashReceived" type="number" min="0" step="1000" inputmode="numeric"
+                           class="form-control" placeholder="Nhập số tiền khách đưa">
+                    <div class="pos-change-row"><span>Tiền thối lại</span><strong id="posChangeDue">0 ₫</strong></div>
+                </div>
+                <label id="posTransferConfirmation" class="pos-transfer-confirm" hidden>
+                    <input id="counterTransferConfirmed" type="checkbox">
+                    <span>Tôi đã kiểm tra và nhận đủ tiền chuyển khoản</span>
+                </label>
+                <div class="pos-summary" aria-live="polite">
+                    <div class="pos-price-line"><span>Tạm tính (gồm topping)</span><strong id="counterCartTotal">0 ₫</strong></div>
+                    <div class="pos-price-line"><span>Giảm giá cửa hàng</span><strong id="posDiscountAmount">−0 ₫</strong></div>
+                    <div class="pos-price-line pos-price-grand"><span>Khách cần thanh toán</span><strong id="posFinalTotal" class="pos-summary-value">0 ₫</strong></div>
+                    <p id="posPriceStatus" class="pos-summary-note mb-0" role="status">Giá sẽ được đối chiếu với hệ thống trước khi thu.</p>
+                </div>
+                <button id="counterSubmitBtn" type="button" class="pos-submit mt-3" onclick="CashierApp.submitCounterOrder()">
+                    <i class="bi bi-check-circle-fill" aria-hidden="true"></i> Xác nhận đã thu tiền
+                </button>
+                <p class="pos-smallprint"><i class="bi bi-shield-check" aria-hidden="true"></i> Chỉ xác nhận sau khi đã nhận tiền. Hệ thống sẽ phát hành hóa đơn.</p>
             </section>
+        </div>
 
-            <section class="pos-panel pos-menu">
+        <!-- Trên điện thoại: phím tắt giỏ hàng luôn trong tầm tay, không thay thế nút thanh toán. -->
+        <a class="pos-mobile-cart" href="#cashierCheckout" aria-label="Chuyển đến giỏ hàng">
+            <span><i class="bi bi-bag-check" aria-hidden="true"></i> Giỏ hàng <small id="posMobileItemCount">0 món</small></span>
+            <strong id="posMobileCartTotal">0 ₫ <i class="bi bi-arrow-down-short" aria-hidden="true"></i></strong>
+        </a>
 
-                <div class="d-flex justify-content-between gap-3 align-items-center mb-3">
-                    <h4 class="mb-0">
-                        <i class="bi bi-cup-hot"></i>
-                        Chọn món
-                    </h4>
-
-                    <label class="pos-search mb-0">
-                        <i class="bi bi-search"></i>
-                        <input id="posProductSearch" placeholder="Tìm trà sữa, cà phê..." aria-label="Tìm món">
-                    </label>
-                </div>
-
-                <div class="pos-categories" id="posCategories">
-                    <button class="active" data-category="">Tất cả</button>
-
-                    <button th:each="c : ${categories}" th:attr="data-category=${c.id}" th:text="${c.name}">
-                    </button>
-                </div>
-
-                <div id="posToppingModeBanner"
-                    class="alert alert-info d-none d-flex justify-content-between align-items-center py-2 px-3 mb-3 rounded-3 shadow-sm border-0">
-
-                    <div>
-                        <i class="bi bi-pin-angle-fill me-1 text-primary"></i>
-                        <span class="small fw-semibold">
-                            Đang gắn Topping cho dòng:
-                            <strong id="toppingTargetLineName">Trà Sữa</strong>
-                        </span>
+        <div class="modal fade" id="posPaymentSuccessModal" tabindex="-1" aria-labelledby="posPaymentSuccessTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered"><div class="modal-content pos-success-modal">
+                <div class="modal-body text-center p-4">
+                    <div class="pos-success-icon"><i class="bi bi-check-lg"></i></div>
+                    <h2 id="posPaymentSuccessTitle" class="h4 mt-3">Thanh toán thành công!</h2>
+                    <p id="posSuccessMessage" class="text-muted small">Đơn đã ghi nhận và chuyển đến khu vực pha chế.</p>
+                    <div class="pos-success-details">
+                        <span>Đơn hàng</span><strong id="posSuccessOrderCode">—</strong>
+                        <span>Đã thanh toán</span><strong id="posSuccessAmount">0 ₫</strong>
+                        <span>Phương thức</span><strong id="posSuccessMethod">—</strong>
                     </div>
-
-                    <button type="button" class="btn btn-sm btn-primary-custom rounded-pill px-3 py-1"
-                        onclick="CashierApp.exitToppingMode()">
-                        <i class="bi bi-check-lg me-1"></i>
-                        Xong Topping
-                    </button>
-
+                    <div class="d-grid gap-2 mt-3">
+                        <button type="button" id="posSuccessReceiptBtn" class="btn btn-primary-custom">Xem / In hóa đơn</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Tạo đơn tiếp theo</button>
+                    </div>
                 </div>
-
-                <div id="posProductGrid" class="pos-product-grid"></div>
-
-            </section>
-
-            <section class="pos-panel pos-tables">
-
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4 class="mb-0">
-                        <i class="bi bi-map"></i>
-                        Sơ đồ bàn
-                    </h4>
-                </div>
-
-                <div class="d-flex gap-3 text-muted small mb-3">
-                    <span>
-                        <i class="bi bi-circle-fill text-success"></i>
-                        Trống
-                    </span>
-                    <span>
-                        <i class="bi bi-circle-fill text-danger"></i>
-                        Có khách
-                    </span>
-                </div>
-
-                <div id="tablesGrid" class="pos-tables-grid"></div>
-
-            </section>
-
+            </div></div>
         </div>
 
         <div class="modal fade" id="tableBlockersModal" tabindex="-1">
@@ -1008,228 +529,10 @@
 
     <th:block th:fragment="scripts">
         <script th:src="@{/js/cashier/cashier.js}"></script>
-
+        <script th:src="@{/js/cashier/delivery-inbox.js}"></script>
         <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                CashierApp.init();
-
-                const workspace = document.querySelector('.pos-workspace');
-                const productGrid = document.getElementById('posProductGrid');
-                const cartList = document.getElementById('counterCartList');
-                const totalElement = document.getElementById('counterCartTotal');
-
-                if (!workspace) return;
-
-                const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-                const restartAnimation = (element, className) => {
-                    if (!element || reducedMotion.matches) return;
-
-                    element.classList.remove(className);
-                    void element.offsetWidth;
-                    element.classList.add(className);
-                };
-
-                const animateProducts = () => {
-                    if (!productGrid || reducedMotion.matches) return;
-
-                    const products = Array.from(
-                        productGrid.querySelectorAll('.pos-product')
-                    );
-
-                    products.forEach((product, index) => {
-                        product.classList.remove('pos-product-enter');
-                        product.style.animationDelay = '';
-
-                        if (index < 12) {
-                            product.style.animationDelay = `${index * 45}ms`;
-                            void product.offsetWidth;
-                            product.classList.add('pos-product-enter');
-                        }
-                    });
-                };
-
-                const animateNewCartItems = (nodes) => {
-                    if (reducedMotion.matches) return;
-
-                    nodes.forEach(node => {
-                        if (!(node instanceof Element)) return;
-
-                        const items = [];
-
-                        if (node.matches('.pos-cart-item')) {
-                            items.push(node);
-                        }
-
-                        node.querySelectorAll('.pos-cart-item').forEach(item => {
-                            items.push(item);
-                        });
-
-                        items.forEach(item => {
-                            restartAnimation(item, 'pos-cart-enter');
-                        });
-                    });
-                };
-
-                if (productGrid) {
-                    const productObserver = new MutationObserver(mutations => {
-                        if (mutations.some(mutation =>
-                            mutation.type === 'childList'
-                        )) {
-                            animateProducts();
-                        }
-                    });
-
-                    productObserver.observe(productGrid, {
-                        childList: true
-                    });
-
-                    animateProducts();
-                }
-
-                if (cartList) {
-                    const cartObserver = new MutationObserver(mutations => {
-                        const addedNodes = [];
-
-                        mutations.forEach(mutation => {
-                            if (mutation.type === 'childList') {
-                                mutation.addedNodes.forEach(node => {
-                                    addedNodes.push(node);
-                                });
-                            }
-                        });
-
-                        if (addedNodes.length) {
-                            animateNewCartItems(addedNodes);
-                        }
-                    });
-
-                    cartObserver.observe(cartList, {
-                        childList: true,
-                        subtree: true
-                    });
-                }
-
-                if (totalElement) {
-                    let previousTotal = totalElement.textContent.trim();
-
-                    const totalObserver = new MutationObserver(() => {
-                        const currentTotal = totalElement.textContent.trim();
-
-                        if (currentTotal !== previousTotal) {
-                            previousTotal = currentTotal;
-                            restartAnimation(
-                                totalElement,
-                                'pos-total-updated'
-                            );
-                        }
-                    });
-
-                    totalObserver.observe(totalElement, {
-                        childList: true,
-                        characterData: true,
-                        subtree: true
-                    });
-                }
-
-                const tablesGrid = document.getElementById('tablesGrid');
-
-                if (tablesGrid) {
-                    const animateSelectedTable = () => {
-                        if (reducedMotion.matches) return;
-
-                        tablesGrid.querySelectorAll(
-                            '.pos-table-card.selected'
-                        ).forEach(card => {
-                            restartAnimation(card, 'pos-table-selected');
-                        });
-                    };
-
-                    const tableObserver = new MutationObserver(mutations => {
-                        mutations.forEach(mutation => {
-                            if (
-                                mutation.type === 'attributes' &&
-                                mutation.attributeName === 'class' &&
-                                mutation.target.classList.contains('selected')
-                            ) {
-                                const card = mutation.target;
-
-                                if (!reducedMotion.matches) {
-                                    card.style.animation = 'none';
-                                    void card.offsetWidth;
-                                    card.style.animation = '';
-                                }
-                            }
-                        });
-                    });
-
-                    tableObserver.observe(tablesGrid, {
-                        subtree: true,
-                        attributes: true,
-                        attributeFilter: ['class']
-                    });
-                }
-
-                const successSelector = [
-                    '.toast.show.text-bg-success',
-                    '.toast.show.bg-success',
-                    '.alert-success:not(.d-none)',
-                    '[role="alert"].text-bg-success'
-                ].join(',');
-
-                const animatedSuccessElements = new WeakSet();
-
-                const checkPaymentSuccess = () => {
-                    document.querySelectorAll(successSelector).forEach(element => {
-                        const isVisible = element.getClientRects().length > 0;
-
-                        if (!isVisible || animatedSuccessElements.has(element)) {
-                            return;
-                        }
-
-                        const text = (element.textContent || '').toLowerCase();
-
-                        const refersToPayment = [
-                            'thanh toán thành công',
-                            'thanh toan thanh cong',
-                            'đã thanh toán',
-                            'da thanh toan'
-                        ].some(value => text.includes(value));
-
-                        if (!refersToPayment) return;
-
-                        animatedSuccessElements.add(element);
-
-                        if (!reducedMotion.matches) {
-                            element.classList.add('pos-payment-success');
-                        }
-                    });
-                };
-
-                const successObserver = new MutationObserver(checkPaymentSuccess);
-
-                successObserver.observe(document.body, {
-                    childList: true,
-                    subtree: true,
-                    attributes: true,
-                    attributeFilter: ['class', 'style']
-                });
-
-                checkPaymentSuccess();
-            });
+            document.addEventListener('DOMContentLoaded', () => CashierApp.init());
         </script>
-
-        <style>
-            .pos-workspace .pos-table-card.pos-table-selected {
-                animation: posTableSelect .26s ease-out;
-            }
-
-            @media (prefers-reduced-motion: reduce) {
-                .pos-workspace .pos-table-card.pos-table-selected {
-                    animation: none !important;
-                }
-            }
-        </style>
     </th:block>
 
 </body>

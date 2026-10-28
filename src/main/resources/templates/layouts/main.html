@@ -25,12 +25,17 @@
     <link rel="stylesheet" th:href="@{/css/app.css}">
     <link rel="stylesheet" th:href="@{/css/ute-theme.css}">
     <link rel="stylesheet" th:href="@{/css/ute-olive.css}">
+    <!-- Shared stylesheets belong in head to prevent late style application. -->
+    <link rel="stylesheet" th:href="@{/css/staff-ui.css}">
+    <link rel="stylesheet" th:href="@{/css/ute-polish.css}">
+    <link rel="stylesheet" th:href="@{/css/staff-unified.css}">
+    <link rel="stylesheet" th:href="@{/css/ute-layout-final.css}">
+    <link rel="stylesheet" th:href="@{/css/customer-checkout.css}">
 </head>
 <body th:attr="data-account-id=${#authorization.expression('isAuthenticated()') ? #authentication.principal.accountId : ''}">
 
-    <div class="ute-topbar" sec:authorize="!hasAnyRole('ADMIN','CASHIER','KITCHEN','CHEF')">
+    <div class="ute-topbar" sec:authorize="!hasAnyRole('ADMIN','CASHIER','KITCHEN','CHEF','SHIPPER')">
         <span><i class="bi bi-stars me-1"></i> UTE TEA • TINH VỊ TRÀ, CHẠM VỊ THANH XUÂN</span>
-        <span class="ute-topbar-extra"><i class="bi bi-truck me-1"></i> Chọn món dễ dàng <span class="mx-2">•</span> <i class="bi bi-shield-check me-1"></i> Thanh toán minh bạch</span>
     </div>
     <!-- Header / Navbar Fragment -->
     <div th:replace="~{fragments/header :: navbar}"></div>
@@ -48,7 +53,7 @@
 
     <!-- Realtime Toast Notifications -->
     <div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3" style="z-index: 1090;">
-        <div id="liveToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div id="liveToast" class="toast align-items-center text-white bg-success border-0" role="status" aria-live="polite" aria-atomic="true">
             <div class="d-flex">
                 <div class="toast-body">
                     <strong class="toast-title d-block mb-1">Thông báo</strong>
@@ -77,10 +82,6 @@
         </div>
     </div>
 
-    <link rel="stylesheet" th:href="@{/css/ute-polish.css}">
-    <link rel="stylesheet" th:href="@{/css/staff-unified.css}">
-    <link rel="stylesheet" th:href="@{/css/ute-layout-final.css}">
-    <link rel="stylesheet" th:href="@{/css/customer-checkout.css}">
 
     <!-- External Libs: Bootstrap 5, SockJS, StompJS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -90,6 +91,7 @@
     <!-- MilkTea Common Scripts -->
     <script th:src="@{/js/common/api.js}"></script>
     <script th:src="@{/js/common/websocket.js}"></script>
+    <script th:src="@{/js/common/footer-branches.js}" defer></script>
 
     <div id="receiptShop" hidden th:attr="data-name='UTE Tea',data-address=${settings != null ? settings.address : ''},data-bank=${settings != null ? settings.bankName : ''},data-account=${settings != null ? settings.bankAccountNumber : ''},data-holder=${settings != null ? settings.bankAccountHolder : ''}"></div>
     <script th:src="@{/js/common/receipts.js}"></script>

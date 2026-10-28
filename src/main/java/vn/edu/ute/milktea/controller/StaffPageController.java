@@ -45,9 +45,20 @@ public class StaffPageController {
         return switch (actor.getRole()) {
             case CASHIER -> "redirect:/cashier";
             case KITCHEN -> "redirect:/kitchen";
+            case SHIPPER -> "redirect:/delivery";
             case ADMIN -> "redirect:/cashier";
             default -> "redirect:/login?redirect=/staff";
         };
+    }
+
+    @GetMapping("/delivery")
+    public String deliveryPage(@AuthenticationPrincipal CurrentActor actor, Model model) {
+        if (actor == null || !actor.hasRole(Role.SHIPPER)) {
+            return "redirect:/login?redirect=/delivery";
+        }
+        model.addAttribute("actor", actor);
+        model.addAttribute("pageTitle", "Giao hàng được phân công");
+        return "delivery/dashboard";
     }
 
     @GetMapping("/cashier")
@@ -58,10 +69,26 @@ public class StaffPageController {
         GlobalSettings settings = settingsRepository.findById(1).orElse(null);
         model.addAttribute("settings", settings);
         model.addAttribute("actor", actor);
-        model.addAttribute("categories", categoryRepository.findAllByActiveTrue());
-        model.addAttribute("products", productRepository.findAllByActiveTrue());
+        var posProducts = productRepository.findAllByActiveTrue().stream()
+                .filter(product -> product.getShop() == null).toList();
+        var posCategoryIds = posProducts.stream().map(product -> product.getCategory().getId())
+                .collect(java.util.stream.Collectors.toSet());
+        model.addAttribute("categories", categoryRepository.findAllByActiveTrue().stream()
+                .filter(category -> posCategoryIds.contains(category.getId())).toList());
+        model.addAttribute("products", posProducts);
         model.addAttribute("tables", tableRepository.findByActiveTrueOrderByIdAsc());
         return "cashier/index";
+    }
+
+    @GetMapping("/cashier/delivery-orders")
+    public String cashierDeliveryPage(@AuthenticationPrincipal CurrentActor actor, Model model) {
+        if (actor == null || (actor.getRole() != Role.CASHIER && actor.getRole() != Role.ADMIN)) {
+            return "redirect:/login?redirect=/cashier/delivery-orders";
+        }
+        // Opening the JS-driven delivery inbox should not depend on CauHinhChung.
+        model.addAttribute("actor", actor);
+        model.addAttribute("pageTitle", "Quản lý đơn giao hàng");
+        return "cashier/delivery-orders";
     }
 
     @GetMapping("/kitchen")
@@ -137,7 +164,7 @@ public class StaffPageController {
         if (actor == null || actor.getRole() != Role.ADMIN) {
             return "redirect:/login?redirect=/admin/orders";
         }
-        model.addAttribute("settings", settingsRepository.findById(1).orElse(null));
+        // Order management loads its records using authenticated APIs.
         model.addAttribute("actor", actor);
         model.addAttribute("pageTitle", "Quản lý đơn hàng");
         return "admin/orders";

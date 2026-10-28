@@ -1,907 +1,1403 @@
+
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main :: html(~{::content}, ~{::scripts})}">
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/main :: html(~{::content}, ~{::scripts})}">
 
 <head>
     <title>Xác Thực - UTE Tea</title>
 </head>
 
 <body>
-    <div th:fragment="content" class="container py-5 ute-auth-page">
-        <div class="row justify-content-center g-4 align-items-stretch">
-            <div class="col-lg-6 d-none d-lg-flex">
-              <aside class="ute-auth-promo w-100" aria-label="Giới thiệu UTE Tea">
-                <div><div class="ute-eyebrow"><i class="bi bi-leaf"></i> UTE TEA EXPERIENCE</div>
-                  <h1>Tinh vị trà,<br><span>chạm vị thanh xuân.</span></h1>
-                  <p>Một khoảng lặng dịu dàng giữa nhịp sống. Chào mừng bạn trở lại với UTE Tea.</p>
+<div th:fragment="content" class="container py-5 ute-auth-page">
+
+<style>
+.ute-auth-page {
+    --ute-ink:#313d30;
+    --ute-olive:#4f6145;
+    --ute-sage:#e8ecdf;
+    --ute-line:#e4e8db;
+    --ute-muted:#7a8475;
+    max-width:1230px!important;
+    padding-top:34px!important;
+    padding-bottom:52px!important;
+    font-family:'Be Vietnam Pro',sans-serif;
+}
+.ute-auth-page .ute-auth-shell {
+    --bs-gutter-x:22px;
+    --bs-gutter-y:22px;
+}
+.ute-auth-page .ute-auth-promo {
+    min-height:0;
+    height:100%;
+    padding:34px 36px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:24px;
+    position:relative;
+    overflow:hidden;
+    isolation:isolate;
+    border-radius:28px!important;
+    background:linear-gradient(155deg,#344738 0%,#4b6047 62%,#566c51 100%)!important;
+    border:1px solid #506249;
+    box-shadow:0 22px 60px rgba(48,63,44,.12);
+}
+.ute-auth-page .ute-auth-promo::before {
+    content:'';
+    position:absolute;
+    width:270px;
+    height:270px;
+    top:-145px;
+    right:-130px;
+    border:50px solid rgba(232,216,178,.10);
+    border-radius:50%;
+    pointer-events:none;
+}
+.ute-auth-page .ute-auth-promo::after {
+    content:'';
+    position:absolute;
+    width:220px;
+    height:220px;
+    bottom:-150px;
+    left:-100px;
+    border:1px solid rgba(244,241,222,.14);
+    border-radius:50%;
+    pointer-events:none;
+}
+.ute-auth-page .ute-promo-copy {
+    position:relative;
+    z-index:1;
+}
+.ute-auth-page .ute-promo-copy h1 {
+    font-family:'Playfair Display',Georgia,serif!important;
+    color:#fffaf0!important;
+    max-width:470px;
+    font-weight:500!important;
+    font-size:clamp(2.25rem,3vw,3.35rem);
+    line-height:1.19;
+    letter-spacing:-.035em!important;
+    margin:0 0 18px;
+}
+.ute-auth-page .ute-promo-copy h1 em {
+    color:#e9d8ac;
+    font-style:normal;
+}
+.ute-auth-page .ute-promo-copy p {
+    font-size:.86rem;
+    color:#e7ecdf!important;
+    line-height:1.85;
+    max-width:425px;
+    margin:0;
+}
+.ute-auth-page .ute-auth-photo-frame {
+    position:relative;
+    z-index:1;
+    width:100%;
+    margin:4px 0 0;
+    padding:7px;
+    border:1px solid rgba(255,255,255,.22);
+    border-radius:22px;
+    background:rgba(255,255,255,.11);
+    overflow:hidden;
+    box-shadow:0 18px 32px rgba(21,34,20,.18);
+}
+.ute-auth-page .ute-auth-photo-frame img {
+    display:block;
+    width:100%!important;
+    height:clamp(250px,23vw,305px)!important;
+    border-radius:15px!important;
+    object-fit:cover!important;
+    object-position:center 53%;
+    filter:saturate(.94) contrast(1.02);
+}
+.ute-auth-page .ute-auth-card {
+    border:1px solid #e5e8dc!important;
+    border-radius:28px!important;
+    overflow:hidden;
+    background:#fffdfa;
+    box-shadow:0 20px 60px rgba(46,60,39,.09)!important;
+    height:100%;
+}
+.ute-auth-page .ute-auth-card .card-header {
+    background:transparent!important;
+    padding:27px 39px 10px!important;
+}
+.ute-auth-page .ute-auth-brand-row {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+}
+.ute-auth-page .ute-auth-logo {
+    height:61px;
+    width:61px;
+    display:block;
+    margin:0 auto 4px;
+    object-fit:contain;
+}
+.ute-auth-page .ute-login-wordmark {
+    color:#3c4d37;
+    font-family:'Playfair Display',Georgia,serif;
+    letter-spacing:.2em;
+    font-size:.91rem;
+    font-weight:700;
+}
+.ute-auth-page .ute-auth-small-label {
+    margin-top:16px;
+    text-transform:uppercase;
+    letter-spacing:.16em;
+    font-size:.62rem;
+    color:#a19a77;
+    font-weight:700;
+}
+.ute-auth-page .ute-auth-card .card-header h2 {
+    font-family:'Playfair Display',Georgia,serif;
+    font-size:clamp(1.55rem,2vw,2rem);
+    font-weight:600;
+    letter-spacing:-.035em;
+    color:#344530;
+    margin:8px 0 6px;
+}
+.ute-auth-page .ute-auth-card .card-header p {
+    color:#788374!important;
+    font-size:.77rem;
+    line-height:1.7;
+}
+.ute-auth-page .ute-auth-switch {
+    padding:12px 39px 0!important;
+}
+.ute-auth-page #authTab {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:4px;
+    background:#edf0e7!important;
+    border:1px solid #e6e9dd;
+    padding:5px!important;
+    border-radius:14px!important;
+}
+.ute-auth-page #authTab .nav-link {
+    width:100%;
+    border-radius:10px!important;
+    padding:12px 5px!important;
+    background:transparent;
+    box-shadow:none;
+    color:#697365;
+    font-size:.82rem;
+    font-weight:700;
+}
+.ute-auth-page #authTab .nav-link.active {
+    background:#fffdf7!important;
+    color:#394d37!important;
+    box-shadow:0 3px 11px rgba(45,57,39,.09)!important;
+}
+.ute-auth-page .ute-auth-card .card-body {
+    background:transparent!important;
+    padding:23px 39px 29px!important;
+}
+.ute-auth-page .form-label {
+    color:#465744;
+    font-size:.78rem;
+    font-weight:700;
+    margin-bottom:9px!important;
+}
+.ute-auth-page .input-group {
+    border-radius:14px;
+}
+.ute-auth-page .input-group:focus-within {
+    box-shadow:0 0 0 4px rgba(115,143,105,.14);
+}
+.ute-auth-page .input-group .input-group-text {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-width:50px;
+    color:#7d8e75!important;
+    background:#f7f8f1!important;
+    border:1px solid #dbe2d3!important;
+    border-right:0!important;
+    border-radius:14px 0 0 14px!important;
+}
+.ute-auth-page .form-control {
+    min-height:51px;
+    background:#fff!important;
+    color:#344a34!important;
+    border:1px solid #dbe2d3!important;
+    box-shadow:none!important;
+    font-size:.85rem;
+}
+.ute-auth-page .input-group > .form-control {
+    border-left:0!important;
+    border-radius:0 14px 14px 0!important;
+}
+.ute-auth-page .input-group > .form-control:has(+ .ute-password-toggle) {
+    border-radius:0!important;
+    border-right:0!important;
+}
+.ute-auth-page .form-control:focus {
+    border-color:#9aaf8d!important;
+}
+.ute-auth-page .ute-password-toggle {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:47px;
+    color:#71826d;
+    background:#fff;
+    border:1px solid #dbe2d3;
+    border-left:0;
+    border-radius:0 14px 14px 0;
+    cursor:pointer;
+}
+.ute-auth-page .ute-auth-card .btn-primary-custom,
+.ute-auth-page .ute-auth-card .btn-success {
+    min-height:53px;
+    border-radius:14px!important;
+    background:#44684f!important;
+    border-color:#44684f!important;
+    box-shadow:0 10px 21px rgba(63,100,69,.16)!important;
+    font-size:.88rem;
+    font-weight:700;
+}
+.ute-auth-page .ute-auth-card .btn-primary-custom:hover,
+.ute-auth-page .ute-auth-card .btn-success:hover {
+    background:#31583d!important;
+    border-color:#31583d!important;
+}
+.ute-auth-page .ute-demo-section {
+    border-top:1px solid #e8ebdf;
+    margin-top:24px;
+    padding-top:19px;
+}
+.ute-auth-page .ute-demo-heading {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:13px;
+}
+.ute-auth-page .ute-demo-heading strong {
+    font-size:.78rem;
+    font-weight:700;
+    color:#52614c;
+}
+.ute-auth-page .ute-demo-grid {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+}
+.ute-auth-page .ute-demo-account {
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:center;
+    text-align:left;
+    min-width:0;
+    min-height:92px;
+    gap:5px;
+    background:linear-gradient(145deg,#fff,#f8faf5)!important;
+    border:1px solid #e0e7d7!important;
+    border-radius:14px!important;
+    padding:11px 14px;
+    color:#394934!important;
+    box-shadow:none;
+    transition:transform .18s ease,border-color .18s ease;
+}
+.ute-auth-page .ute-demo-account:hover,
+.ute-auth-page .ute-demo-account:focus-visible {
+    transform:translateY(-2px);
+    border-color:#a6b997!important;
+    box-shadow:0 9px 18px rgba(73,91,64,.09);
+}
+.ute-auth-page .ute-demo-account--shipper {
+    grid-column:1 / -1;
+    min-height:80px;
+}
+.ute-auth-page .ute-demo-account strong {
+    font-size:.78rem;
+    font-weight:700;
+    line-height:1.3;
+}
+.ute-auth-page .ute-demo-account small {
+    color:#8a9484;
+    font-size:.68rem;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    max-width:100%;
+}
+.ute-auth-page .ute-demo-badge {
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    background:#ebf0e5;
+    color:#536748;
+    border-radius:99px;
+    padding:4px 8px;
+    font-weight:800;
+    font-size:.57rem;
+    letter-spacing:.05em;
+}
+.ute-auth-page .ute-auth-bottom-note {
+    text-align:center;
+    color:#929b90;
+    font-size:.68rem;
+    margin-top:17px;
+}
+.ute-auth-page #registerTabContent .form-text {
+    font-size:.72rem;
+    line-height:1.6;
+}
+.ute-auth-page #registerTabContent .form-control,
+.ute-auth-page #forgotPasswordModal .form-control {
+    min-height:50px;
+}
+.ute-auth-page .modal-content {
+    border:1px solid #e4e9db!important;
+    border-radius:22px!important;
+}
+.ute-auth-page #otpCodeInput,
+.ute-auth-page #resetOtpInput {
+    border-radius:12px!important;
+    letter-spacing:8px;
+    border-left:1px solid #dbe2d3!important;
+}
+@media(max-width:1199.98px) {
+    .ute-auth-page .ute-auth-promo {
+        padding:28px 26px;
+        gap:20px;
+    }
+    .ute-auth-page .ute-auth-card .card-body {
+        padding:20px 28px 28px!important;
+    }
+    .ute-auth-page .ute-auth-card .card-header {
+        padding:25px 28px 9px!important;
+    }
+    .ute-auth-page .ute-auth-switch {
+        padding:10px 28px 0!important;
+    }
+}
+@media(max-width:991.98px) {
+    .ute-auth-page {
+        max-width:650px!important;
+        padding-top:21px!important;
+    }
+}
+@media(max-width:575.98px) {
+    .ute-auth-page {
+        padding:10px 12px 26px!important;
+    }
+    .ute-auth-page .ute-auth-shell {
+        --bs-gutter-x:0;
+        --bs-gutter-y:0;
+    }
+    .ute-auth-page .ute-auth-card {
+        border-radius:21px!important;
+    }
+    .ute-auth-page .ute-auth-card .card-header {
+        padding:23px 20px 9px!important;
+    }
+    .ute-auth-page .ute-auth-switch {
+        padding:11px 20px 0!important;
+    }
+    .ute-auth-page .ute-auth-card .card-body {
+        padding:21px 20px 25px!important;
+    }
+    .ute-auth-page .ute-demo-grid {
+        gap:8px;
+    }
+    .ute-auth-page .ute-demo-account {
+        padding:11px 9px;
+    }
+    .ute-auth-page .ute-demo-account small {
+        font-size:.60rem;
+    }
+}
+@media(max-width:360px) {
+    .ute-auth-page .ute-demo-grid {
+        grid-template-columns:1fr;
+    }
+}
+</style>
+
+<div class="row justify-content-center g-4 align-items-stretch ute-auth-shell">
+
+    <div class="col-lg-6 d-none d-lg-flex">
+        <aside class="ute-auth-promo w-100">
+            <div class="ute-promo-copy">
+                <h1>Tinh vị trà,<br><em>chạm vị thanh xuân.</em></h1>
+                <p>Gặp nhau bên một ly trà ngon. Thưởng thức từng khoảnh khắc dịu dàng cùng UTE Tea.</p>
+            </div>
+            <figure class="ute-auth-photo-frame">
+                <img th:src="@{/images/ute-tea-login-editorial.webp}"
+                     src="/images/ute-tea-login-editorial.webp"
+                     width="960" height="750"
+                     alt="Trà xanh, trà sữa và trà trái cây UTE Tea">
+            </figure>
+        </aside>
+    </div>
+
+    <div class="col-12 col-md-10 col-lg-6">
+        <div class="card ute-auth-card border-0 shadow-lg rounded-4 overflow-hidden">
+
+            <div class="card-header bg-white text-center pt-4 pb-2 border-0">
+                <div class="ute-auth-brand-row">
+                    <img th:src="@{/images/ute-tea-olive-mark.png}"
+                         src="/images/ute-tea-olive-mark.png"
+                         alt="UTE Tea" class="ute-auth-logo">
+                    <span class="ute-login-wordmark">UTE TEA</span>
                 </div>
-                <img th:src="@{/images/ute-tea-drinks-hero.webp}" src="/images/ute-tea-drinks-hero.webp" alt="Thức uống UTE Tea" width="480" height="350">
-                <div class="ute-auth-perks"><span><i class="bi bi-shield-check me-1"></i>Bảo mật tài khoản</span><span><i class="bi bi-lightning-charge me-1"></i>Đặt món nhanh</span><span><i class="bi bi-heart me-1"></i>Trải nghiệm đồng nhất</span></div>
-              </aside>
+                <div class="ute-auth-small-label">Chào mừng đến với UTE Tea</div>
+                <h2>Rất vui khi gặp lại bạn!</h2>
+                <p class="text-muted small mb-0">Đăng nhập hoặc tạo tài khoản để tận hưởng vị trà yêu thích.</p>
             </div>
 
-            <div class="col-md-8 col-lg-5">
-                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                    <!-- Card Header -->
-                    <div class="card-header bg-white text-center pt-4 pb-2 border-0">
-                        <div class="mb-2">
-                            <img th:src="@{/images/ute-tea-olive-mark.png}" src="/images/ute-tea-olive-mark.png" alt="Biểu tượng lá trà UTE Tea" class="ute-auth-logo" width="72" height="72">
-                            <span class="ute-login-wordmark">UTE TEA</span>
-                        </div>
-                        <h4 class="brand-font mb-1">Chào mừng trở lại!</h4>
-                        <p class="text-muted small mb-0">Đăng nhập hoặc tạo tài khoản để trải nghiệm UTE Tea</p>
-                    </div>
+            <div class="px-4 pt-2 ute-auth-switch">
+                <ul class="nav nav-pills nav-fill bg-light p-1 rounded-3" id="authTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active rounded-3 py-2 fw-semibold"
+                                id="login-tab" type="button" role="tab"
+                                aria-controls="loginTabContent" aria-selected="true"
+                                data-bs-toggle="tab" data-bs-target="#loginTabContent">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Đăng Nhập
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link rounded-3 py-2 fw-semibold"
+                                id="register-tab" type="button" role="tab"
+                                aria-controls="registerTabContent" aria-selected="false"
+                                data-bs-toggle="tab" data-bs-target="#registerTabContent">
+                            <i class="bi bi-person-plus me-1"></i> Đăng Ký
+                        </button>
+                    </li>
+                </ul>
+            </div>
 
-                    <!-- Nav Tabs: Đăng Nhập & Đăng Ký -->
-                    <div class="px-4 pt-2">
-                        <ul class="nav nav-pills nav-fill bg-light p-1 rounded-3" id="authTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active rounded-3 py-2 fw-semibold" id="login-tab"
-                                    data-bs-toggle="tab" data-bs-target="#loginTabContent" type="button" role="tab">
-                                    <i class="bi bi-box-arrow-in-right me-1"></i> Đăng Nhập
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link rounded-3 py-2 fw-semibold" id="register-tab"
-                                    data-bs-toggle="tab" data-bs-target="#registerTabContent" type="button" role="tab">
-                                    <i class="bi bi-person-plus me-1"></i> Đăng Ký
-                                </button>
-                            </li>
-                        </ul>
-                    </div>
+            <div class="card-body p-4">
+                <div id="authAlert" class="alert alert-danger d-none py-2 small rounded-3" role="alert"></div>
 
-                    <div class="card-body p-4">
-                        <!-- Alert Box chung -->
-                        <div id="authAlert" class="alert alert-danger d-none py-2 small rounded-3" role="alert"></div>
+                <div class="tab-content" id="authTabContent">
 
-                        <!-- Tab Content -->
-                        <div class="tab-content" id="authTabContent">
-                            <!-- TAB 1: ĐĂNG NHẬP -->
-                            <div class="tab-pane fade show active" id="loginTabContent" role="tabpanel">
-                                <form id="loginForm" onsubmit="handleLogin(event)">
-                                    <div class="mb-3">
-                                        <label for="email" class="form-label small fw-semibold">Email tài khoản</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-light border-end-0"><i
-                                                    class="bi bi-envelope text-muted"></i></span>
-                                            <input type="email" class="form-control border-start-0" id="email" required
-                                                placeholder="email@example.com">
-                                        </div>
-                                    </div>
+                    <!-- ĐĂNG NHẬP -->
+                    <div class="tab-pane fade show active" id="loginTabContent"
+                         role="tabpanel" aria-labelledby="login-tab">
 
-                                    <div class="mb-2">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <label for="password" class="form-label small fw-semibold mb-0">Mật khẩu</label>
-                                            <a href="javascript:void(0)"
-                                                id="forgotPasswordLink"
-                                                class="text-primary small text-decoration-none fw-semibold"
-                                                onclick="openForgotPasswordModal(event)">
-                                                Quên mật khẩu?
-                                            </a>
-                                        </div>
-                                        <div class="input-group mt-1">
-                                            <span class="input-group-text bg-light border-end-0"><i
-                                                    class="bi bi-lock text-muted"></i></span>
-                                            <input type="password" class="form-control border-start-0" id="password"
-                                                required placeholder="••••••••">
-                                        </div>
-                                    </div>
+                        <form id="loginForm" onsubmit="handleLogin(event)">
+                            <div class="mb-3">
+                                <label for="email" class="form-label small fw-semibold">Email tài khoản</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-envelope text-muted"></i>
+                                    </span>
+                                    <input type="email" class="form-control border-start-0"
+                                           id="email" autocomplete="username" required
+                                           placeholder="email@example.com">
+                                </div>
+                            </div>
 
-                                    <button type="submit" id="loginBtn"
-                                        class="btn btn-primary-custom w-100 py-2 rounded-3 mt-3">
-                                        <span class="spinner-border spinner-border-sm me-2 d-none"
-                                            id="loginSpinner"></span>
-                                        Đăng Nhập
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label for="password" class="form-label small fw-semibold mb-0">Mật khẩu</label>
+                                    <a href="#" id="forgotPasswordLink"
+                                       class="text-primary small text-decoration-none fw-semibold">
+                                        Quên mật khẩu?
+                                    </a>
+                                </div>
+                                <div class="input-group mt-1">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-lock text-muted"></i>
+                                    </span>
+                                    <input type="password" class="form-control border-start-0"
+                                           id="password" required placeholder="••••••••">
+                                    <button class="ute-password-toggle" type="button"
+                                            data-toggle-password="password"
+                                            aria-label="Hiện mật khẩu" aria-pressed="false">
+                                        <i class="bi bi-eye"></i>
                                     </button>
-                                </form>
-
-                                <!-- Tài Khoản Mẫu Nhanh -->
-                                <div class="mt-4 pt-3 border-top">
-                                    <p class="text-center text-muted small fw-semibold mb-2">Chọn nhanh tài khoản thử nghiệm:</p>
-                                    <div class="d-grid gap-2">
-                                        <button type="button"
-                                            class="btn btn-sm btn-outline-danger text-start py-2 px-3 rounded-3"
-                                            onclick="fillDemo('admin@milktea.vn', 'Password@123')">
-                                            <i class="bi bi-shield-lock-fill me-2"></i><strong>Quản Trị Viên (ADMIN)</strong>
-                                        </button>
-                                        <button type="button"
-                                            class="btn btn-sm btn-outline-primary text-start py-2 px-3 rounded-3"
-                                            onclick="fillDemo('cashier@milktea.vn', 'Password@123')">
-                                            <i class="bi bi-calculator me-2"></i><strong>Thu Ngân (CASHIER)</strong>
-                                        </button>
-                                        <button type="button"
-                                            class="btn btn-sm btn-outline-success text-start py-2 px-3 rounded-3"
-                                            onclick="fillDemo('kitchen@milktea.vn', 'Password@123')">
-                                            <i class="bi bi-fire me-2"></i><strong>Bếp Trưởng (KITCHEN)</strong>
-                                        </button>
-                                        <button type="button"
-                                            class="btn btn-sm btn-outline-secondary text-start py-2 px-3 rounded-3"
-                                            onclick="fillDemo('customer@milktea.vn', 'Password@123')">
-                                            <i class="bi bi-person me-2"></i><strong>Khách Hàng Demo (CUSTOMER)</strong>
-                                        </button>
-                                    </div>
                                 </div>
                             </div>
 
-                            <!-- TAB 2: ĐĂNG KÝ -->
-                            <div class="tab-pane fade" id="registerTabContent" role="tabpanel">
-                                <!-- Bước A: Form nhập thông tin đăng ký -->
-                                <div id="registerFormContainer">
-                                    <form id="registerForm" onsubmit="handleRegister(event)">
-                                        <div class="mb-3">
-                                            <label for="regFullName" class="form-label small fw-semibold">Họ và tên</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-light border-end-0"><i
-                                                        class="bi bi-person text-muted"></i></span>
-                                                <input type="text" class="form-control border-start-0" id="regFullName"
-                                                    required placeholder="Nguyễn Văn A">
-                                            </div>
-                                        </div>
+                            <button type="submit" id="loginBtn"
+                                    class="btn btn-primary-custom w-100 py-2 rounded-3 mt-3">
+                                <span class="spinner-border spinner-border-sm me-2 d-none"
+                                      id="loginSpinner"></span>
+                                <i class="bi bi-arrow-right-circle me-2"></i> Đăng nhập
+                            </button>
+                        </form>
 
-                                        <div class="mb-3">
-                                            <label for="regEmail" class="form-label small fw-semibold">Email đăng ký</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-light border-end-0"><i
-                                                        class="bi bi-envelope text-muted"></i></span>
-                                                <input type="email" class="form-control border-start-0" id="regEmail"
-                                                    required placeholder="example@gmail.com">
-                                            </div>
-                                            <div class="form-text small text-muted">Hệ thống sẽ gửi mã OTP 6 số đến email này để kích hoạt.</div>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label for="regPhone" class="form-label small fw-semibold">Số điện thoại</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-light border-end-0"><i
-                                                        class="bi bi-telephone text-muted"></i></span>
-                                                <input type="tel" class="form-control border-start-0" id="regPhone"
-                                                    required pattern="[0-9]{10}" placeholder="0901234567">
-                                            </div>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label for="regPassword" class="form-label small fw-semibold">Mật khẩu</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-light border-end-0"><i
-                                                        class="bi bi-lock text-muted"></i></span>
-                                                <input type="password" class="form-control border-start-0" id="regPassword"
-                                                    required minlength="6" placeholder="Tối thiểu 6 ký tự">
-                                            </div>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label for="regConfirmPassword" class="form-label small fw-semibold">Xác nhận mật khẩu</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-light border-end-0"><i
-                                                        class="bi bi-shield-check text-muted"></i></span>
-                                                <input type="password" class="form-control border-start-0"
-                                                    id="regConfirmPassword" required minlength="6"
-                                                    placeholder="Nhập lại mật khẩu">
-                                            </div>
-                                        </div>
-
-                                        <button type="submit" id="registerBtn"
-                                            class="btn btn-success w-100 py-2 rounded-3 mt-2">
-                                            <span class="spinner-border spinner-border-sm me-2 d-none"
-                                                id="registerSpinner"></span>
-                                            Đăng Ký & Nhận Mã Xác Thực
-                                        </button>
-                                    </form>
-                                </div>
-
-                                <!-- Bước B: Form nhập mã OTP xác thực email (Ẩn ban đầu) -->
-                                <div id="registerOtpContainer" class="d-none">
-                                    <div class="text-center mb-3">
-                                        <div class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded-circle mb-2" style="width: 56px; height: 56px;">
-                                            <i class="bi bi-envelope-check-fill fs-3"></i>
-                                        </div>
-                                        <h5 class="fw-bold mb-1">Xác Thực Địa Chỉ Email</h5>
-                                        <p class="text-muted small mb-0">
-                                            Mã xác thực gồm 6 chữ số đã được gửi tới:
-                                        </p>
-                                        <div class="fw-bold text-primary mt-1" id="verifyTargetEmail">email@example.com</div>
-                                    </div>
-
-                                    <div id="otpAlert" class="alert alert-danger d-none py-2 small rounded-3" role="alert"></div>
-
-                                    <form id="verifyOtpForm" onsubmit="handleVerifyOtp(event)">
-                                        <div class="mb-3 text-center">
-                                            <label for="otpCodeInput" class="form-label small fw-semibold">Nhập mã OTP (6 chữ số):</label>
-                                            <input type="text" class="form-control text-center fs-2 font-monospace fw-bold py-2 rounded-3 border-2" 
-                                                   id="otpCodeInput" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" 
-                                                   autocomplete="one-time-code" required placeholder="••••••" style="letter-spacing: 8px;">
-                                            <div class="form-text small text-muted mt-2">
-                                                <i class="bi bi-clock-history me-1"></i> Mã có hiệu lực trong <strong>10 phút</strong>.
-                                            </div>
-                                        </div>
-
-                                        <button type="submit" id="btnVerifyOtp" class="btn btn-primary-custom w-100 py-2 rounded-3">
-                                            <span class="spinner-border spinner-border-sm me-2 d-none" id="verifySpinner"></span>
-                                            Xác Thực & Kích Hoạt Tài Khoản
-                                        </button>
-                                    </form>
-
-                                    <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-                                        <button type="button" class="btn btn-link text-muted small p-0 text-decoration-none" onclick="backToRegisterForm()">
-                                            <i class="bi bi-arrow-left me-1"></i> Đổi thông tin
-                                        </button>
-                                        <button type="button" id="btnResendOtp" class="btn btn-sm btn-outline-secondary rounded-3" onclick="handleResendOtp()" disabled>
-                                            <span class="spinner-border spinner-border-sm me-1 d-none" id="resendSpinner"></span>
-                                            <span id="resendBtnText">Gửi lại mã (60s)</span>
-                                        </button>
-                                    </div>
-                                </div>
+                        <!-- TRUY CẬP NHANH: ĐỦ 5 ROLE -->
+                        <div class="ute-demo-section">
+                            <div class="ute-demo-heading">
+                                <strong>
+                                    <i class="bi bi-grid me-1"></i> Truy cập nhanh
+                                </strong>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- MODAL QUÊN MẬT KHẨU / OTP 2 BƯỚC (Đặt bên trong fragment content để render vào DOM) -->
-        <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content rounded-4 border-0 shadow">
-                    <div class="modal-header border-bottom-0 pb-0">
-                        <h5 class="modal-title fw-bold" id="forgotPasswordModalLabel">
-                            <i class="bi bi-key-fill text-primary me-2"></i>Khôi Phục Mật Khẩu
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeForgotPasswordModal()"></button>
-                    </div>
+                            <div class="ute-demo-grid">
 
-                    <div class="modal-body p-4 pt-2">
-                        <div id="forgotAlert" class="alert alert-danger d-none py-2 small rounded-3" role="alert"></div>
+                                <!-- ADMIN -->
+                                <button type="button" class="btn ute-demo-account"
+                                        onclick="fillDemo('admin@utetea.local', 'Password@123')">
+                                    <span class="ute-demo-badge">
+                                        <i class="bi bi-shield-lock-fill"></i> ADMIN
+                                    </span>
+                                    <strong>Quản trị viên</strong>
+                                    <small>admin@utetea.local</small>
+                                </button>
 
-                        <!-- BƯỚC 1: NHẬP EMAIL NHẬN MÃ KHÔI PHỤC -->
-                        <div id="forgotStep1">
-                            <p class="text-muted small">
-                                Nhập địa chỉ email tài khoản của bạn. Hệ thống sẽ gửi mã xác thực 6 chữ số qua email để xác minh danh tính.
+                                <!-- CASHIER -->
+                                <button type="button" class="btn ute-demo-account"
+                                        onclick="fillDemo('cashier@utetea.local', 'Password@123')">
+                                    <span class="ute-demo-badge">
+                                        <i class="bi bi-calculator"></i> CASHIER
+                                    </span>
+                                    <strong>Thu ngân</strong>
+                                    <small>cashier@utetea.local</small>
+                                </button>
+
+                                <!-- KITCHEN -->
+                                <button type="button" class="btn ute-demo-account"
+                                        onclick="fillDemo('kitchen@utetea.local', 'Password@123')">
+                                    <span class="ute-demo-badge">
+                                        <i class="bi bi-cup-hot-fill"></i> KITCHEN
+                                    </span>
+                                    <strong>Pha chế</strong>
+                                    <small>kitchen@utetea.local</small>
+                                </button>
+
+                                <!-- CUSTOMER -->
+                                <button type="button" class="btn ute-demo-account"
+                                        onclick="fillDemo('customer@utetea.local', 'Password@123')">
+                                    <span class="ute-demo-badge">
+                                        <i class="bi bi-person"></i> CUSTOMER
+                                    </span>
+                                    <strong>Khách hàng</strong>
+                                    <small>customer@utetea.local</small>
+                                </button>
+
+                                <!-- SHIPPER -->
+                                <button type="button"
+                                        class="btn ute-demo-account ute-demo-account--shipper"
+                                        onclick="fillDemo('shipper@utetea.local', 'Password@123')">
+                                    <span class="ute-demo-badge">
+                                        <i class="bi bi-truck"></i> SHIPPER
+                                    </span>
+                                    <strong>Nhân viên giao hàng</strong>
+                                    <small>shipper@utetea.local</small>
+                                </button>
+
+                            </div>
+
+                            <p class="ute-auth-bottom-note mb-0">
+                                <i class="bi bi-shield-check"></i>
+                                Thông tin tài khoản được bảo vệ an toàn
                             </p>
-                            <form id="step1Form" onsubmit="handleRequestReset(event)">
-                                <div class="mb-3">
-                                    <label for="forgotEmail" class="form-label small fw-semibold">Email tài khoản</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-light"><i
-                                                class="bi bi-envelope text-muted"></i></span>
-                                        <input type="email" class="form-control" id="forgotEmail" required
-                                            placeholder="email@example.com">
-                                    </div>
-                                </div>
-                                <button type="submit" id="btnSendReset" class="btn btn-primary-custom w-100 py-2 rounded-3">
-                                    <span class="spinner-border spinner-border-sm me-2 d-none" id="sendResetSpinner"></span>
-                                    Gửi Mã Khôi Phục Qua Email
-                                </button>
-                            </form>
                         </div>
+                    </div>
 
-                        <!-- BƯỚC 2: XÁC THỰC MÃ OTP 6 CHỮ SỐ (Bắt buộc xác thực đúng trước khi mở form đổi mật khẩu) -->
-                        <div id="forgotStep2" class="d-none">
-                            <div class="alert alert-info py-2 small rounded-3 mb-3">
-                                <i class="bi bi-info-circle-fill me-1"></i> Mã xác thực 6 chữ số đã được gửi đến <strong id="forgotTargetEmail">email</strong>. Vui lòng kiểm tra hộp thư (cả mục Spam) và nhập vào bên dưới:
-                            </div>
-                            <form id="step2OtpForm" onsubmit="handleVerifyResetOtp(event)">
-                                <div class="mb-3 text-center">
-                                    <label for="resetOtpInput" class="form-label small fw-semibold">Nhập mã xác thực OTP (6 chữ số):</label>
-                                    <input type="text" class="form-control text-center font-monospace fs-2 fw-bold py-2 rounded-3 border-2" 
-                                        id="resetOtpInput" required maxlength="6" pattern="[0-9]{6}" inputmode="numeric" 
-                                        autocomplete="one-time-code" placeholder="••••••" style="letter-spacing: 8px;">
-                                    <div class="form-text small text-muted mt-2">
-                                        <i class="bi bi-clock-history me-1"></i> Mã có hiệu lực trong <strong>15 phút</strong>.
-                                    </div>
-                                </div>
-                                <button type="submit" id="btnVerifyResetOtp" class="btn btn-primary-custom w-100 py-2 rounded-3">
-                                    <span class="spinner-border spinner-border-sm me-2 d-none" id="verifyResetOtpSpinner"></span>
-                                    Xác Thực Mã OTP &amp; Tiếp Tục
-                                </button>
-                            </form>
-                            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-                                <button type="button" class="btn btn-link text-muted small p-0 text-decoration-none" onclick="backToStep1()">
-                                    <i class="bi bi-arrow-left me-1"></i> Đổi email khác
-                                </button>
-                                <button type="button" id="btnResendResetOtp" class="btn btn-sm btn-outline-secondary rounded-3" onclick="handleResendResetOtp()" disabled>
-                                    <span class="spinner-border spinner-border-sm me-1 d-none" id="resendResetSpinner"></span>
-                                    <span id="resendResetBtnText">Gửi lại mã (60s)</span>
-                                </button>
-                            </div>
-                        </div>
+                    <!-- ĐĂNG KÝ -->
+                    <div class="tab-pane fade" id="registerTabContent"
+                         role="tabpanel" aria-labelledby="register-tab">
 
-                        <!-- BƯỚC 3: THIẾT LẬP MẬT KHẨU MỚI (Chỉ mở khi OTP đã xác thực đúng) -->
-                        <div id="forgotStep3" class="d-none">
-                            <div class="alert alert-success py-2 small rounded-3 mb-3">
-                                <i class="bi bi-check-circle-fill me-1"></i> Mã OTP đã được xác thực thành công! Vui lòng nhập mật khẩu mới cho tài khoản:
-                            </div>
-                            <form id="step3PasswordForm" onsubmit="handleConfirmReset(event)">
+                        <div id="registerFormContainer">
+                            <form id="registerForm" onsubmit="handleRegister(event)">
+
                                 <div class="mb-3">
-                                    <label for="resetNewPassword" class="form-label small fw-semibold">Mật khẩu mới</label>
+                                    <label for="regFullName" class="form-label small fw-semibold">Họ và tên</label>
                                     <div class="input-group">
-                                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock text-muted"></i></span>
-                                        <input type="password" class="form-control border-start-0" id="resetNewPassword" required minlength="6"
-                                            placeholder="Tối thiểu 6 ký tự">
+                                        <span class="input-group-text bg-light border-end-0">
+                                            <i class="bi bi-person text-muted"></i>
+                                        </span>
+                                        <input type="text" class="form-control border-start-0"
+                                               id="regFullName" autocomplete="name" required
+                                               placeholder="Nguyễn Văn A">
                                     </div>
                                 </div>
+
                                 <div class="mb-3">
-                                    <label for="resetConfirmNewPassword" class="form-label small fw-semibold">Xác nhận mật khẩu mới</label>
+                                    <label for="regEmail" class="form-label small fw-semibold">Email đăng ký</label>
                                     <div class="input-group">
-                                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-shield-check text-muted"></i></span>
-                                        <input type="password" class="form-control border-start-0" id="resetConfirmNewPassword" required
-                                            minlength="6" placeholder="Nhập lại mật khẩu mới">
+                                        <span class="input-group-text bg-light border-end-0">
+                                            <i class="bi bi-envelope text-muted"></i>
+                                        </span>
+                                        <input type="email" class="form-control border-start-0"
+                                               id="regEmail" autocomplete="email" required
+                                               placeholder="example@gmail.com">
+                                    </div>
+                                    <div class="form-text small text-muted">
+                                        Hệ thống sẽ gửi mã OTP 6 số đến email này để kích hoạt.
                                     </div>
                                 </div>
-                                <button type="submit" id="btnConfirmReset" class="btn btn-success w-100 py-2 rounded-3">
+
+                                <div class="mb-3">
+                                    <label for="regPhone" class="form-label small fw-semibold">Số điện thoại</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0">
+                                            <i class="bi bi-telephone text-muted"></i>
+                                        </span>
+                                        <input type="tel" class="form-control border-start-0"
+                                               id="regPhone" autocomplete="tel" required
+                                               pattern="[0-9]{10}" placeholder="0901234567">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="regPassword" class="form-label small fw-semibold">Mật khẩu</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0">
+                                            <i class="bi bi-lock text-muted"></i>
+                                        </span>
+                                        <input type="password" class="form-control border-start-0"
+                                               id="regPassword" autocomplete="new-password"
+                                               required minlength="6" placeholder="Tối thiểu 6 ký tự">
+                                        <button class="ute-password-toggle" type="button"
+                                                data-toggle-password="regPassword"
+                                                aria-label="Hiện mật khẩu" aria-pressed="false">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="regConfirmPassword" class="form-label small fw-semibold">Xác nhận mật khẩu</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0">
+                                            <i class="bi bi-shield-check text-muted"></i>
+                                        </span>
+                                        <input type="password" class="form-control border-start-0"
+                                               id="regConfirmPassword" autocomplete="new-password"
+                                               required minlength="6" placeholder="Nhập lại mật khẩu">
+                                        <button class="ute-password-toggle" type="button"
+                                                data-toggle-password="regConfirmPassword"
+                                                aria-label="Hiện mật khẩu" aria-pressed="false">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <button type="submit" id="registerBtn"
+                                        class="btn btn-primary-custom w-100 py-2 rounded-3 mt-2">
                                     <span class="spinner-border spinner-border-sm me-2 d-none"
-                                        id="confirmResetSpinner"></span>
-                                    Đặt Lại Mật Khẩu &amp; Hoàn Tất
+                                          id="registerSpinner"></span>
+                                    Đăng Ký & Nhận Mã Xác Thực
                                 </button>
                             </form>
                         </div>
+
+                        <div id="registerOtpContainer" class="d-none">
+                            <div class="text-center mb-3">
+                                <div class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded-circle mb-2"
+                                     style="width:56px;height:56px">
+                                    <i class="bi bi-envelope-check-fill fs-3"></i>
+                                </div>
+                                <h5 class="fw-bold mb-1">Xác Thực Địa Chỉ Email</h5>
+                                <p class="text-muted small mb-0">Mã xác thực gồm 6 chữ số đã được gửi tới:</p>
+                                <div class="fw-bold text-primary mt-1" id="verifyTargetEmail">email@example.com</div>
+                            </div>
+
+                            <div id="otpAlert" class="alert alert-danger d-none py-2 small rounded-3" role="alert"></div>
+
+                            <form id="verifyOtpForm" onsubmit="handleVerifyOtp(event)">
+                                <div class="mb-3 text-center">
+                                    <label for="otpCodeInput" class="form-label small fw-semibold">Nhập mã OTP (6 chữ số):</label>
+                                    <input type="text" class="form-control text-center fs-2 font-monospace fw-bold py-2 rounded-3 border-2"
+                                           id="otpCodeInput" maxlength="6" pattern="[0-9]{6}"
+                                           inputmode="numeric" autocomplete="one-time-code"
+                                           required placeholder="••••••" style="letter-spacing:8px">
+                                    <div class="form-text small text-muted mt-2">
+                                        <i class="bi bi-clock-history me-1"></i>
+                                        Mã có hiệu lực trong <strong>10 phút</strong>.
+                                    </div>
+                                </div>
+                                <button type="submit" id="btnVerifyOtp"
+                                        class="btn btn-primary-custom w-100 py-2 rounded-3">
+                                    <span class="spinner-border spinner-border-sm me-2 d-none"
+                                          id="verifySpinner"></span>
+                                    Xác Thực & Kích Hoạt Tài Khoản
+                                </button>
+                            </form>
+
+                            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                                <button type="button" class="btn btn-link text-muted small p-0 text-decoration-none"
+                                        onclick="backToRegisterForm()">
+                                    <i class="bi bi-arrow-left me-1"></i> Đổi thông tin
+                                </button>
+                                <button type="button" id="btnResendOtp"
+                                        class="btn btn-sm btn-outline-secondary rounded-3"
+                                        onclick="handleResendOtp()" disabled>
+                                    <span class="spinner-border spinner-border-sm me-1 d-none"
+                                          id="resendSpinner"></span>
+                                    <span id="resendBtnText">Gửi lại mã (60s)</span>
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <th:block th:fragment="scripts">
-        <script>
-            let forgotModal = null;
-            let currentVerifyEmail = '';
-            let currentForgotEmail = '';
-            let currentResetToken = '';
-            let resendTimer = null;
-            let remainingCooldown = 0;
-            let forgotResendTimer = null;
-            let forgotRemainingCooldown = 0;
+<!-- KHÔI PHỤC MẬT KHẨU -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1"
+     aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
 
-            function fillDemo(email, pass) {
-                document.getElementById('email').value = email;
-                document.getElementById('password').value = pass;
-                document.getElementById('authAlert').classList.add('d-none');
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold" id="forgotPasswordModalLabel">
+                    <i class="bi bi-key-fill text-primary me-2"></i>
+                    Khôi Phục Mật Khẩu
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close" onclick="closeForgotPasswordModal()"></button>
+            </div>
+
+            <div class="modal-body p-4 pt-2">
+                <div id="forgotAlert" class="alert alert-danger d-none py-2 small rounded-3" role="alert"></div>
+
+                <div id="forgotStep1">
+                    <p class="text-muted small">
+                        Nhập địa chỉ email tài khoản của bạn. Hệ thống sẽ gửi mã xác thực 6 chữ số qua email để xác minh danh tính.
+                    </p>
+                    <form id="step1Form" onsubmit="handleRequestReset(event)">
+                        <div class="mb-3">
+                            <label for="forgotEmail" class="form-label small fw-semibold">Email tài khoản</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="bi bi-envelope text-muted"></i>
+                                </span>
+                                <input type="email" class="form-control" id="forgotEmail"
+                                       required placeholder="email@example.com">
+                            </div>
+                        </div>
+                        <button type="submit" id="btnSendReset"
+                                class="btn btn-primary-custom w-100 py-2 rounded-3">
+                            <span class="spinner-border spinner-border-sm me-2 d-none"
+                                  id="sendResetSpinner"></span>
+                            Gửi Mã Khôi Phục Qua Email
+                        </button>
+                    </form>
+                </div>
+
+                <div id="forgotStep2" class="d-none">
+                    <div class="alert alert-info py-2 small rounded-3 mb-3">
+                        <i class="bi bi-info-circle-fill me-1"></i>
+                        Mã xác thực đã được gửi đến
+                        <strong id="forgotTargetEmail">email</strong>.
+                        Vui lòng kiểm tra hộp thư và nhập mã:
+                    </div>
+
+                    <form id="step2OtpForm" onsubmit="handleVerifyResetOtp(event)">
+                        <div class="mb-3 text-center">
+                            <label for="resetOtpInput" class="form-label small fw-semibold">
+                                Nhập mã xác thực OTP (6 chữ số):
+                            </label>
+                            <input type="text"
+                                   class="form-control text-center font-monospace fs-2 fw-bold py-2 rounded-3 border-2"
+                                   id="resetOtpInput" required maxlength="6"
+                                   pattern="[0-9]{6}" inputmode="numeric"
+                                   autocomplete="one-time-code" placeholder="••••••">
+                            <div class="form-text small text-muted mt-2">
+                                <i class="bi bi-clock-history me-1"></i>
+                                Mã có hiệu lực trong <strong>15 phút</strong>.
+                            </div>
+                        </div>
+                        <button type="submit" id="btnVerifyResetOtp"
+                                class="btn btn-primary-custom w-100 py-2 rounded-3">
+                            <span class="spinner-border spinner-border-sm me-2 d-none"
+                                  id="verifyResetOtpSpinner"></span>
+                            Xác Thực Mã OTP &amp; Tiếp Tục
+                        </button>
+                    </form>
+
+                    <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                        <button type="button" class="btn btn-link text-muted small p-0 text-decoration-none"
+                                onclick="backToStep1()">
+                            <i class="bi bi-arrow-left me-1"></i> Đổi email khác
+                        </button>
+                        <button type="button" id="btnResendResetOtp"
+                                class="btn btn-sm btn-outline-secondary rounded-3"
+                                onclick="handleResendResetOtp()" disabled>
+                            <span class="spinner-border spinner-border-sm me-1 d-none"
+                                  id="resendResetSpinner"></span>
+                            <span id="resendResetBtnText">Gửi lại mã (60s)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="forgotStep3" class="d-none">
+                    <div class="alert alert-success py-2 small rounded-3 mb-3">
+                        <i class="bi bi-check-circle-fill me-1"></i>
+                        Mã OTP đã xác thực thành công. Vui lòng nhập mật khẩu mới.
+                    </div>
+
+                    <form id="step3PasswordForm" onsubmit="handleConfirmReset(event)">
+                        <div class="mb-3">
+                            <label for="resetNewPassword" class="form-label small fw-semibold">Mật khẩu mới</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="bi bi-lock text-muted"></i>
+                                </span>
+                                <input type="password" class="form-control border-start-0"
+                                       id="resetNewPassword" autocomplete="new-password"
+                                       required minlength="6" placeholder="Tối thiểu 6 ký tự">
+                                <button class="ute-password-toggle" type="button"
+                                        data-toggle-password="resetNewPassword"
+                                        aria-label="Hiện mật khẩu" aria-pressed="false">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="resetConfirmNewPassword" class="form-label small fw-semibold">Xác nhận mật khẩu mới</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="bi bi-shield-check text-muted"></i>
+                                </span>
+                                <input type="password" class="form-control border-start-0"
+                                       id="resetConfirmNewPassword" autocomplete="new-password"
+                                       required minlength="6" placeholder="Nhập lại mật khẩu mới">
+                                <button class="ute-password-toggle" type="button"
+                                        data-toggle-password="resetConfirmNewPassword"
+                                        aria-label="Hiện mật khẩu" aria-pressed="false">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="btnConfirmReset"
+                                class="btn btn-primary-custom w-100 py-2 rounded-3">
+                            <span class="spinner-border spinner-border-sm me-2 d-none"
+                                  id="confirmResetSpinner"></span>
+                            Đặt Lại Mật Khẩu &amp; Hoàn Tất
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<th:block th:fragment="scripts">
+<script>
+let currentVerifyEmail = '';
+let currentForgotEmail = '';
+let currentResetToken = '';
+let resendTimer = null;
+let remainingCooldown = 0;
+let forgotResendTimer = null;
+let forgotRemainingCooldown = 0;
+
+// Hiện/ẩn mật khẩu
+document.addEventListener('click', function(event) {
+    const btn = event.target.closest('[data-toggle-password]');
+    if (!btn) return;
+    const input = document.getElementById(btn.dataset.togglePassword);
+    if (!input) return;
+    const visible = input.type === 'password';
+    input.type = visible ? 'text' : 'password';
+    btn.setAttribute('aria-pressed', String(visible));
+    btn.setAttribute('aria-label', visible ? 'Ẩn mật khẩu' : 'Hiện mật khẩu');
+    const icon = btn.querySelector('i');
+    if (icon) icon.className = visible ? 'bi bi-eye-slash' : 'bi bi-eye';
+    input.focus({preventScroll:true});
+});
+
+// Điền tài khoản truy cập nhanh
+function fillDemo(email, password) {
+    document.getElementById('email').value = email;
+    document.getElementById('password').value = password;
+    document.getElementById('authAlert').classList.add('d-none');
+}
+
+// Đăng nhập
+async function handleLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const alertEl = document.getElementById('authAlert');
+    const btn = document.getElementById('loginBtn');
+    const spinner = document.getElementById('loginSpinner');
+
+    alertEl.classList.add('d-none');
+    alertEl.textContent = '';
+    btn.disabled = true;
+    spinner.classList.remove('d-none');
+
+    try {
+        const data = await MilkTeaApi.post('/api/v1/auth/login', {
+            email, password
+        });
+
+        if (MilkTeaApi.showToast) {
+            MilkTeaApi.showToast('Đăng nhập thành công!', 'success');
+        }
+
+        const redirect = new URLSearchParams(window.location.search).get('redirect');
+
+        setTimeout(() => {
+            const role = data.role || (data.user && data.user.role);
+
+            if (role === 'ADMIN') {
+                window.location.href = '/admin';
+            } else if (role === 'CASHIER') {
+                window.location.href = '/cashier';
+            } else if (role === 'KITCHEN') {
+                window.location.href = '/kitchen';
+            } else if (role === 'SHIPPER') {
+                window.location.href = '/delivery';
+            } else {
+                const safeRedirect = redirect &&
+                    redirect.startsWith('/') &&
+                    !redirect.startsWith('//') &&
+                    !redirect.includes('\\') &&
+                    !redirect.includes('/login');
+
+                window.location.href = safeRedirect ? redirect : '/';
             }
+        }, 500);
+
+    } catch (err) {
+        alertEl.className = 'alert alert-danger py-2 small rounded-3';
+
+        if (err.code === 'AUTH_EMAIL_NOT_VERIFIED') {
+            currentVerifyEmail = email;
+            const message = document.createElement('span');
+            message.textContent = err.message || 'Email chưa được xác thực.';
+            const verifyButton = document.createElement('button');
+            verifyButton.type = 'button';
+            verifyButton.className = 'btn btn-link fw-bold text-decoration-underline text-danger mt-1 p-0 d-block';
+            verifyButton.textContent = 'Nhập mã OTP kích hoạt tài khoản ngay';
+            verifyButton.addEventListener('click', openVerifyFromLogin);
+            alertEl.replaceChildren(message, verifyButton);
+        } else {
+            alertEl.textContent = err.message || 'Email hoặc mật khẩu không chính xác';
+        }
+
+        alertEl.classList.remove('d-none');
+        btn.disabled = false;
+        spinner.classList.add('d-none');
+    }
+}
+
+function openVerifyFromLogin() {
+    const tab = document.getElementById('register-tab');
+    if (tab && window.bootstrap) bootstrap.Tab.getOrCreateInstance(tab).show();
+    showOtpVerificationScreen(currentVerifyEmail, currentVerifyEmail, 60);
+}
+
+// Đăng ký
+async function handleRegister(e) {
+    e.preventDefault();
+
+    const fullName = document.getElementById('regFullName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const phone = document.getElementById('regPhone').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const confirmPass = document.getElementById('regConfirmPassword').value;
+    const alertEl = document.getElementById('authAlert');
+    const btn = document.getElementById('registerBtn');
+    const spinner = document.getElementById('registerSpinner');
+
+    if (!/^[0-9]{10}$/.test(phone)) {
+        alertEl.textContent = 'Số điện thoại phải gồm đúng 10 chữ số';
+        alertEl.className = 'alert alert-danger py-2 small rounded-3';
+        alertEl.classList.remove('d-none');
+        return;
+    }
+
+    if (password !== confirmPass) {
+        alertEl.textContent = 'Mật khẩu xác nhận không khớp!';
+        alertEl.className = 'alert alert-danger py-2 small rounded-3';
+        alertEl.classList.remove('d-none');
+        return;
+    }
+
+    alertEl.classList.add('d-none');
+    btn.disabled = true;
+    spinner.classList.remove('d-none');
+
+    try {
+        const res = await MilkTeaApi.post('/api/v1/auth/register', {
+            fullName, email, phone, password
+        });
+
+        const maskedEmail = res && res.maskedEmail ? res.maskedEmail : email;
+        const cooldown = res && res.cooldownSeconds ? res.cooldownSeconds : 60;
+
+        if (MilkTeaApi.showToast) {
+            MilkTeaApi.showToast('Đã gửi mã xác thực tới email!', 'info');
+        }
+        showOtpVerificationScreen(email, maskedEmail, cooldown);
+    } catch (err) {
+        alertEl.textContent = err.message || 'Không thể đăng ký tài khoản';
+        alertEl.className = 'alert alert-danger py-2 small rounded-3';
+        alertEl.classList.remove('d-none');
+    } finally {
+        btn.disabled = false;
+        spinner.classList.add('d-none');
+    }
+}
+
+function showOtpVerificationScreen(rawEmail, displayEmail, cooldownSec) {
+    currentVerifyEmail = rawEmail;
+    document.getElementById('registerFormContainer').classList.add('d-none');
+    document.getElementById('registerOtpContainer').classList.remove('d-none');
+    document.getElementById('verifyTargetEmail').textContent = displayEmail;
+    document.getElementById('otpCodeInput').value = '';
+    document.getElementById('otpAlert').classList.add('d-none');
+    document.getElementById('authAlert').classList.add('d-none');
+    startResendCooldown(cooldownSec);
+    setTimeout(() => document.getElementById('otpCodeInput').focus(), 300);
+}
+
+function backToRegisterForm() {
+    document.getElementById('registerFormContainer').classList.remove('d-none');
+    document.getElementById('registerOtpContainer').classList.add('d-none');
+    document.getElementById('otpAlert').classList.add('d-none');
+    if (resendTimer) clearInterval(resendTimer);
+}
+
+function startResendCooldown(seconds) {
+    remainingCooldown = seconds;
+    const btn = document.getElementById('btnResendOtp');
+    const text = document.getElementById('resendBtnText');
+
+    btn.disabled = true;
+    if (resendTimer) clearInterval(resendTimer);
+
+    resendTimer = setInterval(() => {
+        remainingCooldown--;
+        if (remainingCooldown <= 0) {
+            clearInterval(resendTimer);
+            btn.disabled = false;
+            text.textContent = 'Gửi lại mã OTP';
+        } else {
+            text.textContent = `Gửi lại sau (${remainingCooldown}s)`;
+        }
+    }, 1000);
+}
+
+async function handleVerifyOtp(e) {
+    e.preventDefault();
+
+    const otp = document.getElementById('otpCodeInput').value.trim();
+    const alertEl = document.getElementById('otpAlert');
+    const btn = document.getElementById('btnVerifyOtp');
+    const spinner = document.getElementById('verifySpinner');
+
+    if (!/^[0-9]{6}$/.test(otp)) {
+        alertEl.textContent = 'Vui lòng nhập đúng 6 chữ số mã xác thực.';
+        alertEl.className = 'alert alert-danger py-2 small rounded-3';
+        alertEl.classList.remove('d-none');
+        return;
+    }
+
+    alertEl.classList.add('d-none');
+    btn.disabled = true;
+    spinner.classList.remove('d-none');
+
+    try {
+        const res = await MilkTeaApi.post('/api/v1/auth/verify-email', {
+            email: currentVerifyEmail,
+            otp
+        });
+
+        alertEl.textContent = res && res.message
+            ? res.message : 'Kích hoạt tài khoản thành công!';
+        alertEl.className = 'alert alert-success py-2 small rounded-3';
+        alertEl.classList.remove('d-none');
+
+        setTimeout(() => {
+            const tab = document.getElementById('login-tab');
+            if (tab && window.bootstrap) bootstrap.Tab.getOrCreateInstance(tab).show();
+            document.getElementById('email').value = currentVerifyEmail;
+            document.getElementById('password').value = '';
+            backToRegisterForm();
+
+            const mainAlert = document.getElementById('authAlert');
+            mainAlert.textContent = 'Email đã được kích hoạt. Vui lòng đăng nhập.';
+            mainAlert.className = 'alert alert-success py-2 small rounded-3';
+            mainAlert.classList.remove('d-none');
+        }, 1200);
+
+    } catch (err) {
+        alertEl.textContent = err.message || 'Mã OTP không hợp lệ hoặc đã hết hạn.';
+        alertEl.className = 'alert alert-danger py-2 small rounded-3';
+        alertEl.classList.remove('d-none');
+    } finally {
+        btn.disabled = false;
+        spinner.classList.add('d-none');
+    }
+}
+
+async function handleResendOtp() {
+    if (!currentVerifyEmail) return;
+
+    const btn = document.getElementById('btnResendOtp');
+    const spinner = document.getElementById('resendSpinner');
+    const alertEl = document.getElementById('otpAlert');
+
+    btn.disabled = true;
+    spinner.classList.remove('d-none');
+    alertEl.classList.add('d-none');
+
+    try {
+        const res = await MilkTeaApi.post('/api/v1/auth/resend-otp', {
+            email: currentVerifyEmail
+        });
+        alertEl.textContent = res && res.message ? res.message : 'Đã gửi lại mã OTP.';
+        alertEl.className = 'alert alert-info py-2 small rounded-3';
+        alertEl.classList.remove('d-none');
+        startResendCooldown(60);
+    } catch (err) {
+        alertEl.textContent = err.message || 'Không thể gửi lại mã OTP.';
+        alertEl.className = 'alert alert-danger py-2 small rounded-3';
+        alertEl.classList.remove('d-none');
+        btn.disabled = false;
+    } finally {
+        spinner.classList.add('d-none');
+    }
+}
+
+// Quên mật khẩu
+function getOrInitForgotModal() {
+    const el = document.getElementById('forgotPasswordModal');
+    if (!el || !window.bootstrap || !bootstrap.Modal) return null;
+    return bootstrap.Modal.getOrCreateInstance(el);
+}
+
+function openForgotPasswordModal(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    backToStep1();
+    const alertEl = document.getElementById('forgotAlert');
+    alertEl.classList.add('d-none');
+    alertEl.textContent = '';
+
+    document.getElementById('forgotEmail').value =
+        document.getElementById('email').value.trim();
+
+    const modal = getOrInitForgotModal();
+    if (modal) modal.show();
+}
+
+function closeForgotPasswordModal() {
+    const modal = getOrInitForgotModal();
+    if (modal) modal.hide();
+}
+
+function backToStep1() {
+    document.getElementById('forgotStep1').classList.remove('d-none');
+    document.getElementById('forgotStep2').classList.add('d-none');
+    document.getElementById('forgotStep3').classList.add('d-none');
+    document.getElementById('forgotAlert').classList.add('d-none');
+    currentResetToken = '';
+    if (forgotResendTimer) clearInterval(forgotResendTimer);
+}
+
+function startForgotResendCooldown(seconds) {
+    forgotRemainingCooldown = seconds;
+    const btn = document.getElementById('btnResendResetOtp');
+    const text = document.getElementById('resendResetBtnText');
+    btn.disabled = true;
+    if (forgotResendTimer) clearInterval(forgotResendTimer);
+
+    forgotResendTimer = setInterval(() => {
+        forgotRemainingCooldown--;
+        if (forgotRemainingCooldown <= 0) {
+            clearInterval(forgotResendTimer);
+            btn.disabled = false;
+            text.textContent = 'Gửi lại mã OTP';
+        } else {
+            text.textContent = `Gửi lại sau (${forgotRemainingCooldown}s)`;
+        }
+    }, 1000);
+}
+
+async function handleRequestReset(e) {
+    e.preventDefault();
+
+    const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
+    const alertEl = document.getElementById('forgotAlert');
+    const btn = document.getElementById('btnSendReset');
+    const spinner = document.getElementById('sendResetSpinner');
+
+    if (!email) return;
+
+    alertEl.classList.add('d-none');
+    btn.disabled = true;
+    spinner.classList.remove('d-none');
+
+    try {
+        currentForgotEmail = email;
+        await MilkTeaApi.post('/api/v1/auth/password-reset', {email});
+
+        document.getElementById('forgotTargetEmail').textContent = email;
+        document.getElementById('forgotStep1').classList.add('d-none');
+        document.getElementById('forgotStep2').classList.remove('d-none');
+        document.getElementById('forgotStep3').classList.add('d-none');
+        document.getElementById('resetOtpInput').value = '';
+
+        startForgotResendCooldown(60);
+        if (MilkTeaApi.showToast) {
+            MilkTeaApi.showToast('Mã xác thực đã được gửi qua email', 'info');
+        }
+    } catch (err) {
+        alertEl.textContent = err.message || 'Không thể gửi mã xác thực.';
+        alertEl.classList.remove('d-none');
+    } finally {
+        btn.disabled = false;
+        spinner.classList.add('d-none');
+    }
+}
+
+async function handleVerifyResetOtp(e) {
+    e.preventDefault();
+
+    const email = currentForgotEmail;
+    const otp = document.getElementById('resetOtpInput').value.replace(/\s+/g, '');
+    const alertEl = document.getElementById('forgotAlert');
+    const btn = document.getElementById('btnVerifyResetOtp');
+    const spinner = document.getElementById('verifyResetOtpSpinner');
+
+    if (!/^[0-9]{6}$/.test(otp)) {
+        alertEl.textContent = 'Mã xác thực phải gồm đúng 6 chữ số!';
+        alertEl.classList.remove('d-none');
+        return;
+    }
+
+    alertEl.classList.add('d-none');
+    btn.disabled = true;
+    spinner.classList.remove('d-none');
+
+    try {
+        const res = await MilkTeaApi.post('/api/v1/auth/password-reset/verify-otp', {
+            email, otp
+        });
+
+        currentResetToken = res && res.resetToken ? res.resetToken : '';
+        if (!currentResetToken) {
+            throw new Error('Không nhận được vé xác thực từ hệ thống');
+        }
+
+        document.getElementById('forgotStep2').classList.add('d-none');
+        document.getElementById('forgotStep3').classList.remove('d-none');
+        document.getElementById('resetNewPassword').value = '';
+        document.getElementById('resetConfirmNewPassword').value = '';
+
+        if (MilkTeaApi.showToast) {
+            MilkTeaApi.showToast('OTP hợp lệ. Vui lòng đặt mật khẩu mới.', 'success');
+        }
+    } catch (err) {
+        alertEl.textContent = err.message || 'Mã OTP không hợp lệ hoặc đã hết hạn';
+        alertEl.classList.remove('d-none');
+    } finally {
+        btn.disabled = false;
+        spinner.classList.add('d-none');
+    }
+}
+
+async function handleResendResetOtp() {
+    if (!currentForgotEmail) return;
+
+    const btn = document.getElementById('btnResendResetOtp');
+    const spinner = document.getElementById('resendResetSpinner');
+    const alertEl = document.getElementById('forgotAlert');
+
+    btn.disabled = true;
+    spinner.classList.remove('d-none');
+    alertEl.classList.add('d-none');
+
+    try {
+        await MilkTeaApi.post('/api/v1/auth/password-reset', {
+            email: currentForgotEmail
+        });
+        startForgotResendCooldown(60);
+    } catch (err) {
+        alertEl.textContent = err.message || 'Không thể gửi lại mã xác thực.';
+        alertEl.classList.remove('d-none');
+        btn.disabled = false;
+    } finally {
+        spinner.classList.add('d-none');
+    }
+}
+
+async function handleConfirmReset(e) {
+    e.preventDefault();
+
+    const email = currentForgotEmail;
+    const newPassword = document.getElementById('resetNewPassword').value;
+    const confirmPass = document.getElementById('resetConfirmNewPassword').value;
+    const alertEl = document.getElementById('forgotAlert');
+    const btn = document.getElementById('btnConfirmReset');
+    const spinner = document.getElementById('confirmResetSpinner');
+
+    if (newPassword.length < 6) {
+        alertEl.textContent = 'Mật khẩu mới tối thiểu 6 ký tự!';
+        alertEl.classList.remove('d-none');
+        return;
+    }
+    if (newPassword !== confirmPass) {
+        alertEl.textContent = 'Mật khẩu xác nhận không khớp!';
+        alertEl.classList.remove('d-none');
+        return;
+    }
+
+    alertEl.classList.add('d-none');
+    btn.disabled = true;
+    spinner.classList.remove('d-none');
+
+    try {
+        const res = await MilkTeaApi.post('/api/v1/auth/password-reset/confirm', {
+            email,
+            token: currentResetToken,
+            newPassword
+        });
+
+        closeForgotPasswordModal();
+
+        const mainAlert = document.getElementById('authAlert');
+        mainAlert.textContent = res && res.message
+            ? res.message : 'Đặt lại mật khẩu thành công!';
+        mainAlert.className = 'alert alert-success py-2 small rounded-3';
+        mainAlert.classList.remove('d-none');
+
+        const tab = document.getElementById('login-tab');
+        if (tab && window.bootstrap) bootstrap.Tab.getOrCreateInstance(tab).show();
+
+        document.getElementById('email').value = email;
+        document.getElementById('password').value = '';
+
+    } catch (err) {
+        alertEl.textContent = err.message || 'Không thể đặt lại mật khẩu.';
+        alertEl.classList.remove('d-none');
+    } finally {
+        btn.disabled = false;
+        spinner.classList.add('d-none');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const modalEl = document.getElementById('forgotPasswordModal');
+    if (modalEl) {
+        modalEl.addEventListener('hidden.bs.modal', () => {
+            backToStep1();
+        });
+    }
+    const forgotLink = document.getElementById('forgotPasswordLink');
+    if (forgotLink) {
+        forgotLink.addEventListener('click', openForgotPasswordModal);
+    }
+});
+</script>
+</th:block>
 
-            async function handleLogin(e) {
-                e.preventDefault();
-                const email = document.getElementById('email').value.trim();
-                const password = document.getElementById('password').value;
-                const alertEl = document.getElementById('authAlert');
-                const btn = document.getElementById('loginBtn');
-                const spinner = document.getElementById('loginSpinner');
-
-                alertEl.classList.add('d-none');
-                alertEl.innerHTML = '';
-                btn.disabled = true;
-                spinner.classList.remove('d-none');
-
-                try {
-                    const data = await MilkTeaApi.post('/api/v1/auth/login', { email, password });
-                    if (MilkTeaApi.showToast) MilkTeaApi.showToast('Đăng nhập thành công!', 'success');
-
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const redirect = urlParams.get('redirect');
-
-                    setTimeout(() => {
-                        const role = data.role || (data.user && data.user.role);
-                        if (role === 'ADMIN') {
-                            window.location.href = '/admin';
-                        } else if (role === 'CASHIER' || role === 'KITCHEN') {
-                            window.location.href = role === 'KITCHEN' ? '/kitchen' : '/cashier';
-                        } else {
-                            // CUSTOMER hoặc Khách hàng thường
-                            // Only relative in-app navigation (never external redirects).
-                            let targetUrl = (redirect && redirect.startsWith('/') &&
-                                !redirect.startsWith('//') && !redirect.includes('\\') &&
-                                !redirect.includes('/login')) ? redirect : '/';
-
-                            // No legacy QR/table query restoration: table is assigned at POS only.
-                            window.location.href = targetUrl;
-                        }
-                    }, 500);
-
-                } catch (err) {
-                    alertEl.className = 'alert alert-danger py-2 small rounded-3';
-                    if (err.code === 'AUTH_EMAIL_NOT_VERIFIED') {
-                        currentVerifyEmail = email;
-                        alertEl.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-1"></i> ${err.message || 'Email chưa được xác thực.'} <br><a href="javascript:void(0)" onclick="openVerifyFromLogin()" class="fw-bold text-decoration-underline text-danger mt-1 d-inline-block"><i class="bi bi-shield-check me-1"></i>Nhập mã OTP kích hoạt tài khoản ngay</a>`;
-                    } else if (err.code === 'ACCESS_DENIED') {
-                        alertEl.innerHTML = `<i class="bi bi-lock-fill me-1"></i> ${err.message || 'Tài khoản đã bị tạm khóa bởi ban quản trị.'}`;
-                    } else {
-                        alertEl.textContent = err.message || 'Email hoặc mật khẩu không chính xác';
-                    }
-                    alertEl.classList.remove('d-none');
-                    btn.disabled = false;
-                    spinner.classList.add('d-none');
-                }
-            }
-
-            function openVerifyFromLogin() {
-                const regTabBtn = document.getElementById('register-tab');
-                if (regTabBtn) {
-                    const tab = new bootstrap.Tab(regTabBtn);
-                    tab.show();
-                }
-                showOtpVerificationScreen(currentVerifyEmail, currentVerifyEmail, 60);
-            }
-
-            async function handleRegister(e) {
-                e.preventDefault();
-                const fullName = document.getElementById('regFullName').value.trim();
-                const email = document.getElementById('regEmail').value.trim();
-                const phone = document.getElementById('regPhone').value.trim();
-                const password = document.getElementById('regPassword').value;
-                const confirmPass = document.getElementById('regConfirmPassword').value;
-                const alertEl = document.getElementById('authAlert');
-                const btn = document.getElementById('registerBtn');
-                const spinner = document.getElementById('registerSpinner');
-
-                if (!/^[0-9]{10}$/.test(phone)) {
-                    alertEl.textContent = 'Số điện thoại phải gồm đúng 10 chữ số';
-                    alertEl.className = 'alert alert-danger py-2 small rounded-3';
-                    alertEl.classList.remove('d-none');
-                    document.getElementById('regPhone').focus();
-                    return;
-                }
-
-                if (password !== confirmPass) {
-                    alertEl.textContent = 'Mật khẩu xác nhận không khớp!';
-                    alertEl.className = 'alert alert-danger py-2 small rounded-3';
-                    alertEl.classList.remove('d-none');
-                    return;
-                }
-
-                alertEl.classList.add('d-none');
-                btn.disabled = true;
-                spinner.classList.remove('d-none');
-
-                try {
-                    const res = await MilkTeaApi.post('/api/v1/auth/register', {
-                        fullName,
-                        email,
-                        phone,
-                        password
-                    });
-
-                    if (MilkTeaApi.showToast) MilkTeaApi.showToast('Đã gửi mã xác thực tới email của bạn!', 'info');
-                    
-                    const maskedEmail = res && res.maskedEmail ? res.maskedEmail : email;
-                    const cooldown = res && res.cooldownSeconds ? res.cooldownSeconds : 60;
-                    showOtpVerificationScreen(email, maskedEmail, cooldown);
-
-                } catch (err) {
-                    alertEl.textContent = err.message || 'Không thể đăng ký tài khoản';
-                    alertEl.className = 'alert alert-danger py-2 small rounded-3';
-                    alertEl.classList.remove('d-none');
-                } finally {
-                    btn.disabled = false;
-                    spinner.classList.add('d-none');
-                }
-            }
-
-            function showOtpVerificationScreen(rawEmail, displayEmail, cooldownSec) {
-                currentVerifyEmail = rawEmail;
-                document.getElementById('registerFormContainer').classList.add('d-none');
-                document.getElementById('registerOtpContainer').classList.remove('d-none');
-                document.getElementById('verifyTargetEmail').textContent = displayEmail;
-                document.getElementById('otpCodeInput').value = '';
-                document.getElementById('otpAlert').classList.add('d-none');
-                document.getElementById('authAlert').classList.add('d-none');
-
-                startResendCooldown(cooldownSec);
-                setTimeout(() => document.getElementById('otpCodeInput').focus(), 300);
-            }
-
-            function backToRegisterForm() {
-                document.getElementById('registerFormContainer').classList.remove('d-none');
-                document.getElementById('registerOtpContainer').classList.add('d-none');
-                document.getElementById('otpAlert').classList.add('d-none');
-                if (resendTimer) clearInterval(resendTimer);
-            }
-
-            function startResendCooldown(seconds) {
-                remainingCooldown = seconds;
-                const btn = document.getElementById('btnResendOtp');
-                const textSpan = document.getElementById('resendBtnText');
-
-                btn.disabled = true;
-                if (resendTimer) clearInterval(resendTimer);
-
-                resendTimer = setInterval(() => {
-                    remainingCooldown--;
-                    if (remainingCooldown <= 0) {
-                        clearInterval(resendTimer);
-                        btn.disabled = false;
-                        textSpan.textContent = 'Gửi lại mã OTP';
-                    } else {
-                        textSpan.textContent = `Gửi lại sau (${remainingCooldown}s)`;
-                    }
-                }, 1000);
-            }
-
-            async function handleVerifyOtp(e) {
-                e.preventDefault();
-                const otp = document.getElementById('otpCodeInput').value.trim();
-                const alertEl = document.getElementById('otpAlert');
-                const btn = document.getElementById('btnVerifyOtp');
-                const spinner = document.getElementById('verifySpinner');
-
-                if (!/^[0-9]{6}$/.test(otp)) {
-                    alertEl.textContent = 'Vui lòng nhập đúng 6 chữ số mã xác thực.';
-                    alertEl.className = 'alert alert-danger py-2 small rounded-3';
-                    alertEl.classList.remove('d-none');
-                    return;
-                }
-
-                alertEl.classList.add('d-none');
-                btn.disabled = true;
-                spinner.classList.remove('d-none');
-
-                try {
-                    const res = await MilkTeaApi.post('/api/v1/auth/verify-email', {
-                        email: currentVerifyEmail,
-                        otp: otp
-                    });
-
-                    if (MilkTeaApi.showToast) MilkTeaApi.showToast('Kích hoạt tài khoản thành công!', 'success');
-                    
-                    alertEl.textContent = res && res.message ? res.message : 'Kích hoạt tài khoản thành công! Đang chuyển đến màn hình đăng nhập...';
-                    alertEl.className = 'alert alert-success py-2 small rounded-3';
-                    alertEl.classList.remove('d-none');
-
-                    setTimeout(() => {
-                        const loginTabBtn = document.getElementById('login-tab');
-                        if (loginTabBtn) {
-                            const tab = new bootstrap.Tab(loginTabBtn);
-                            tab.show();
-                        }
-                        document.getElementById('email').value = currentVerifyEmail;
-                        document.getElementById('password').value = '';
-                        document.getElementById('password').focus();
-
-                        const mainAlert = document.getElementById('authAlert');
-                        mainAlert.textContent = 'Email đã được kích hoạt thành công. Vui lòng đăng nhập để tiếp tục.';
-                        mainAlert.className = 'alert alert-success py-2 small rounded-3';
-                        mainAlert.classList.remove('d-none');
-
-                        backToRegisterForm();
-                    }, 1200);
-
-                } catch (err) {
-                    alertEl.textContent = err.message || 'Mã xác thực không hợp lệ hoặc đã hết hạn.';
-                    alertEl.className = 'alert alert-danger py-2 small rounded-3';
-                    alertEl.classList.remove('d-none');
-                } finally {
-                    btn.disabled = false;
-                    spinner.classList.add('d-none');
-                }
-            }
-
-            async function handleResendOtp() {
-                if (!currentVerifyEmail) return;
-                const btn = document.getElementById('btnResendOtp');
-                const spinner = document.getElementById('resendSpinner');
-                const alertEl = document.getElementById('otpAlert');
-
-                btn.disabled = true;
-                spinner.classList.remove('d-none');
-                alertEl.classList.add('d-none');
-
-                try {
-                    const res = await MilkTeaApi.post('/api/v1/auth/resend-otp', { email: currentVerifyEmail });
-                    if (MilkTeaApi.showToast) MilkTeaApi.showToast('Đã gửi lại mã xác thực mới!', 'info');
-                    
-                    alertEl.textContent = res && res.message ? res.message : 'Đã gửi lại mã xác thực mới vào email của bạn.';
-                    alertEl.className = 'alert alert-info py-2 small rounded-3';
-                    alertEl.classList.remove('d-none');
-
-                    startResendCooldown(60);
-                } catch (err) {
-                    alertEl.textContent = err.message || 'Không thể gửi lại mã xác thực lúc này.';
-                    alertEl.className = 'alert alert-danger py-2 small rounded-3';
-                    alertEl.classList.remove('d-none');
-                    btn.disabled = false;
-                } finally {
-                    spinner.classList.add('d-none');
-                }
-            }
-
-            function getOrInitForgotModal() {
-                const el = document.getElementById('forgotPasswordModal');
-                if (!el) return null;
-                if (window.bootstrap && window.bootstrap.Modal) {
-                    return bootstrap.Modal.getOrCreateInstance(el);
-                }
-                return null;
-            }
-
-            function openForgotPasswordModal(e) {
-                if (e) {
-                    if (typeof e.preventDefault === 'function') e.preventDefault();
-                    if (typeof e.stopPropagation === 'function') e.stopPropagation();
-                }
-                backToStep1();
-                const alertEl = document.getElementById('forgotAlert');
-                if (alertEl) {
-                    alertEl.classList.add('d-none');
-                    alertEl.textContent = '';
-                }
-                const inputEmail = document.getElementById('email') ? document.getElementById('email').value.trim() : '';
-                const forgotEmailInput = document.getElementById('forgotEmail');
-                if (forgotEmailInput) {
-                    forgotEmailInput.value = inputEmail || '';
-                }
-
-                const modal = getOrInitForgotModal();
-                if (modal) {
-                    modal.show();
-                } else {
-                    const el = document.getElementById('forgotPasswordModal');
-                    if (el) {
-                        el.classList.add('show');
-                        el.style.display = 'block';
-                        el.removeAttribute('aria-hidden');
-                        document.body.classList.add('modal-open');
-                        let backdrop = document.querySelector('.modal-backdrop');
-                        if (!backdrop) {
-                            backdrop = document.createElement('div');
-                            backdrop.className = 'modal-backdrop fade show';
-                            document.body.appendChild(backdrop);
-                        }
-                    }
-                }
-            }
-
-            function closeForgotPasswordModal() {
-                const modal = getOrInitForgotModal();
-                if (modal) {
-                    modal.hide();
-                }
-                const el = document.getElementById('forgotPasswordModal');
-                if (el) {
-                    el.classList.remove('show');
-                    el.style.display = 'none';
-                    el.setAttribute('aria-hidden', 'true');
-                }
-                document.body.classList.remove('modal-open');
-                const backdrop = document.querySelector('.modal-backdrop');
-                if (backdrop) backdrop.remove();
-            }
-
-            function backToStep1() {
-                const s1 = document.getElementById('forgotStep1');
-                const s2 = document.getElementById('forgotStep2');
-                const s3 = document.getElementById('forgotStep3');
-                const alertEl = document.getElementById('forgotAlert');
-                if (s1) s1.classList.remove('d-none');
-                if (s2) s2.classList.add('d-none');
-                if (s3) s3.classList.add('d-none');
-                if (alertEl) {
-                    alertEl.classList.add('d-none');
-                    alertEl.textContent = '';
-                }
-                currentResetToken = '';
-                if (forgotResendTimer) clearInterval(forgotResendTimer);
-            }
-
-            function startForgotResendCooldown(seconds) {
-                forgotRemainingCooldown = seconds;
-                const btn = document.getElementById('btnResendResetOtp');
-                const textSpan = document.getElementById('resendResetBtnText');
-                if (!btn || !textSpan) return;
-
-                btn.disabled = true;
-                if (forgotResendTimer) clearInterval(forgotResendTimer);
-
-                forgotResendTimer = setInterval(() => {
-                    forgotRemainingCooldown--;
-                    if (forgotRemainingCooldown <= 0) {
-                        clearInterval(forgotResendTimer);
-                        btn.disabled = false;
-                        textSpan.textContent = 'Gửi lại mã OTP';
-                    } else {
-                        textSpan.textContent = `Gửi lại sau (${forgotRemainingCooldown}s)`;
-                    }
-                }, 1000);
-            }
-
-            async function handleRequestReset(e) {
-                e.preventDefault();
-                const emailInput = document.getElementById('forgotEmail');
-                const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
-                const alertEl = document.getElementById('forgotAlert');
-                const btn = document.getElementById('btnSendReset');
-                const spinner = document.getElementById('sendResetSpinner');
-
-                if (!email) return;
-
-                alertEl.classList.add('d-none');
-                alertEl.textContent = '';
-                btn.disabled = true;
-                spinner.classList.remove('d-none');
-
-                try {
-                    currentForgotEmail = email;
-                    await MilkTeaApi.post('/api/v1/auth/password-reset', { email });
-
-                    document.getElementById('forgotTargetEmail').textContent = email;
-                    document.getElementById('forgotStep1').classList.add('d-none');
-                    document.getElementById('forgotStep2').classList.remove('d-none');
-                    document.getElementById('forgotStep3').classList.add('d-none');
-                    const otpInput = document.getElementById('resetOtpInput');
-                    if (otpInput) otpInput.value = '';
-
-                    startForgotResendCooldown(60);
-
-                    if (MilkTeaApi.showToast) MilkTeaApi.showToast('Mã xác thực đã được gửi qua email', 'info');
-                    setTimeout(() => {
-                        if (otpInput) otpInput.focus();
-                    }, 300);
-                } catch (err) {
-                    alertEl.textContent = err.message || 'Không thể xử lý yêu cầu đặt lại mật khẩu';
-                    alertEl.classList.remove('d-none');
-                } finally {
-                    btn.disabled = false;
-                    spinner.classList.add('d-none');
-                }
-            }
-
-            async function handleVerifyResetOtp(e) {
-                e.preventDefault();
-                const email = currentForgotEmail || (document.getElementById('forgotEmail') ? document.getElementById('forgotEmail').value.trim().toLowerCase() : '');
-                const otpInput = document.getElementById('resetOtpInput');
-                const otp = otpInput ? otpInput.value.replace(/\s+/g, '') : '';
-                const alertEl = document.getElementById('forgotAlert');
-                const btn = document.getElementById('btnVerifyResetOtp');
-                const spinner = document.getElementById('verifyResetOtpSpinner');
-
-                if (!/^[0-9]{6}$/.test(otp)) {
-                    alertEl.textContent = 'Mã xác thực phải gồm đúng 6 chữ số!';
-                    alertEl.classList.remove('d-none');
-                    if (otpInput) otpInput.focus();
-                    return;
-                }
-
-                alertEl.classList.add('d-none');
-                alertEl.textContent = '';
-                btn.disabled = true;
-                spinner.classList.remove('d-none');
-
-                try {
-                    const res = await MilkTeaApi.post('/api/v1/auth/password-reset/verify-otp', {
-                        email,
-                        otp
-                    });
-
-                    currentResetToken = res && res.resetToken ? res.resetToken : '';
-                    if (!currentResetToken) {
-                        throw new Error('Không nhận được vé xác thực từ hệ thống');
-                    }
-
-                    // Chuyển sang Bước 3: Mở form đặt lại mật khẩu mới
-                    document.getElementById('forgotStep2').classList.add('d-none');
-                    document.getElementById('forgotStep3').classList.remove('d-none');
-                    const newPassInput = document.getElementById('resetNewPassword');
-                    const confirmPassInput = document.getElementById('resetConfirmNewPassword');
-                    if (newPassInput) newPassInput.value = '';
-                    if (confirmPassInput) confirmPassInput.value = '';
-
-                    if (MilkTeaApi.showToast) MilkTeaApi.showToast('Xác thực mã OTP thành công! Vui lòng đặt mật khẩu mới.', 'success');
-                    setTimeout(() => {
-                        if (newPassInput) newPassInput.focus();
-                    }, 300);
-
-                } catch (err) {
-                    alertEl.textContent = err.message || 'Mã xác thực không hợp lệ hoặc đã hết hạn';
-                    alertEl.classList.remove('d-none');
-                } finally {
-                    btn.disabled = false;
-                    spinner.classList.add('d-none');
-                }
-            }
-
-            async function handleResendResetOtp() {
-                if (!currentForgotEmail) return;
-                const btn = document.getElementById('btnResendResetOtp');
-                const spinner = document.getElementById('resendResetSpinner');
-                const alertEl = document.getElementById('forgotAlert');
-
-                btn.disabled = true;
-                spinner.classList.remove('d-none');
-                alertEl.classList.add('d-none');
-
-                try {
-                    await MilkTeaApi.post('/api/v1/auth/password-reset', { email: currentForgotEmail });
-                    if (MilkTeaApi.showToast) MilkTeaApi.showToast('Đã gửi lại mã xác thực mới!', 'info');
-                    startForgotResendCooldown(60);
-                } catch (err) {
-                    alertEl.textContent = err.message || 'Không thể gửi lại mã xác thực lúc này.';
-                    alertEl.classList.remove('d-none');
-                    btn.disabled = false;
-                } finally {
-                    spinner.classList.add('d-none');
-                }
-            }
-
-            async function handleConfirmReset(e) {
-                e.preventDefault();
-                const email = currentForgotEmail || (document.getElementById('forgotEmail') ? document.getElementById('forgotEmail').value.trim().toLowerCase() : '');
-                const newPassword = document.getElementById('resetNewPassword') ? document.getElementById('resetNewPassword').value : '';
-                const confirmPass = document.getElementById('resetConfirmNewPassword') ? document.getElementById('resetConfirmNewPassword').value : '';
-                const alertEl = document.getElementById('forgotAlert');
-                const btn = document.getElementById('btnConfirmReset');
-                const spinner = document.getElementById('confirmResetSpinner');
-
-                if (newPassword.length < 6) {
-                    alertEl.textContent = 'Mật khẩu mới tối thiểu 6 ký tự!';
-                    alertEl.classList.remove('d-none');
-                    const passInput = document.getElementById('resetNewPassword');
-                    if (passInput) passInput.focus();
-                    return;
-                }
-
-                if (newPassword !== confirmPass) {
-                    alertEl.textContent = 'Mật khẩu xác nhận không khớp!';
-                    alertEl.classList.remove('d-none');
-                    const confirmPassInput = document.getElementById('resetConfirmNewPassword');
-                    if (confirmPassInput) confirmPassInput.focus();
-                    return;
-                }
-
-                alertEl.classList.add('d-none');
-                alertEl.textContent = '';
-                btn.disabled = true;
-                spinner.classList.remove('d-none');
-
-                try {
-                    const res = await MilkTeaApi.post('/api/v1/auth/password-reset/confirm', {
-                        email,
-                        token: currentResetToken,
-                        newPassword
-                    });
-
-                    closeForgotPasswordModal();
-
-                    const mainAlert = document.getElementById('authAlert');
-                    if (mainAlert) {
-                        mainAlert.textContent = res && res.message ? res.message : 'Đặt lại mật khẩu thành công! Bạn có thể đăng nhập bằng mật khẩu mới.';
-                        mainAlert.className = 'alert alert-success py-2 small rounded-3';
-                        mainAlert.classList.remove('d-none');
-                    }
-
-                    // Chuyển sang tab login và điền sẵn email
-                    const tabBtn = document.getElementById('login-tab');
-                    if (tabBtn && window.bootstrap && window.bootstrap.Tab) {
-                        const tab = bootstrap.Tab.getOrCreateInstance(tabBtn);
-                        tab.show();
-                    }
-                    if (document.getElementById('email')) document.getElementById('email').value = email;
-                    if (document.getElementById('password')) {
-                        document.getElementById('password').value = '';
-                        document.getElementById('password').focus();
-                    }
-
-                    if (MilkTeaApi.showToast) MilkTeaApi.showToast('Đặt lại mật khẩu thành công!', 'success');
-
-                } catch (err) {
-                    alertEl.textContent = err.message || 'Không thể đặt lại mật khẩu hoặc phiên khôi phục đã hết hạn';
-                    alertEl.classList.remove('d-none');
-                } finally {
-                    btn.disabled = false;
-                    spinner.classList.add('d-none');
-                }
-            }
-
-            document.addEventListener('DOMContentLoaded', () => {
-                const modalEl = document.getElementById('forgotPasswordModal');
-                if (modalEl) {
-                    modalEl.addEventListener('hidden.bs.modal', () => {
-                        backToStep1();
-                        const alertEl = document.getElementById('forgotAlert');
-                        if (alertEl) alertEl.classList.add('d-none');
-                    });
-                }
-                const link = document.getElementById('forgotPasswordLink');
-                if (link) {
-                    link.addEventListener('click', openForgotPasswordModal);
-                }
-            });
-        </script>
-    </th:block>
 </body>
-
 </html>

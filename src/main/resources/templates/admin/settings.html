@@ -11,7 +11,7 @@
     <div th:fragment="content" class="container-fluid py-4 px-lg-4 admin-settings-page">
         <style>
             .admin-settings-page {
-                --settings-primary: #565c45;
+                --settings-primary: var(--primary-color, #565c45);
                 --settings-primary-hover: #3e4837;
                 --settings-primary-light: #f0f0e8;
                 --settings-secondary: #717763;
@@ -33,8 +33,6 @@
             .admin-settings-page *::before,
             .admin-settings-page *::after {
                 box-sizing: border-box;
-                animation: none !important;
-                transition: none !important;
             }
 
             .admin-settings-page .admin-sidebar {
@@ -187,7 +185,7 @@
             }
 
             .admin-settings-page .form-control::placeholder {
-                color: #A58A74;
+                color: #a1aa9e;
                 font-weight: 400;
             }
 
@@ -291,14 +289,19 @@
                 min-width: 0;
             }
 
-            .admin-settings-page .settings-logo-upload .input-group {
-                flex-wrap: nowrap;
+            .admin-settings-page .settings-logo-upload-row {
+                display: flex;
+                align-items: stretch;
+                gap: 12px;
+                width: 100%;
             }
 
             .admin-settings-page #shopLogoInput {
                 min-width: 0;
-                padding: 7px 9px;
-                border-radius: 12px 0 0 12px !important;
+                width: 100%;
+                flex: 1 1 auto;
+                padding: 10px 12px;
+                border-radius: 12px !important;
             }
 
             .admin-settings-page #shopLogoInput::file-selector-button {
@@ -306,10 +309,21 @@
                 color: var(--settings-primary-hover);
                 border: none;
                 border-radius: 8px;
-                padding: 7px 12px;
+                padding: 8px 12px;
                 margin-right: 12px;
                 font-weight: 600;
                 cursor: pointer;
+            }
+
+            .admin-settings-page .settings-logo-upload-btn {
+                min-width: 138px;
+                height: auto;
+                border-radius: 12px !important;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                white-space: nowrap;
+                flex-shrink: 0;
             }
 
             .admin-settings-page .btn {
@@ -528,8 +542,8 @@
                     align-items: flex-start !important;
                 }
 
-                .admin-settings-page .settings-logo-upload .input-group {
-                    flex-wrap: wrap;
+                .admin-settings-page .settings-logo-upload-row {
+                    flex-direction: column;
                     gap: 8px;
                 }
 
@@ -538,8 +552,9 @@
                     border-radius: 12px !important;
                 }
 
-                .admin-settings-page #btnUploadLogo {
+                .admin-settings-page .settings-logo-upload-btn {
                     width: 100%;
+                    min-width: 100%;
                     border-radius: 12px !important;
                 }
 
@@ -671,14 +686,14 @@
                                             </div>
 
                                             <div class="flex-grow-1 settings-logo-upload">
-                                                <div class="input-group">
+                                                <div class="settings-logo-upload-row">
                                                     <input type="file"
                                                            id="shopLogoInput"
                                                            class="form-control"
                                                            accept="image/jpeg,image/png,image/webp">
 
                                                     <button type="button"
-                                                            class="btn btn-primary"
+                                                            class="btn btn-primary settings-logo-upload-btn"
                                                             id="btnUploadLogo"
                                                             onclick="AdminApp.uploadLogo(document.getElementById('shopLogoInput'))">
                                                         <span class="spinner-border spinner-border-sm me-1 d-none"
@@ -698,6 +713,10 @@
                                     <h6 class="text-uppercase text-muted fw-bold small mb-3 border-bottom pb-2 settings-section-title">
                                         Chương trình khuyến mãi
                                     </h6>
+                                    <div class="alert alert-light border rounded-3 d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                                        <span class="small">Giảm tự động dưới đây dành cho hóa đơn POS. Mã <strong>GIAMGIA10</strong> và các mã tự tạo dành cho giao hàng online được quản lý riêng.</span>
+                                        <a th:href="@{/merchant}" class="btn btn-outline-success btn-sm">Tạo / quản lý mã giảm giá <i class="bi bi-arrow-right"></i></a>
+                                    </div>
 
                                     <div class="mb-4">
                                         <label class="form-label fw-semibold">
@@ -747,7 +766,7 @@
                                         </div>
 
                                         <small class="text-muted" id="discountHelpText">
-                                            Áp dụng trực tiếp vào tổng tiền khi khách đặt đơn hoặc thu ngân tạo đơn.
+                                            Áp dụng trực tiếp cho đơn POS tại quầy; đơn giao hàng dùng mã voucher ở bước thanh toán.
                                         </small>
                                     </div>
 
@@ -812,8 +831,8 @@
 
                                 <h4 class="fw-bold tracking-wider mb-3 text-light"
                                     id="previewBankNumber"
-                                    th:text="${settings?.bankAccountNumber != null ? settings.bankAccountNumber : '0987654321'}">
-                                    0987654321
+                                    th:text="${settings?.bankAccountNumber != null ? settings.bankAccountNumber : '1206999906'}">
+                                    1206999906
                                 </h4>
 
                                 <div class="d-flex justify-content-between">
@@ -847,18 +866,6 @@
                                 <h6 class="fw-bold mb-3">
                                     <i class="bi bi-info-circle-fill text-primary me-2"></i>Lưu ý cấu hình
                                 </h6>
-
-                                <ul class="text-muted small ps-3 mb-0 d-flex flex-column gap-2">
-                                    <li>
-                                        Thông tin tài khoản được dùng để hướng dẫn chuyển khoản và đối soát thanh toán.
-                                    </li>
-                                    <li>
-                                        Tỷ lệ giảm giá (%) áp dụng cho các đơn hàng tạo sau khi lưu cấu hình.
-                                    </li>
-                                    <li>
-                                        Đơn hàng cũ giữ nguyên snapshot giá và giảm giá tại thời điểm đặt đơn.
-                                    </li>
-                                </ul>
                             </div>
                         </div>
                     </div>

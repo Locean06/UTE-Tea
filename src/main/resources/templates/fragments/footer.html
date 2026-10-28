@@ -24,17 +24,18 @@
              <h3>Tài khoản</h3>
              <a th:href="@{/login}">Đăng nhập</a>
              <a th:href="@{/cart}">Giỏ hàng</a>
-             <a th:href="@{/orders}" sec:authorize="hasRole('CUSTOMER')">Đơn hàng</a>
+             <a th:href="@{/my-orders}" sec:authorize="hasRole('CUSTOMER')">Đơn hàng của tôi</a>
              <a th:href="@{/profile}">Trang cá nhân</a>
            </div>
            <div class="col-lg-4 col-md-6">
-             <h3>Ghé thăm UTE Tea</h3>
-             <p><i class="bi bi-geo-alt me-2"></i><span th:text="${settings != null and settings.address != null and !settings.address.isEmpty() ? settings.address : 'Thông tin địa chỉ sẽ được cập nhật tại cửa hàng'}">Địa chỉ cửa hàng</span></p>
-             <p><i class="bi bi-cup-hot me-2"></i>Chọn món dễ dàng, theo dõi đơn trong tài khoản của bạn.</p>
+             <h3>Chi nhánh UTE Tea</h3>
+             <ul id="uteFooterBranches" aria-live="polite" class="list-unstyled mb-2">
+               <li class="small text-white-50">Đang tải chi nhánh...</li>
+             </ul>
            </div>
          </div>
          <div class="ute-footer-bottom d-flex flex-wrap align-items-center justify-content-between gap-2">
-           <span>© 2026 UTE Tea. Tinh vị trà, chạm vị thanh xuân.</span>
+           <span>© 2026 UTE Tea. </span>
            <span>Thực hiện với Spring Boot · Thymeleaf · Bootstrap</span>
          </div>
        </div>

@@ -18,7 +18,7 @@
          <button type="button" class="btn btn-primary" id="confirmationTransferBtn"><i class="bi bi-bank"></i> Tôi đã chuyển khoản</button>
        </div>
     </div>
-    <div class="confirmation-footer"><a th:href="@{/}" class="btn btn-outline-secondary">Về thực đơn</a><a th:href="@{/orders}" class="btn btn-link">Lịch sử đơn hàng (cần đăng nhập)</a></div>
+    <div class="confirmation-footer"><a th:href="@{/}" class="btn btn-outline-secondary">Về thực đơn</a><a th:href="@{/my-orders(tab='counter')}" class="btn btn-primary-custom">Đơn hàng của tôi</a></div>
   </section>
 </main>
 <th:block th:fragment="scripts"><script th:src="@{/js/customer/order-confirmation.js}"></script></th:block>

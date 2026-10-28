@@ -33,8 +33,15 @@ public class SettingsService {
                         .build());
 
         String discountType = settings.getDiscountType() != null ? settings.getDiscountType() : "PERCENT";
-        BigDecimal discountValue = settings.getDiscountValue() != null ? settings.getDiscountValue()
-                : settings.getDiscountPercent();
+        // Align the public POS quote with OrderService.computeDiscount: old seed data
+        // stores TyLeGiam=10 while GiaTriGiam is still 0.
+        BigDecimal discountValue = settings.getDiscountValue();
+        if ("PERCENT".equalsIgnoreCase(discountType) &&
+                (discountValue == null || discountValue.signum() == 0) &&
+                settings.getDiscountPercent() != null) {
+            discountValue = settings.getDiscountPercent();
+        }
+        if (discountValue == null) discountValue = BigDecimal.ZERO;
 
         return SettingsDto.ShopInfoResponse.builder()
                 .shopName(settings.getShopName())

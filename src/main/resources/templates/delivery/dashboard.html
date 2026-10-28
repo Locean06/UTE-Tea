@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main :: html(~{::content}, ~{::scripts})}">
+<body>
+<main th:fragment="content" class="container-fluid shipper-workspace px-3 px-lg-4 py-4">
+    <header class="shipper-page-header">
+        <div class="shipper-page-intro">
+            <div class="shipper-breadcrumb"><span>UTE TEA</span><i class="bi bi-chevron-right" aria-hidden="true"></i><span>GIAO HÀNG</span></div>
+            <h1>Đơn giao của bạn <span class="shipper-title-symbol" aria-hidden="true"><i class="bi bi-truck"></i></span></h1>
+        </div>
+        <div class="shipper-header-actions">
+            <span id="shipperLastUpdated" class="shipper-updated" aria-live="polite">Đang đồng bộ...</span>
+            <button id="shipperRefresh" class="shipper-refresh" type="button">
+                <i class="bi bi-arrow-clockwise" aria-hidden="true"></i><span>Làm mới</span>
+            </button>
+        </div>
+    </header>
+
+    <div id="shipperNotice" class="shipper-notice d-none" role="status" aria-live="polite"></div>
+
+    <section class="shipper-overview" aria-labelledby="shipperSummaryHeading">
+        <div class="shipper-section-heading">
+            <div>
+                <h2 id="shipperSummaryHeading">Tình hình giao hàng</h2>
+                <p>Số liệu của tất cả đơn đã phân công cho bạn</p>
+            </div>
+        </div>
+        <div class="shipper-stat-grid">
+            <article class="shipper-stat-card shipper-stat-card--waiting">
+                <div class="shipper-stat-top"><span>Chờ nhận giao</span><span class="shipper-stat-icon"><i class="bi bi-box-seam" aria-hidden="true"></i></span></div>
+                <div class="shipper-stat-bottom"><strong id="statWaiting">—</strong><span>Đơn cần bắt đầu giao</span></div>
+            </article>
+            <article class="shipper-stat-card shipper-stat-card--shipping">
+                <div class="shipper-stat-top"><span>Đang vận chuyển</span><span class="shipper-stat-icon"><i class="bi bi-bicycle" aria-hidden="true"></i></span></div>
+                <div class="shipper-stat-bottom"><strong id="statShipping">—</strong><span>Đơn đang trên đường giao</span></div>
+            </article>
+            <article class="shipper-stat-card shipper-stat-card--delivered">
+                <div class="shipper-stat-top"><span>Đã giao thành công</span><span class="shipper-stat-icon"><i class="bi bi-check2-circle" aria-hidden="true"></i></span></div>
+                <div class="shipper-stat-bottom"><strong id="statDelivered">—</strong><span>Đơn đã hoàn thành</span></div>
+            </article>
+        </div>
+    </section>
+
+    <div class="shipper-layout">
+        <section class="shipper-orders-panel" id="shipperOrdersSection" aria-labelledby="shipperOrdersHeading">
+            <div class="shipper-panel-heading">
+                <div>
+                    <div class="shipper-eyebrow">DANH SÁCH CÔNG VIỆC</div>
+                    <h2 id="shipperOrdersHeading">Đơn được phân công <span class="shipper-count" id="shipperFilteredCount">0</span></h2>
+                </div>
+            </div>
+            <div class="shipper-filter-area">
+                <div class="shipper-tabs" role="group" aria-label="Lọc đơn theo tiến độ">
+                    <button class="shipper-tab is-active" type="button" data-shipper-filter="active" aria-pressed="true">Cần xử lý <span id="tabActiveCount">0</span></button>
+                    <button class="shipper-tab" type="button" data-shipper-filter="done" aria-pressed="false">Hoàn tất <span id="tabDoneCount">0</span></button>
+                    <button class="shipper-tab" type="button" data-shipper-filter="all" aria-pressed="false">Tất cả <span id="tabAllCount">0</span></button>
+                </div>
+                <label class="shipper-search">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                    <span class="visually-hidden">Tìm đơn theo mã, tên người nhận hoặc số điện thoại</span>
+                    <input id="shipperSearch" type="search" autocomplete="off" placeholder="Tìm mã đơn, tên, SĐT...">
+                </label>
+            </div>
+            <div id="shipperOrdersList" class="shipper-order-list" aria-live="polite">
+                <p class="shipper-loading"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang tải đơn giao hàng...</p>
+            </div>
+            <div class="shipper-empty d-none" id="shipperEmpty">
+                <span class="shipper-empty-illustration"><i class="bi bi-inbox" aria-hidden="true"></i></span>
+                <h3 id="shipperEmptyTitle">Không có đơn cần xử lý</h3>
+                <p id="shipperEmptyText">Khi cửa hàng phân công đơn, bạn sẽ thấy ở đây.</p>
+            </div>
+        </section>
+
+        <aside class="shipper-sidebar" aria-labelledby="shipperPerformanceHeading">
+            <div class="shipper-insight-card">
+                <div class="shipper-eyebrow">THỐNG KÊ CÁ NHÂN</div>
+                <h2 id="shipperPerformanceHeading">Kết quả giao hàng</h2>
+                <div class="shipper-rate-line">
+                    <strong id="shipperRate">0%</strong><span>Tỷ lệ thành công</span>
+                </div>
+                <div class="shipper-progress" id="shipperScore" role="progressbar" aria-label="Tỷ lệ giao thành công" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                    <span class="shipper-progress-fill" id="shipperProgressFill"></span>
+                </div>
+                <p class="shipper-rate-note">Tính trên các đơn đã giao xong hoặc giao thất bại.</p>
+                <div class="shipper-insight-list">
+                    <div><span><i class="bi bi-collection" aria-hidden="true"></i> Tổng được phân công</span><strong id="statAssigned">—</strong></div>
+                    <div><span><i class="bi bi-check-circle" aria-hidden="true"></i> Giao thành công</span><strong id="resultDelivered">—</strong></div>
+                    <div><span><i class="bi bi-x-circle" aria-hidden="true"></i> Giao thất bại</span><strong id="statFailed">—</strong></div>
+                </div>
+                <div class="shipper-cod-summary">
+                    <span><i class="bi bi-cash-stack" aria-hidden="true"></i> COD đơn đã giao</span>
+                    <strong id="resultCOD">0 ₫</strong>
+                    <small>Chỉ là tổng giá trị đơn COD đã ghi nhận; không phải số tiền đã đối soát.</small>
+                </div>
+            </div>
+            <div class="shipper-help-card">
+                <i class="bi bi-info-circle" aria-hidden="true"></i>
+                <div><strong>Cách cập nhật đơn</strong><p>Chọn <b>Bắt đầu giao</b> khi nhận đơn. Sau khi giao, xác nhận <b>Thành công</b> hoặc <b>Thất bại</b>.</p></div>
+            </div>
+        </aside>
+    </div>
+</main>
+<th:block th:fragment="scripts">
+    <link rel="stylesheet" th:href="@{/css/delivery-dashboard.css}">
+    <script defer th:src="@{/js/delivery/dashboard.js}"></script>
+</th:block>
+</body></html>

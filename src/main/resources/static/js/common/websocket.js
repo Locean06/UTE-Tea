@@ -18,11 +18,24 @@ const MilkTeaRealtime = (() => {
             return;
         }
 
+        // The SocketJS/STOMP CDN can be unavailable. Never prevent the HTTP inbox/POS
+        // from loading when optional realtime dependencies fail to load.
+        if (typeof SockJS !== 'function' || typeof Stomp === 'undefined' || typeof Stomp.over !== 'function') {
+            console.warn('WebSocket client unavailable; pages will continue using HTTP refresh.');
+            return;
+        }
         console.log('Đang kết nối WebSocket STOMP tới /ws...');
         isConnecting = true;
-        const socket = new SockJS('/ws');
-        stompClient = Stomp.over(socket);
-        stompClient.debug = null; // Tắt debug log rác trong console
+        try {
+            const socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+            stompClient.debug = null; // Tắt debug log rác trong console
+        } catch (error) {
+            isConnecting = false;
+            isConnected = false;
+            console.warn('Không khởi tạo được WebSocket, vẫn tải dữ liệu qua API:', error);
+            return;
+        }
 
         // Đính kèm token guest nếu có
         const connectHeaders = { ...headers };
@@ -35,7 +48,11 @@ const MilkTeaRealtime = (() => {
             }
         }
 
-        stompClient.connect(connectHeaders, onConnected, onError);
+        try {
+            stompClient.connect(connectHeaders, onConnected, onError);
+        } catch (error) {
+            onError(error);
+        }
     }
 
     function onConnected(frame) {

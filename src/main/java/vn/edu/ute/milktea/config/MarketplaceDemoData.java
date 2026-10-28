@@ -4,6 +4,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import vn.edu.ute.milktea.entity.account.*;
 import vn.edu.ute.milktea.entity.catalog.*;
@@ -17,10 +19,23 @@ import java.math.BigDecimal;
 @Component @Profile("demo") @Order(10) @RequiredArgsConstructor
 public class MarketplaceDemoData implements CommandLineRunner {
  private final AccountRepository accounts;private final ShopRepository shops;private final CategoryRepository categories;private final ProductRepository products;private final CarrierRepository carriers;
+ private final PasswordEncoder passwordEncoder;
+ @Value("${app.demo.shipper-password:Password@123}") private String demoShipperPassword;
  @Override @Transactional public void run(String...args){
+  // Keep a separately hashed shipper demo login even when shops already exist.
+  // This fixture ONLY runs under the demo profile; never on production.
+  accounts.findByEmail("shipper@ute-tea.demo").ifPresentOrElse(
+   existing -> { if(existing.getRole()!=Role.SHIPPER)throw new IllegalStateException("Demo shipper email is assigned to another role"); },
+   () -> accounts.save(Account.builder()
+    .email("shipper@ute-tea.demo")
+    .passwordHash(passwordEncoder.encode(demoShipperPassword))
+    .fullName("Nguyễn Minh Giao - Nhân viên giao hàng")
+    .phone("0901000005")
+    .role(Role.SHIPPER).active(true).emailVerified(true).tokenVersion(1L).build())
+  );
   if(shops.count()>0)return;
   String hash=accounts.findByEmail("admin@milktea.vn").orElseThrow().getPasswordHash();
-  Account manager=create("manager@ute-tea.demo",Role.MANAGER,hash),shipper=create("shipper@ute-tea.demo",Role.SHIPPER,hash);
+  Account manager=create("manager@ute-tea.demo",Role.MANAGER,hash);
   String[] locations={"Campus","Làng Đại Học","Thủ Đức"};
   var counterMenu=products.findAllByActiveTrue().stream().filter(p->p.getShop()==null).toList();
   for(int i=0;i<3;i++){

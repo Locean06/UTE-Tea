@@ -30,6 +30,13 @@ public class OrderController {
         return ResponseEntity.status(201).body(ApiResponse.ok(response));
     }
 
+    @PostMapping("/cashier/orders/quote")
+    public ResponseEntity<ApiResponse<OrderDto.CounterQuoteResponse>> quoteCounterOrder(
+            @Valid @RequestBody OrderDto.CreateCounterOrderRequest requestBody,
+            @AuthenticationPrincipal CurrentActor actor) {
+        return ResponseEntity.ok(ApiResponse.ok(orderService.quoteCounterOrder(requestBody, actor)));
+    }
+
     @PostMapping({ "/orders/counter", "/cashier/orders" })
     public ResponseEntity<ApiResponse<OrderDto.OrderResponse>> createCounterOrder(
             @Valid @RequestBody OrderDto.CreateCounterOrderRequest requestBody,

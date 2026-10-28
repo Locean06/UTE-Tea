@@ -9,6 +9,7 @@ import vn.edu.ute.milktea.dto.CatalogDto;
 import vn.edu.ute.milktea.entity.catalog.Product;
 import vn.edu.ute.milktea.repository.catalog.CategoryRepository;
 import vn.edu.ute.milktea.repository.catalog.ProductRepository;
+import vn.edu.ute.milktea.util.MenuCatalogSupport;
 
 import java.util.List;
 
@@ -75,7 +76,7 @@ public class CatalogService {
                 .size(p.getSize())
                 .description(p.getDescription())
                 .price(p.getPrice())
-                .imageUrl(p.getImageUrl())
+                .imageUrl(MenuCatalogSupport.resolveIllustration(p))
                 .active(p.getActive())
                 .build();
     }

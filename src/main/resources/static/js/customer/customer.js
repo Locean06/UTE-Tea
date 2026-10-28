@@ -65,6 +65,33 @@ const CustomerApp = (() => {
         localStorage.removeItem(getLocalCartStorageKey());
     }
 
+    // Chỉ xóa giỏ đúng phiên bản đã checkout; If-Match bảo vệ khi tab khác cập nhật giỏ.
+    async function clearCartIfVersion(expectedVersion) {
+        if (!accountId || expectedVersion == null) return false;
+        await cartWrite.catch(() => {});
+        const current = await MilkTeaApi.get('/api/v1/account/cart');
+        accountCartVersion = current.version;
+        if (String(current.version) !== String(expectedVersion)) {
+            localCart = current.items.map(it => ({...it, price: it.unitPrice}));
+            updateCartBadge();
+            return false;
+        }
+        try {
+            const cleared = await MilkTeaApi.put('/api/v1/account/cart', {items: []}, {'If-Match': expectedVersion});
+            accountCartVersion = cleared.version;
+            localCart = [];
+            updateCartBadge();
+            return true;
+        } catch (error) {
+            const latest = await MilkTeaApi.get('/api/v1/account/cart');
+            accountCartVersion = latest.version;
+            localCart = latest.items.map(it => ({...it, price: it.unitPrice}));
+            updateCartBadge();
+            if (error.status === 409) return false;
+            throw error;
+        }
+    }
+
     // Khách đặt hàng trực tuyến: nhận tại quầy / mang về. Bàn do thu ngân gán trong POS.
     function initContext() {
         if(!contextReady)contextReady=initializeContext().catch(error=>{contextReady=null;throw error;});
@@ -358,7 +385,16 @@ const CustomerApp = (() => {
                 toppingIds: extractToppingIds(it)
             }));
 
-            const order = await MilkTeaApi.post('/api/v1/orders/counter', { items });
+            const payload = { items };
+            const signature = JSON.stringify(payload);
+            let attempt = null;
+            try { attempt = JSON.parse(sessionStorage.getItem('uteTea.counterAttempt') || 'null'); } catch (_) {}
+            if (!attempt || attempt.signature !== signature) {
+                attempt = {signature, key: globalThis.crypto?.randomUUID?.() || 'COUNTER_'+Date.now()+'_'+Math.random().toString(36).slice(2)};
+            }
+            try { sessionStorage.setItem('uteTea.counterAttempt', JSON.stringify(attempt)); } catch (_) {}
+            const order = await MilkTeaApi.post('/api/v1/orders/counter', payload, {'Idempotency-Key': attempt.key});
+            try { sessionStorage.removeItem('uteTea.counterAttempt'); } catch (_) {}
             MilkTeaApi.showToast('Đặt đơn thành công! Đang chuyển hướng...', 'success');
 
             // Cập nhật context phiên nếu là đơn đầu tiên mở phiên
@@ -408,6 +444,7 @@ const CustomerApp = (() => {
         removeItem,
         replaceItem,
         clearCart: async()=>{await clearLocalCart();updateCartBadge();},
+        clearCartIfVersion,
         getCartVersion: ()=>accountCartVersion,
         submitOrder,
         loadServerCart,

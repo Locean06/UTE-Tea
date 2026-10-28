@@ -2,11 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" th:replace="~{layouts/main :: html(~{::content}, ~{::scripts})}">
 <body>
 <div th:fragment="content" class="container py-4 milk-orders-page">
-    <link rel="stylesheet" th:href="@{/css/staff-ui.css}">
 
     <style>
         .milk-orders-page {
-            --orders-primary: #565c45;
+            --orders-primary: var(--primary-color, #565c45);
             --orders-primary-hover: #3e4837;
             --orders-primary-light: #f0f0e8;
             --orders-secondary: #717763;

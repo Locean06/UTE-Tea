@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main :: html(~{::content}, ~{::scripts})}" lang="vi">
+<body>
+<main th:fragment="content" class="ute-myorders container py-4 py-lg-5">
+    <link rel="stylesheet" th:href="@{/css/customer/my-orders.css}">
+    <header class="ute-myorders-hero">
+        <div>
+            <p class="ute-myorders-eyebrow">UTE TEA / TÀI KHOẢN CỦA BẠN</p>
+            <h1>Đơn hàng của tôi</h1>
+            <p>Theo dõi đơn đã đặt, xem chi tiết và kiểm tra trạng thái giao hàng.</p>
+        </div>
+        <div class="ute-myorders-hero-icon" aria-hidden="true"><i class="bi bi-bag-check"></i></div>
+    </header>
+
+    <div id="myOrdersError" class="alert alert-danger d-none mt-3" role="alert"></div>
+    <section class="ute-myorders-stats" aria-label="Tổng quan đơn hàng">
+        <div><span>Tổng đơn đã đặt</span><strong id="myOrdersTotal">—</strong></div>
+        <div><span>Đang xử lý / giao</span><strong id="myOrdersPending">—</strong></div>
+        <div><span>Hoàn tất</span><strong id="myOrdersDone">—</strong></div>
+    </section>
+
+    <section class="ute-myorders-board" aria-label="Lịch sử đặt hàng">
+        <div class="ute-myorders-board-head">
+            <div>
+                <h2>Lịch sử đặt hàng</h2>
+                <p>Chỉ hiển thị các đơn gắn với tài khoản đang đăng nhập.</p>
+            </div>
+            <button id="myOrdersRefresh" type="button" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-clockwise me-1"></i> Làm mới</button>
+        </div>
+        <div class="ute-myorders-controls">
+            <div role="tablist" aria-label="Loại đơn hàng" class="ute-myorders-tabs">
+                <button type="button" id="myOrdersDeliveryTab" role="tab" aria-selected="true" class="active" data-tab="delivery"><i class="bi bi-truck me-1"></i> Giao tận nơi <span id="myOrdersDeliveryCount">0</span></button>
+                <button type="button" id="myOrdersCounterTab" role="tab" aria-selected="false" data-tab="counter"><i class="bi bi-cup-hot me-1"></i> Tại quầy <span id="myOrdersCounterCount">0</span></button>
+            </div>
+            <div class="ute-myorders-filterbar">
+                <label class="ute-myorders-search"><i class="bi bi-search" aria-hidden="true"></i><input id="myOrdersSearch" type="search" placeholder="Tìm mã đơn hoặc tên món..." aria-label="Tìm kiếm đơn hàng"></label>
+                <label class="visually-hidden" for="myOrdersStatus">Trạng thái đơn hàng</label>
+                <select id="myOrdersStatus" class="form-select" aria-label="Lọc theo trạng thái"><option value="all">Tất cả trạng thái</option><option value="pending">Đang xử lý</option><option value="done">Hoàn tất</option><option value="other">Đã hủy / thất bại</option></select>
+            </div>
+        </div>
+        <div id="myOrdersLoading" class="ute-myorders-empty" role="status"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Đang tải đơn hàng...</div>
+        <div id="myOrdersList" class="ute-myorders-list" aria-live="polite"></div>
+        <div id="myOrdersEmpty" class="ute-myorders-empty d-none">
+            <i class="bi bi-bag-x" aria-hidden="true"></i>
+            <h3>Chưa có đơn nào phù hợp</h3>
+            <p>Thử chọn bộ lọc khác, hoặc khám phá thực đơn để đặt món nhé.</p>
+            <a class="btn btn-primary-custom" th:href="@{/}">Khám phá thực đơn</a>
+        </div>
+    </section>
+</main>
+<th:block th:fragment="scripts"><script th:src="@{/js/customer/my-orders.js}"></script></th:block>
+</body>
+</html>

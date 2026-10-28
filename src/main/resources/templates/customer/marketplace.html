@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main :: html(~{::content}, ~{::scripts})}"><body>
+<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main :: html(~{::content}, ~{::scripts})}"><body>
 <main th:fragment="content" class="container py-4">
  <section class="ute-page-banner"><div><div class="ute-kicker">UTE TEA / GIAO TẬN NƠI</div><h1>Hương vị từ những cửa hàng bạn yêu</h1><p>Chọn món yêu thích, sau đó chọn địa chỉ và cơ sở phù hợp.</p></div></section>
+ <div class="d-flex justify-content-end mb-3" sec:authorize="hasRole('CUSTOMER')">
+   <a class="btn btn-outline-secondary" th:href="@{/my-orders}"><i class="bi bi-receipt me-1"></i> Xem đơn hàng đã đặt</a>
+ </div>
  <div id="marketMessage" role="status" class="alert d-none"></div>
  <form id="marketFilters" class="row g-2 mb-4">
   <div class="col-12 col-md-4"><label for="marketSearch" class="form-label">Tìm món</label><input id="marketSearch" name="q" class="form-control" maxlength="120" placeholder="Tên món uống"></div>
 
-  <div class="col-6 col-md-4"><label for="marketSort" class="form-label">Sắp xếp</label><select id="marketSort" name="sort" class="form-select"><option value="newest">20 món mới nhất</option><option value="bestselling">Bán chạy</option><option value="rating">Đánh giá cao</option><option value="favorites">Yêu thích nhiều</option><option value="price_asc">Giá tăng</option><option value="price_desc">Giá giảm</option></select></div>
+  <div class="col-6 col-md-4"><label for="marketSort" class="form-label">Sắp xếp</label><select id="marketSort" name="sort" class="form-select"><option value="bestselling" selected>Bán chạy</option><option value="newest">20 món mới nhất</option><option value="rating">Đánh giá cao</option><option value="favorites">Yêu thích nhiều</option><option value="price_asc">Giá tăng</option><option value="price_desc">Giá giảm</option></select></div>
   <div class="col-6 col-md-3"><label for="marketMin" class="form-label">Giá từ</label><input id="marketMin" name="min" type="number" min="0" class="form-control"></div>
   <div class="col-6 col-md-3"><label for="marketMax" class="form-label">Giá đến</label><input id="marketMax" name="max" type="number" min="0" class="form-control"></div>
   <div class="col-8 col-md-4"><label for="marketCategory" class="form-label">Danh mục</label><select id="marketCategory" name="category" class="form-select"><option value="">Tất cả danh mục</option></select></div>

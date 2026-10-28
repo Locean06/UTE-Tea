@@ -9,7 +9,7 @@
     <div th:fragment="content" class="container py-4 ute-cart-page">
         <style>
             .container:has(#cartContainer) {
-                --cart-primary: #565c45;
+                --cart-primary: var(--primary-color, #565c45);
                 --cart-primary-hover: #3e4837;
                 --cart-primary-light: #f0f0e8;
                 --cart-secondary: #717763;
@@ -555,7 +555,7 @@
         <script th:src="@{/js/customer/delivery-checkout.js}"></script>
         <script th:inline="javascript">
             const discountType = /*[[${settings != null && settings.discountType != null ? settings.discountType : 'PERCENT'}]]*/ 'PERCENT';
-            const discountValue = /*[[${settings != null && settings.discountValue != null ? settings.discountValue : (settings != null && settings.discountPercent != null ? settings.discountPercent : 0)}]]*/ 0;
+            const discountValue = /*[[${settings != null && settings.discountType == 'FIXED_AMOUNT' ? (settings.discountValue != null ? settings.discountValue : 0) : (settings != null && settings.discountValue != null && settings.discountValue > 0 ? settings.discountValue : (settings != null && settings.discountPercent != null ? settings.discountPercent : 0))}]]*/ 0;
 
             let cartEntranceShown = false;
             let previousCartQuantities = null;
@@ -675,7 +675,7 @@
                 } else {
                     const percent = parseFloat(discountValue) || 0;
                     if (percent > 0) {
-                        discountAmount = Math.min(sub, (sub * percent) / 100);
+                        discountAmount = Math.min(sub, Math.round(sub * percent) / 100);
                         document.getElementById('discountRow').style.display = 'flex';
                         document.getElementById('discountPercentVal').textContent = percent + '%';
                         document.getElementById('discountVal').textContent = '-' + MilkTeaApi.formatVND(discountAmount);

@@ -74,6 +74,42 @@ public class OrderService {
     private final FixedRecipeService fixedRecipeService;
     private final MaterialRepository materialRepository;
     private final vn.edu.ute.milktea.service.realtime.RealtimeEventPublisher realtimeEventPublisher;
+    /** Read-only POS quote; order creation always recalculates prices from current DB state. */
+    @Transactional(readOnly = true)
+    public OrderDto.CounterQuoteResponse quoteCounterOrder(OrderDto.CreateCounterOrderRequest request, CurrentActor actor) {
+        if (actor == null || !(actor.hasRole(Role.CASHIER) || actor.hasRole(Role.ADMIN))) {
+            throw BusinessException.forbidden(ErrorCode.ACCESS_DENIED, "Chỉ thu ngân được báo giá POS");
+        }
+        BigDecimal subtotal = BigDecimal.ZERO;
+        for (CartDto.CartItemRequest item : request.getItems()) {
+            if (item.getProductId() == null || item.getQuantity() == null || item.getQuantity() < 1) {
+                throw BusinessException.badRequest(ErrorCode.VALIDATION_FAILED, "Món hoặc số lượng không hợp lệ");
+            }
+            Product product = productRepository.findById(item.getProductId())
+                    .orElseThrow(() -> BusinessException.badRequest(ErrorCode.PRODUCT_UNAVAILABLE, "Món không tồn tại"));
+            if (!Boolean.TRUE.equals(product.getActive()) || product.getShop() != null) {
+                throw BusinessException.badRequest(ErrorCode.PRODUCT_UNAVAILABLE, "Món không còn bán tại quầy: " + product.getName());
+            }
+            BigDecimal unit = product.getPrice();
+            if (item.getToppingIds() != null && !item.getToppingIds().isEmpty()) {
+                if (product.getCategory() != null && !Boolean.TRUE.equals(product.getCategory().getAllowTopping())) {
+                    throw BusinessException.badRequest(ErrorCode.VALIDATION_FAILED, "Món không hỗ trợ topping: " + product.getName());
+                }
+                for (Long toppingId : item.getToppingIds()) {
+                    Product topping = productRepository.findById(toppingId)
+                            .orElseThrow(() -> BusinessException.badRequest(ErrorCode.PRODUCT_UNAVAILABLE, "Topping không tồn tại"));
+                    if (!Boolean.TRUE.equals(topping.getActive()) || topping.getShop() != null) {
+                        throw BusinessException.badRequest(ErrorCode.PRODUCT_UNAVAILABLE, "Topping không còn bán tại quầy");
+                    }
+                    unit = unit.add(topping.getPrice());
+                }
+            }
+            subtotal = subtotal.add(unit.multiply(BigDecimal.valueOf(item.getQuantity())));
+        }
+        CalculatedDiscount discount = computeDiscount(subtotal, settingsRepository.findById(1).orElse(null));
+        return new OrderDto.CounterQuoteResponse(subtotal, discount.discountAmount, discount.totalAmount);
+    }
+
     @Transactional
     public OrderDto.OrderResponse createTableOrder(OrderDto.CreateTableOrderRequest request, CurrentActor actor, String idempotencyKey) {
         // A table number is not permission to place an order on somebody else's table.

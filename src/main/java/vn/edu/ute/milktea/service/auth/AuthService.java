@@ -182,8 +182,9 @@ public class AuthService {
     public void logout(Long accountId) {
         if (accountId != null) {
             accountRepository.findById(accountId).ifPresent(account -> {
-                // Tăng tokenVersion để vô hiệu hóa mọi token cũ
-                account.setTokenVersion(account.getTokenVersion() + 1);
+                // Tăng tokenVersion để vô hiệu hóa mọi token cũ (xử lý an toàn nếu tokenVersion đang null)
+                long currentVersion = account.getTokenVersion() != null ? account.getTokenVersion() : 0L;
+                account.setTokenVersion(currentVersion + 1);
                 accountRepository.save(account);
             });
         }
@@ -312,7 +313,8 @@ public class AuthService {
         account.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
 
         // Tăng tokenVersion để vô hiệu hóa toàn bộ session/JWT cũ
-        account.setTokenVersion(account.getTokenVersion() + 1);
+        long currentVersion = account.getTokenVersion() != null ? account.getTokenVersion() : 0L;
+        account.setTokenVersion(currentVersion + 1);
 
         // Lưu tài khoản (Lưu ý: Không tự ý mở khóa active nếu tài khoản bị khóa)
         accountRepository.save(account);
@@ -364,7 +366,8 @@ public class AuthService {
         }
 
         account.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
-        account.setTokenVersion(account.getTokenVersion() + 1);
+        long currentVersion = account.getTokenVersion() != null ? account.getTokenVersion() : 0L;
+        account.setTokenVersion(currentVersion + 1);
         accountRepository.save(account);
     }
 }

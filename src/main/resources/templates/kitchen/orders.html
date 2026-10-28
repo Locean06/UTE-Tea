@@ -12,7 +12,7 @@
 
         <style>
             .kitchen-page {
-                --k-primary: #565c45;
+                --k-primary: var(--primary-color, #565c45);
                 --k-primary-hover: #3e4837;
                 --k-primary-light: #f0f0e8;
                 --k-secondary: #717763;
@@ -739,7 +739,7 @@
         </nav>
         <section class="ute-page-banner ute-ops" aria-label="Giới thiệu khu vực làm việc">
           <div><div class="ute-kicker">UTE TEA / KITCHEN DISPLAY</div>
-            <h1>Bếp · Pha chế</h1><p>Nhận đơn trực tiếp từ POS, theo dõi chế biến và quản lý nguyên liệu.</p></div>
+            <h1>Bếp · Pha chế</h1><p>Nhận đơn POS và đơn giao hàng đã xác nhận, theo dõi chế biến và quản lý nguyên liệu.</p></div>
           <span class="ute-page-icon" aria-hidden="true"><i class="bi bi-cup-straw"></i></span>
         </section>
 
@@ -747,7 +747,21 @@
         <div class="tab-content">
 
             <div class="tab-pane fade show active" id="tabKds">
+                <!-- Đơn bán tại quầy (DonHang) vẫn giữ quy trình KDS hiện tại. -->
                 <div class="row g-3" id="kitchenOrdersGrid"></div>
+                <section class="card p-3 p-md-4 mt-4" aria-labelledby="kitchenDeliveryTitle">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                        <div>
+                            <h2 id="kitchenDeliveryTitle" class="h5 mb-1">Đơn giao hàng online cần pha chế</h2>
+                            <p class="small text-muted mb-0">Khách đặt → Thu ngân xác nhận → Bếp pha xong → SHIPPER giao</p>
+                        </div>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="kitchenDeliveryRefresh">Làm mới</button>
+                    </div>
+                    <div id="kitchenDeliveryError" class="alert alert-danger d-none small" role="alert"></div>
+                    <div class="row g-3" id="kitchenDeliveryOrders" aria-live="polite">
+                        <p class="small text-muted">Đang tải đơn giao hàng...</p>
+                    </div>
+                </section>
             </div>
 
             <div class="tab-pane fade" id="tabStock">
@@ -1224,6 +1238,7 @@
 
     <th:block th:fragment="scripts">
         <script th:src="@{/js/kitchen/kitchen.js}"></script>
+        <script th:src="@{/js/kitchen/delivery-orders.js}"></script>
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 KitchenApp.init();

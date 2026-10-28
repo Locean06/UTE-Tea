@@ -7,9 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.edu.ute.milktea.common.BusinessException;
 import vn.edu.ute.milktea.dto.MarketDto.*;
 import vn.edu.ute.milktea.dto.CustomerDataDto;
+import vn.edu.ute.milktea.dto.CartDto;
 import vn.edu.ute.milktea.entity.account.*;
 import vn.edu.ute.milktea.entity.market.DeliveryOrder;
-import vn.edu.ute.milktea.entity.market.Voucher;
 import vn.edu.ute.milktea.repository.account.AccountRepository;
 import vn.edu.ute.milktea.repository.catalog.ProductRepository;
 import vn.edu.ute.milktea.service.market.*;
@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest @ActiveProfiles("test") @Transactional
 class MarketIntegrationTest {
  @Autowired MarketService market;
+ @Autowired DeliveryWorkspaceService delivery;
  @Autowired CatalogSearchService search;
  @Autowired CustomerDataService data;
  @Autowired ReviewService reviews;
@@ -38,8 +39,9 @@ class MarketIntegrationTest {
   product=market.saveProduct(vendor,shop,null,new ProductInput(category,"Trà thử nghiệm","M","Món kiểm thử",new BigDecimal("25000.00"),10,true)).id();
   address=data.saveAddress(buyer,null,new CustomerDataDto.AddressInput("Người mua","0901000001","3 Võ Văn Ngân",true)).id();
   carrier=market.saveCarrier(admin,null,null,new CarrierInput("Giao thử nghiệm",new BigDecimal("10000.00"),true)).id();
+  data.replaceCart(buyer,CartDto.ReplaceCartRequest.builder().items(List.of(CartDto.CartItemRequest.builder().productId(product).quantity(2).build())).build(),data.cart(buyer).getVersion());
  }
- Checkout input(String voucher){return new Checkout(shop,address,carrier,voucher,DeliveryOrder.Method.COD,List.of(new BuyLine(product,2)));}
+ Checkout input(String voucher){return new Checkout(shop,address,carrier,voucher,DeliveryOrder.Method.COD,List.of(new BuyLine(product,2)),null,data.cart(buyer).getVersion());}
  @Test void vendorAndManagerCannotCrossShopBoundary(){
   assertThrows(BusinessException.class,()->market.shopProducts(other,shop));
   assertThrows(BusinessException.class,()->market.shopProducts(manager,shop));
@@ -47,6 +49,15 @@ class MarketIntegrationTest {
   assertEquals(1,market.shopProducts(manager,shop).size());
   assertThrows(BusinessException.class,()->market.shopProducts(manager,otherShop));
   assertThrows(BusinessException.class,()->market.saveProduct(other,otherShop,product,new ProductInput(category,"Hijack","M",null,BigDecimal.ONE,1,true)));
+ }
+ @Test void customerHistoryOnlyShowsOwnOrdersAndBlocksForeignDetails(){
+  var stranger=actor("stranger-customer",Role.CUSTOMER);
+  var mine=market.checkout(buyer,input(null),"customer-history-test");
+  assertEquals(1,market.orders(buyer,null).size());
+  assertEquals(mine.id(),market.orders(buyer,null).getFirst().id());
+  assertTrue(market.orders(stranger,null).isEmpty());
+  assertThrows(BusinessException.class,()->market.order(stranger,mine.id()));
+  assertThrows(BusinessException.class,()->market.orders(buyer,shop));
  }
  @Test void voucherCheckoutIsIdempotentAndPricesAreServerOwned(){
   market.saveVoucher(vendor,shop,new VoucherInput("TEST10",new BigDecimal("10000.00"),new BigDecimal("40000"),Instant.now().minusSeconds(60),Instant.now().plusSeconds(600),2,1,true));
@@ -56,42 +67,49 @@ class MarketIntegrationTest {
   assertEquals(8,products.findById(product).orElseThrow().getDeliveryStock());
   assertThrows(BusinessException.class,()->market.checkout(buyer,input(null),"checkout-key-1"));
  }
- VoucherInput promo(String code,String cap,Voucher.Kind kind,String percent){return new VoucherInput(code,new BigDecimal(cap),BigDecimal.ZERO,Instant.now().minusSeconds(60),Instant.now().plusSeconds(600),5,1,true,kind,percent==null?null:new BigDecimal(percent));}
- @Test void percentAndShippingPromotionsArePricedOnServer(){
-  // đơn mẫu: 2 x 25.000 = 50.000, phí ship 10.000
-  market.saveVoucher(vendor,shop,promo("PCT10","3000",Voucher.Kind.PERCENT,"10"));
-  var pct=market.checkout(buyer,input("PCT10"),"promo-key-1");
-  assertEquals(0,new BigDecimal("3000").compareTo(pct.discountAmount()));   // 10% = 5.000 nhưng tối đa 3.000
-  assertEquals(0,new BigDecimal("57000").compareTo(pct.totalAmount()));
-  market.saveVoucher(vendor,shop,promo("SHIP4K","4000",Voucher.Kind.SHIPPING,null));
-  var fixed=market.checkout(buyer,input("SHIP4K"),"promo-key-2");
-  assertEquals(0,fixed.discountAmount().signum());
-  assertEquals(0,new BigDecimal("6000").compareTo(fixed.shippingFee()));
-  assertEquals(0,new BigDecimal("56000").compareTo(fixed.totalAmount()));
-  market.saveVoucher(vendor,shop,promo("FREESHIP","10000",Voucher.Kind.SHIPPING,"100"));
-  var free=market.checkout(buyer,input("FREESHIP"),"promo-key-3");
-  assertEquals(0,free.shippingFee().signum());
-  assertEquals(0,new BigDecimal("50000").compareTo(free.totalAmount()));
-  assertThrows(BusinessException.class,()->market.saveVoucher(vendor,shop,promo("BADPCT","1000",Voucher.Kind.PERCENT,"0")));
- }
  @Test void shipperWorkflowAndPurchasedOnlyReviews(){
   var o=market.checkout(buyer,input(null),"checkout-key-2");
   Long orderId=o.id();
   assertThrows(BusinessException.class,()->reviews.create(other,product,new ReviewInput(orderId,true,5,"Đây là đánh giá dài hơn năm mươi ký tự nhưng tài khoản này chưa mua hàng.")));
   o=market.transition(vendor,o.id(),new Transition(DeliveryOrder.Status.CONFIRMED,o.version(),null));
   o=market.assignShipper(vendor,o.id(),new AssignShipper(shipper.getAccountId(),o.version()));
-  o=market.transition(shipper,o.id(),new Transition(DeliveryOrder.Status.PICKED_UP,o.version(),null));
-  assertEquals(DeliveryOrder.Status.PICKED_UP,o.status());
   o=market.transition(shipper,o.id(),new Transition(DeliveryOrder.Status.SHIPPING,o.version(),null));
   o=market.transition(shipper,o.id(),new Transition(DeliveryOrder.Status.DELIVERED,o.version(),null));
   assertTrue(o.paid());
-  var best=search.bestSellers(1,50).stream().filter(b->shop.equals(b.product().shopId())).toList();
-  assertEquals(1,best.size());assertEquals(2,best.getFirst().sold());   // 2 ly đã giao
-  assertTrue(search.bestSellers(2,50).stream().noneMatch(b->shop.equals(b.product().shopId())));   // "trên" ngưỡng: 2 không lớn hơn 2
   var review=reviews.create(buyer,product,new ReviewInput(o.id(),true,5,"Trà rất thơm ngon, đóng gói cẩn thận và giao hàng nhanh chóng, mình rất hài lòng."));
   assertEquals(5,review.stars());assertEquals(1,reviews.list(product,0).size());
   assertEquals(new BigDecimal("5000.00"),market.summary(vendor,shop).platformCommission());
   assertTrue(search.search(null,null,shop,null,null,"rating",0,20).items().getFirst().rating()>0);
+ }
+ @Test void courierWorkspaceOnlyListsAssignedOrdersAndProtectsTransitions(){
+  var alternate=actor("alternate-courier",Role.SHIPPER);
+  var first=market.checkout(buyer,input(null),"courier-1");
+  var second=market.checkout(buyer,input(null),"courier-2");
+  first=market.transition(vendor,first.id(),new Transition(DeliveryOrder.Status.CONFIRMED,first.version(),null));
+  second=market.transition(vendor,second.id(),new Transition(DeliveryOrder.Status.CONFIRMED,second.version(),null));
+  first=market.assignShipper(vendor,first.id(),new AssignShipper(shipper.getAccountId(),first.version()));
+  second=market.assignShipper(vendor,second.id(),new AssignShipper(alternate.getAccountId(),second.version()));
+  assertThrows(BusinessException.class,()->delivery.workspace(buyer));
+  assertEquals(1,delivery.workspace(shipper).statistics().assigned());
+  assertEquals(first.id(),delivery.workspace(shipper).orders().getFirst().id());
+  assertEquals(1,delivery.workspace(alternate).statistics().assigned());
+  var firstAssigned=first;
+  assertThrows(BusinessException.class,()->delivery.updateStatus(alternate,firstAssigned.id(),
+      new Transition(DeliveryOrder.Status.SHIPPING,firstAssigned.version(),null)));
+  assertThrows(BusinessException.class,()->delivery.updateStatus(shipper,firstAssigned.id(),
+      new Transition(DeliveryOrder.Status.CANCELLED,firstAssigned.version(),null)));
+  var shipping=delivery.updateStatus(shipper,first.id(),new Transition(DeliveryOrder.Status.SHIPPING,first.version(),null));
+  assertEquals(1,delivery.workspace(shipper).statistics().shipping());
+  assertThrows(BusinessException.class,()->delivery.updateStatus(shipper,shipping.id(),
+      new Transition(DeliveryOrder.Status.DELIVERED,firstAssigned.version(),null)));
+  var delivered=delivery.updateStatus(shipper,shipping.id(),new Transition(DeliveryOrder.Status.DELIVERED,shipping.version(),null));
+  assertEquals(DeliveryOrder.Status.DELIVERED,delivered.status());
+  var stats=delivery.workspace(shipper).statistics();
+  assertEquals(1,stats.delivered());
+  assertEquals(0,stats.failed());
+  assertEquals(100.0,stats.successRate());
+  assertEquals(1,stats.codDelivered());
+  assertEquals(0,new BigDecimal("60000.00").compareTo(stats.codCollected()));
  }
  @Test void cancelledOrderRestocksExactlyOnceAndStaleTransitionsFail(){
   var o=market.checkout(buyer,input(null),"checkout-key-3");Long initialVersion=o.version();

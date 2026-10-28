@@ -1,6 +1,6 @@
 (() => {
  const $=id=>document.getElementById(id),api='/api/v1/market';let user,shops=[],accounts=[];
- const states={NEW:'Mới',CONFIRMED:'Đã xác nhận',PICKED_UP:'Đã lấy hàng',SHIPPING:'Đang giao',DELIVERED:'Đã giao',DELIVERY_FAILED:'Giao thất bại',CANCELLED:'Đã hủy',RETURN_REQUESTED:'Yêu cầu trả hàng',RETURNED:'Đã trả hàng',REFUNDED:'Đã hoàn tiền'};
+ const states={NEW:'Mới',CONFIRMED:'Đã xác nhận',SHIPPING:'Đang giao',DELIVERED:'Đã giao',DELIVERY_FAILED:'Giao thất bại',CANCELLED:'Đã hủy',RETURN_REQUESTED:'Yêu cầu trả hàng',RETURNED:'Đã trả hàng',REFUNDED:'Đã hoàn tiền'};
  function node(tag,text,cls){const n=document.createElement(tag);if(text!=null)n.textContent=text;if(cls)n.className=cls;return n;}
  function message(text,error=false){$('portalMessage').className='alert '+(error?'alert-danger':'alert-success');$('portalMessage').textContent=text;}
  function button(text,fn){const b=node('button',text,'btn btn-sm btn-outline-secondary m-1');b.type='button';b.onclick=async()=>{b.disabled=true;try{await fn();}catch(e){message(e.message,true);}finally{b.disabled=false;}};return b;}
@@ -17,7 +17,14 @@
   const selected=shops.find(s=>s.id===shop());if(selected){fill($('shopForm'),selected);fill($('shopConfigForm'),selected);}
   const [summary,orders]=await Promise.all([MilkTeaApi.get(api+'/summary'+query()),MilkTeaApi.get(api+'/orders'+query())]);
   $('portalSummary').textContent=`${summary.orders} đơn · ${summary.delivered} đã giao · ${summary.failed} giao thất bại · Thực thu đơn đã giao: ${MilkTeaApi.formatVND(summary.paidRevenue)} · Chiết khấu: ${MilkTeaApi.formatVND(summary.platformCommission)}`;
-  renderOrders(orders);
+  const activeShippers = new Map();
+  if (['VENDOR', 'MANAGER', 'ADMIN'].includes(user.role)) {
+   const shopIds = [...new Set(orders.filter(o => o.status === 'CONFIRMED').map(o => o.shopId))];
+   await Promise.all(shopIds.map(async id => {
+    activeShippers.set(id, await MilkTeaApi.get(api + '/shops/' + id + '/shippers'));
+   }));
+  }
+  renderOrders(orders, activeShippers);
   if(shop()&&['VENDOR','MANAGER','ADMIN'].includes(user.role)){
    const [categories,products]=await Promise.all([MilkTeaApi.get(api+'/shops/'+shop()+'/categories'),MilkTeaApi.get(api+'/shops/'+shop()+'/products')]);
    $('portalCategories').replaceChildren();$('productCategory').replaceChildren();
@@ -26,11 +33,11 @@
    const customers=await MilkTeaApi.get(api+'/shops/'+shop()+'/customers');$('portalCustomers').replaceChildren();customers.forEach(c=>{const row=node('div',null,'border-bottom py-2 text-break');row.append(node('span','#'+c.id+' · '+c.email),button(c.active?'Hạn chế tại shop':'Cho mua tại shop',async()=>{await MilkTeaApi.put(api+'/shops/'+shop()+'/customers/'+c.id+'?enabled='+!c.active);await refresh();}));$('portalCustomers').append(row);});
   }else{$('portalCategories').replaceChildren();$('portalProducts').replaceChildren();$('productCategory').replaceChildren();}
   if(['VENDOR','MANAGER','ADMIN'].includes(user.role)&&(shop()||user.role==='ADMIN')){
-   const vouchers=await MilkTeaApi.get(api+'/vouchers'+query());$('portalVouchers').replaceChildren();vouchers.forEach(v=>{const row=node('div',null,'border-bottom py-2 text-break');row.append(node('span',v.code+' · '+(v.kind==='PERCENT'?'Giảm '+v.percent+'% món (tối đa '+MilkTeaApi.formatVND(v.discountAmount)+')':v.kind==='SHIPPING'?(Number(v.percent)>0?'Giảm '+v.percent+'% phí ship (tối đa '+MilkTeaApi.formatVND(v.discountAmount)+')':'Giảm phí ship '+MilkTeaApi.formatVND(v.discountAmount)):'Giảm '+MilkTeaApi.formatVND(v.discountAmount))+' · '+v.usedCount+'/'+v.usageLimit+' lượt · '+(v.active?'Hoạt động':'Đã tắt')));if(v.active)row.append(button('Tắt mã',async()=>{await MilkTeaApi.delete(api+'/vouchers/'+v.id);await refresh();}));$('portalVouchers').append(row);});
+   const vouchers=await MilkTeaApi.get(api+'/vouchers'+query());$('portalVouchers').replaceChildren();vouchers.forEach(v=>{const row=node('div',null,'border-bottom py-2 text-break');row.append(node('span',v.code+' · Giảm '+(v.discountType==='PERCENT'?v.discountPercent+'% trên tổng hóa đơn':MilkTeaApi.formatVND(v.discountAmount))+' · '+v.usedCount+'/'+v.usageLimit+' lượt · '+(v.active?'Hoạt động':'Đã tắt')));if(v.active)row.append(button('Tắt mã',async()=>{await MilkTeaApi.delete(api+'/vouchers/'+v.id);await refresh();}));$('portalVouchers').append(row);});
    const carriers=await MilkTeaApi.get(api+'/carriers'+query());$('portalCarriers').replaceChildren();carriers.forEach(c=>{$('portalCarriers').append(button(c.name+' · '+MilkTeaApi.formatVND(c.fee)+(c.active?'':' · Ngừng dùng'),async()=>fill($('carrierForm'),c)));});
   }
  }
- function renderOrders(orders){
+ function renderOrders(orders, activeShippers){
   $('portalOrders').replaceChildren();if(!orders.length)$('portalOrders').append(node('p','Chưa có đơn trong phạm vi này.'));
   for(const o of orders){
    const col=node('div',null,'col-12 col-lg-6'),card=node('article',null,'card p-3 h-100 text-break');
@@ -41,11 +48,21 @@
    if(seller&&o.status==='NEW')card.append(button('Xác nhận',()=>transition('CONFIRMED')));
    if(seller&&['NEW','CONFIRMED','DELIVERY_FAILED'].includes(o.status))card.append(button('Hủy và hoàn tồn',()=>transition('CANCELLED')));
    if(seller&&o.status==='RETURN_REQUESTED')card.append(button('Đã nhận hàng trả',()=>transition('RETURNED')));
-   if((shipper||seller)&&o.status==='CONFIRMED'&&o.shipperId)card.append(button('Đã lấy hàng',()=>transition('PICKED_UP')));
-   if(shipper&&o.status==='PICKED_UP')card.append(button('Bắt đầu giao',()=>transition('SHIPPING')));
+   if(shipper&&o.status==='CONFIRMED'&&o.preparationStatus==='READY'&&(o.paymentMethod==='COD'||o.paid))card.append(button('Bắt đầu giao',()=>transition('SHIPPING')));
+   else if(shipper&&o.status==='CONFIRMED')card.append(node('p','Chờ bếp hoàn tất hoặc chờ thanh toán trực tuyến','small text-muted'));
    if(shipper&&o.status==='SHIPPING')card.append(button('Giao thành công',()=>transition('DELIVERED')),button('Giao thất bại',()=>transition('DELIVERY_FAILED')));
    if(seller&&o.status==='CONFIRMED'){
-    const form=node('form',null,'d-flex flex-wrap gap-2 mt-2'),input=node('input',null,'form-control');input.type='number';input.required=true;input.min='1';input.placeholder='Mã tài khoản Shipper';input.setAttribute('aria-label','Mã tài khoản Shipper');input.style.maxWidth='220px';const submit=node('button','Phân công','btn btn-outline-secondary');submit.type='submit';form.append(input,submit);form.onsubmit=async e=>{e.preventDefault();submit.disabled=true;try{await MilkTeaApi.put(api+'/orders/'+o.id+'/shipper',{accountId:Number(input.value),version:o.version});await refresh();}catch(error){message(error.message,true);}finally{submit.disabled=false;}};card.append(form,node('small',o.shipperId?'Shipper #'+o.shipperId:'Chưa phân công shipper','text-muted'));
+    const form=node('form',null,'d-flex flex-wrap gap-2 mt-2'),input=node('select',null,'form-select');
+    input.required=true;input.setAttribute('aria-label','Chọn nhân viên giao hàng');input.style.maxWidth='260px';
+    option(input,'','Chọn nhân viên giao hàng');
+    const available = activeShippers.get(o.shopId) || [];
+    available.forEach(a => option(input, a.id, a.name + ' · #' + a.id));
+    if (o.shipperId && available.some(a => a.id === o.shipperId)) input.value=String(o.shipperId);
+    const submit=node('button', o.shipperId ? 'Đổi phân công' : 'Phân công', 'btn btn-outline-secondary');
+    submit.type='submit';submit.disabled=!available.length;
+    form.append(input,submit);
+    form.onsubmit=async e=>{e.preventDefault();submit.disabled=true;try{await MilkTeaApi.put(api+'/orders/'+o.id+'/shipper',{accountId:Number(input.value),version:o.version});await refresh();message('Đã phân công nhân viên giao hàng.');}catch(error){message(error.message,true);}finally{submit.disabled=false;}};
+    card.append(form,node('small',!available.length?'Chưa có nhân viên giao hàng đang hoạt động':o.shipperId?'Đã phân công cho nhân viên #'+o.shipperId:'Chưa phân công shipper','text-muted'));
    }
    if(user.role==='ADMIN'&&o.paid&&['RETURNED','CANCELLED'].includes(o.status)){
     if(o.paymentMethod==='VNPAY')card.append(node('p','Hoàn tiền VNPAY: cần xác nhận từ cổng thanh toán; không đánh dấu hoàn bằng nút tiền mặt.','small text-muted'));
@@ -59,7 +76,16 @@
  bind('managerForm',async(data,e)=>MilkTeaApi.put(api+'/shops/'+requireShop()+'/managers/'+data.accountId+'?enabled='+e.submitter.value));
  bind('categoryForm',async data=>{await MilkTeaApi[data.id?'put':'post'](api+'/shops/'+requireShop()+'/categories'+(data.id?'/'+data.id:''),{name:data.name,active:!!data.active,allowTopping:!!data.allowTopping});$('categoryForm').reset();});
  bind('productForm',async data=>{const p={categoryId:Number(data.categoryId),name:data.name,size:data.size,description:data.description,price:Number(data.price),stock:Number(data.stock),active:!!data.active,catalogVersion:data.catalogVersion?Number(data.catalogVersion):null,menuCode:data.menuCode||null};const saved=await MilkTeaApi[data.id?'put':'post'](api+'/shops/'+requireShop()+'/products'+(data.id?'/'+data.id:''),p);$('productForm').elements.id.value=saved.id;$('productForm').elements.catalogVersion.value=saved.catalogVersion;const file=$('productImage').files[0];if(file){const body=new FormData();body.append('file',file);await MilkTeaApi.upload(api+'/shops/'+requireShop()+'/products/'+saved.id+'/image',body);$('productImage').value='';}});
- bind('voucherForm',async data=>{await MilkTeaApi.post(api+'/vouchers'+query(),{...data,percent:Number(data.percent||0),discountAmount:Number(data.discountAmount),minimumAmount:Number(data.minimumAmount),usageLimit:Number(data.usageLimit),perAccountLimit:Number(data.perAccountLimit),startsAt:new Date(data.startsAt).toISOString(),endsAt:new Date(data.endsAt).toISOString(),active:true});$('voucherForm').reset();});
+ $('voucherCode').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9_-]/g,'');});
+ $('voucherType').onchange=()=>{const percent=$('voucherType').value==='PERCENT';const value=$('voucherValue');value.max=percent?'100':'';value.placeholder=percent?'Ví dụ: 22':'Ví dụ: 20000';value.value='';};
+ bind('voucherForm',async data=>{
+   const percent=data.discountType==='PERCENT',value=Number(data.discountValue);
+   if(!Number.isFinite(value)||value<=0||(percent&&value>100))throw Error('Mức giảm phải lớn hơn 0, và không quá 100% với mã phần trăm.');
+   const payload={code:data.code.trim().toUpperCase(),discountType:data.discountType,discountPercent:percent?value:0,discountAmount:percent?0:value,
+     minimumAmount:Number(data.minimumAmount),usageLimit:Number(data.usageLimit),perAccountLimit:Number(data.perAccountLimit),
+     startsAt:new Date(data.startsAt).toISOString(),endsAt:new Date(data.endsAt).toISOString(),active:true};
+   await MilkTeaApi.post(api+'/vouchers'+query(),payload);$('voucherForm').reset();
+ });
  bind('carrierForm',async data=>{await MilkTeaApi[data.id?'put':'post'](api+'/carriers'+(data.id?'/'+data.id:'')+query(),{name:data.name,fee:Number(data.fee),active:!!data.active});$('carrierForm').reset();});
  function applyRoles(){$('productMenuCode').readOnly=user.role!=='ADMIN';document.querySelectorAll('[data-roles]').forEach(e=>e.classList.toggle('d-none',!e.dataset.roles.split(' ').includes(user.role)));$('portalRole').textContent=user.fullName+' · '+user.role;}
  async function loadAccounts(){

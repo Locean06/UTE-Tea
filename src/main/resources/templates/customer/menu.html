@@ -211,9 +211,16 @@
                 position: relative;
                 background: #f3f2e9;
                 overflow: hidden;
+                aspect-ratio: 5 / 4;
             }
 
             .milk-menu-page .product-img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                object-position: center;
+                filter: saturate(1.03) contrast(1.02);
+                image-rendering: auto;
                 transition: transform .35s cubic-bezier(.22, 1, .36, 1);
             }
 
@@ -249,6 +256,23 @@
                 font-size: 12px;
                 line-height: 1.55;
                 min-height: 38px;
+            }
+
+            .milk-menu-page .product-favorite-btn {
+                background: linear-gradient(180deg, #f8faf2, #edf2df);
+                color: var(--menu-secondary-hover) !important;
+                border: 1px solid #cbd7bb !important;
+                border-radius: 999px !important;
+                font-weight: 700;
+                box-shadow: 0 2px 8px rgba(48, 58, 45, .06);
+            }
+
+            .milk-menu-page .product-favorite-btn:hover,
+            .milk-menu-page .product-favorite-btn:focus-visible {
+                background: #e4ecd3;
+                color: var(--menu-secondary-hover) !important;
+                border-color: #aebc94 !important;
+                box-shadow: 0 0 0 3px rgba(86, 92, 69, .12);
             }
 
             .milk-menu-page .product-card .border-top {
@@ -808,30 +832,17 @@
                 <p class="ute-hero-desc">Mỗi ly trà là một khoảng lặng dịu dàng giữa ngày bận rộn. Tận hưởng nguyên liệu chọn lọc, hương vị hài hòa và những khoảnh khắc đáng nhớ cùng UTE Tea.</p>
                 <div class="ute-hero-actions">
                     <a class="btn ute-hero-cta" href="#uteCatalog">Khám phá thực đơn <i class="bi bi-arrow-right ms-2"></i></a>
-                    <a class="btn ute-hero-ghost" th:href="@{/cart}"><i class="bi bi-bag me-2"></i>Đặt món ngay</a>
-                </div>
-                <div class="ute-hero-highlights" aria-label="Điểm đặc biệt của UTE Tea">
-                    <span><i class="bi bi-flower1"></i> Vị trà nguyên bản</span>
-                    <span><i class="bi bi-heart"></i> Pha chế theo gu</span>
                 </div>
             </div>
             <div class="ute-hero-art">
                 <img th:src="@{/images/ute-tea-bright-hero.webp}" src="/images/ute-tea-bright-hero.webp" width="1200" height="690" loading="eager" alt="Các thức uống trà sữa và trà trái cây mang phong cách UTE Tea">
-                <span class="ute-hero-photo-caption">Một ngụm trà. Một niềm vui.</span>
-            </div>
+                            </div>
         </section>
 
         <section class="ute-service-row ute-olive-promises" aria-label="Trải nghiệm tại UTE Tea">
             <div class="ute-service-item"><i class="bi bi-flower2"></i><div><strong>Nguyên liệu chọn lọc</strong><span>Trọn vị trà trong từng ngụm</span></div></div>
             <div class="ute-service-item"><i class="bi bi-stars"></i><div><strong>Chạm vị theo gu</strong><span>Tùy chọn size, topping và ghi chú</span></div></div>
             <div class="ute-service-item"><i class="bi bi-bag-heart"></i><div><strong>Đặt món tiện lợi</strong><span>Theo dõi đơn hàng dễ dàng</span></div></div>
-        </section>
-
-        <section id="uteBestSellers" class="ute-category-section d-none" aria-labelledby="uteBestTitle">
-            <div class="ute-section-label">BÁN CHẠY NHẤT</div>
-            <h2 class="ute-serif ute-centered-title" id="uteBestTitle">Món được yêu thích nhất</h2>
-            <p class="ute-section-subtitle">Những món đã bán trên 10 ly, xếp từ nhiều đến ít.</p>
-            <div id="uteBestGrid" class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3"></div>
         </section>
 
         <section class="ute-category-section" id="uteCategories" aria-labelledby="uteCategoryTitle">
@@ -844,6 +855,21 @@
                 <button class="ute-category-card ute-cat-coffee" type="button" onclick="selectFeaturedCategory('ca phe')"><i class="bi bi-cup"></i><span><strong>Cà phê</strong><small>Đậm đà, tỉnh táo</small></span><i class="bi bi-arrow-up-right ute-cat-arrow"></i></button>
                 <button class="ute-category-card ute-cat-more" type="button" onclick="selectFeaturedCategory('')"><i class="bi bi-grid-3x3-gap"></i><span><strong>Khám phá tất cả</strong><small>Đủ vị, đủ phong cách</small></span><i class="bi bi-arrow-up-right ute-cat-arrow"></i></button>
             </div>
+        </section>
+        <div th:if="${catalogUnavailable}" class="alert alert-warning mx-auto mb-4" role="alert" style="max-width:1200px">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <strong>Thực đơn đang tạm thời gián đoạn.</strong>
+            Trang UTE Tea vẫn hoạt động, nhưng một số sản phẩm chưa tải được. Vui lòng thử lại hoặc liên hệ quản trị viên kiểm tra bản cập nhật database.
+        </div>
+        <section th:if="${promoDiscountPercent != null}" class="ute-promo-before-menu px-3 px-lg-4 my-4" aria-label="Mã ưu đãi UTE Tea">
+          <div class="alert alert-warning border-0 shadow-sm rounded-4 d-flex flex-column flex-sm-row align-items-sm-center gap-3 py-3 px-4 mx-auto mb-0" style="max-width:1250px">
+            <i class="bi bi-tag-fill fs-3" aria-hidden="true"></i>
+            <div class="flex-grow-1">
+              <strong class="d-block">Giảm <span th:text="${#numbers.formatDecimal(promoDiscountPercent, 0, 0) + '%'}">10%</span> tổng hóa đơn bằng mã GIAMGIA10!</strong>
+              <span class="small">Nhập mã <strong class="user-select-all">GIAMGIA10</strong> ở giỏ hàng để giảm trên tổng tiền món và phí giao hàng. Áp dụng khi mã còn lượt và còn hạn.</span>
+            </div>
+            <a th:href="@{/cart(promo='GIAMGIA10')}" class="btn btn-primary-custom text-nowrap">Dùng mã ngay</a>
+          </div>
         </section>
         <section id="uteCatalog" class="ute-catalog-section" aria-label="Thực đơn UTE Tea">
         <div class="ute-section-label">HƯƠNG VỊ TỪ UTE TEA</div>
@@ -858,7 +884,7 @@
                     <span class="input-group-text bg-white border-end-0"><i class="bi bi-search" aria-hidden="true"></i></span>
                     <input id="uteProductSearch" type="search" class="form-control border-start-0"
                            placeholder="Tìm trà sữa, topping..." aria-label="Tìm món uống theo tên"
-                           oninput="filterCatalog()">
+                           oninput="scheduleCatalogFilter()">
                 </div>
                 <div class="menu-category-filter">
                 <select class="form-select rounded-pill fw-semibold shadow-sm"
@@ -883,7 +909,7 @@
         <div class="row g-2 mb-3">
             <div class="col-6 col-md-3"><label class="form-label small" for="catalogMin">Giá từ (₫)</label><input id="catalogMin" class="form-control" type="number" min="0" onchange="filterCatalog()"></div>
             <div class="col-6 col-md-3"><label class="form-label small" for="catalogMax">Giá đến (₫)</label><input id="catalogMax" class="form-control" type="number" min="0" onchange="filterCatalog()"></div>
-            <div class="col-12 col-md-6"><label class="form-label small" for="catalogSort">Sắp xếp</label><select id="catalogSort" class="form-select" onchange="filterCatalog()"><option value="newest">20 sản phẩm mới nhất</option><option value="bestselling">Bán chạy</option><option value="rating">Đánh giá cao</option><option value="favorites">Yêu thích nhiều nhất</option><option value="price_asc">Giá tăng dần</option><option value="price_desc">Giá giảm dần</option></select></div>
+            <div class="col-12 col-md-6"><label class="form-label small" for="catalogSort">Sắp xếp</label><select id="catalogSort" class="form-select" onchange="filterCatalog()"><option value="bestselling" selected>Bán chạy</option><option value="newest">20 sản phẩm mới nhất</option><option value="rating">Đánh giá cao</option><option value="favorites">Yêu thích nhiều nhất</option><option value="price_asc">Giá tăng dần</option><option value="price_desc">Giá giảm dần</option></select></div>
         </div>
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3" aria-label="Phân trang thực đơn"><button class="btn btn-sm btn-outline-secondary" id="catalogPrevious" onclick="changeCatalogPage(-1)" type="button">Trang trước</button><span id="catalogPageLabel" role="status" class="small"></span><button class="btn btn-sm btn-outline-secondary" id="catalogNext" onclick="changeCatalogPage(1)" type="button">Trang sau</button></div>
 
@@ -896,20 +922,16 @@
                         <img th:src="${p.imageUrl != null and !p.imageUrl.isEmpty() ? p.imageUrl : '/images/ute-tea-product-fallback.svg'}"
                              class="product-img" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/images/ute-tea-product-fallback.svg'"
                              alt="Ảnh món">
-                        <span class="position-absolute top-0 end-0 m-2 badge bg-dark bg-opacity-75 rounded-pill px-2 py-1 small"
-                              th:text="'Size ' + ${p.size}">
-                            Size M
-                        </span>
                     </div>
 
                     <div class="p-3 d-flex flex-column flex-grow-1">
                         <h5 class="fw-bold mb-1 text-truncate" th:text="${p.name}">Trà Sữa Truyền Thống</h5>
-                        <button type="button" class="btn btn-sm btn-outline-secondary mb-2 align-self-start" th:attr="onclick=|favoriteProduct(${p.id}, this)|" aria-label="Thêm vào yêu thích"><i class="bi bi-heart"></i> Yêu thích</button>
+                        <button type="button" class="btn btn-sm product-favorite-btn mb-2 align-self-start" th:attr="onclick=|favoriteProduct(${p.id}, this)|" aria-label="Thêm vào yêu thích"><i class="bi bi-heart"></i> Yêu thích</button>
 
                         <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top">
                             <span class="product-price"
-                                  th:text="${#numbers.formatDecimal(p.price, 0, 'POINT', 0, 'COMMA') + ' ₫'}">
-                                25.000 ₫
+                                  th:text="${(p.size == null or #strings.isEmpty(p.size) ? 'Từ ' : '') + #numbers.formatDecimal(p.price, 0, 'POINT', 0, 'COMMA') + ' ₫'}">
+                                Từ 25.000 ₫
                             </span>
                             <a sec:authorize="hasRole('CASHIER')"
                                href="/cashier"
@@ -936,23 +958,7 @@
                 </div>
                 <img th:src="@{/images/ute-tea-bright-hero.webp}" src="/images/ute-tea-bright-hero.webp" loading="lazy" width="450" height="270" alt="Những món trà tại UTE Tea">
             </div>
-        <div th:if="${settings != null and ((settings.discountType == 'FIXED_AMOUNT' and settings.discountValue != null and settings.discountValue > 0) or (settings.discountType != 'FIXED_AMOUNT' and settings.discountPercent != null and settings.discountPercent > 0))}"
-             class="alert alert-warning border-0 shadow-sm rounded-4 d-flex align-items-center mb-4 py-3 px-4">
-            <i class="bi bi-tag-fill fs-3 text-danger me-3"></i>
-            <div>
-                <strong class="d-block text-dark">Ưu Đãi Đặc Biệt Hôm Nay!</strong>
-                <span class="text-muted small">
-                    Quán đang áp dụng giảm giá
-                    <span th:if="${settings.discountType == 'FIXED_AMOUNT'}"
-                          class="badge bg-danger rounded-pill fs-6"
-                          th:text="${#numbers.formatDecimal(settings.discountValue, 0, 'COMMA', 0, 'POINT') + ' ₫'}">20,000 ₫</span>
-                    <span th:if="${settings.discountType != 'FIXED_AMOUNT'}"
-                          class="badge bg-danger rounded-pill fs-6"
-                          th:text="${#numbers.formatDecimal(settings.discountPercent, 0, 0) + '%'}">10%</span>
-                    trên mọi đơn hàng!
-                </span>
-            </div>
-        </div>
+
 
         </section>
 
@@ -970,7 +976,6 @@
             <div class="ute-experience-grid">
                 <a href="#uteCatalog" class="ute-exp-item"><i class="bi bi-bag-check"></i><strong>Đặt món trực tuyến</strong><span>Chọn thức uống và tùy chỉnh dễ dàng</span></a>
                 <a th:href="@{/cart}" class="ute-exp-item"><i class="bi bi-cart3"></i><strong>Giỏ hàng cá nhân</strong><span>Kiểm tra món trước khi đặt</span></a>
-                <a th:href="@{/orders}" class="ute-exp-item"><i class="bi bi-receipt-cutoff"></i><strong>Lịch sử đơn hàng</strong><span>Đăng nhập để xem các đơn đã đặt</span></a>
                 <a th:href="@{/profile}" class="ute-exp-item"><i class="bi bi-person-heart"></i><strong>Tài khoản của bạn</strong><span>Quản lý thông tin cá nhân</span></a>
             </div>
         </section>
@@ -988,6 +993,7 @@
     <th:block th:fragment="scripts">
         <script th:src="@{/js/customer/customer.js}"></script>
         <script th:src="@{/js/customer/menu-selection.js}"></script>
+        <script th:src="@{/js/customer/catalog-ui.js}"></script>
         <script th:inline="javascript">
 
             document.addEventListener('DOMContentLoaded', () => {
@@ -1013,68 +1019,67 @@
                 cartBtn.classList.add('cart-bounce');
             }
 
-            // Search and category filters share one predicate; existing category calls still work.
+            // The catalog API is paginated and can return products not present in the
+            // initial server-rendered HTML. Render API results instead of merely
+            // rearranging existing DOM nodes (which left later pages empty).
             let catalogPage = 0;
             let catalogRequest = 0;
+            let catalogSearchTimer = null;
             async function filterCatalog(reset = true) {
                 if (reset) catalogPage = 0;
                 const request = ++catalogRequest;
-                const selected = document.getElementById('categoryFilterSelect')?.value || 'ALL';
-                const params = new URLSearchParams({q:document.getElementById('uteProductSearch')?.value || '',sort:document.getElementById('catalogSort').value,page:String(catalogPage),size:'20'});
-                if (selected !== 'ALL') params.set('category', selected);
-                for (const [key,id] of Object.entries({min:'catalogMin',max:'catalogMax'})) if(document.getElementById(id).value) params.set(key,document.getElementById(id).value);
+                const get = id => document.getElementById(id);
+                const category = get('categoryFilterSelect')?.value || 'ALL';
+                const params = new URLSearchParams({
+                    q: get('uteProductSearch')?.value || '',
+                    sort: get('catalogSort')?.value || 'bestselling',
+                    page: String(catalogPage),
+                    size: '20'
+                });
+                if (category !== 'ALL') params.set('category', category);
+                for (const [key, id] of Object.entries({min:'catalogMin', max:'catalogMax'})) {
+                    const value = get(id)?.value;
+                    if (value) params.set(key, value);
+                }
+                UTETeaCatalog.setLoading(true);
                 try {
-                    const result = await MilkTeaApi.get('/api/v1/public/market/catalog?'+params);
-                    if(request!==catalogRequest) return;
-                    const grid = document.getElementById('productsGrid');
-                    const nodes = new Map([...grid.querySelectorAll('.product-item')].map(n=>[Number(n.dataset.id),n]));
-                    nodes.forEach(n=>n.style.display='none');
-                    result.items.forEach(p=>{const n=nodes.get(p.id);if(n){n.style.display='';grid.append(n);}});
-                    document.getElementById('uteCatalogEmpty').classList.toggle('d-none',result.items.length>0);
-                    document.getElementById('catalogPageLabel').textContent='Trang '+(catalogPage+1)+' / '+Math.max(1,Math.ceil(result.total/20))+' · '+result.total+' món';
-                    document.getElementById('catalogPrevious').disabled=catalogPage===0;
-                    document.getElementById('catalogNext').disabled=(catalogPage+1)*20>=result.total;
-                } catch(e) { if(request===catalogRequest) MilkTeaApi.showToast(e.message,'error'); }
+                    const result = await MilkTeaApi.get('/api/v1/public/market/catalog?' + params);
+                    if (request !== catalogRequest) return;
+                    UTETeaCatalog.render(result, catalogPage);
+                } catch (error) {
+                    if (request === catalogRequest) {
+                        // Preserve the initial Thymeleaf cards as a fallback when
+                        // the API is unavailable, and show an actionable error.
+                        UTETeaCatalog.showError(error.message || 'Không thể tải thực đơn.');
+                    }
+                } finally {
+                    if (request === catalogRequest) UTETeaCatalog.setLoading(false);
+                }
             }
-            function changeCatalogPage(delta){catalogPage=Math.max(0,catalogPage+delta);filterCatalog(false);}
-            async function loadBestSellers() {
-                try {
-                    const list = await MilkTeaApi.get('/api/v1/public/market/best-sellers?minSold=10&limit=12');
-                    const section = document.getElementById('uteBestSellers'), grid = document.getElementById('uteBestGrid');
-                    if (!list || !list.length) return;
-                    grid.replaceChildren();
-                    list.forEach(item => {
-                        const p = item.product, col = document.createElement('div'), card = document.createElement('article');
-                        col.className = 'col'; card.className = 'card h-100 overflow-hidden';
-                        const img = document.createElement('img');
-                        img.src = p.imageUrl || '/images/ute-tea-product-fallback.svg'; img.alt = p.name; img.loading = 'lazy';
-                        img.style.cssText = 'width:100%;aspect-ratio:1;object-fit:cover';
-                        img.onerror = () => { img.onerror = null; img.src = '/images/ute-tea-product-fallback.svg'; };
-                        const body = document.createElement('div'); body.className = 'card-body d-flex flex-column gap-1';
-                        const name = document.createElement('h3'); name.className = 'h6 mb-0'; name.textContent = p.name;
-                        const sold = document.createElement('span'); sold.className = 'small text-muted'; sold.textContent = 'Đã bán ' + item.sold;
-                        const price = document.createElement('strong'); price.textContent = MilkTeaApi.formatVND(p.price);
-                        const add = document.createElement('button'); add.type = 'button'; add.className = 'btn btn-primary-custom btn-sm mt-auto'; add.textContent = 'Thêm';
-                        add.addEventListener('click', () => MenuSelection.open(p.id));
-                        body.append(name, sold, price, add); card.append(img, body); col.append(card); grid.append(col);
-                    });
-                    section.classList.remove('d-none');
-                } catch (e) { /* khu vực bán chạy là phần phụ, không chặn trang chủ */ }
+            function changeCatalogPage(delta) {
+                catalogPage = Math.max(0, catalogPage + delta);
+                filterCatalog(false);
             }
-            document.addEventListener('DOMContentLoaded',()=>{
-                loadBestSellers();
+            document.addEventListener('DOMContentLoaded', () => {
+                UTETeaCatalog.consolidateInitialCards();
                 filterCatalog();
-                const product=Number(new URLSearchParams(location.search).get('product'));
-                if(product) openCustomizeModal(product);
+                const product = Number(new URLSearchParams(location.search).get('product'));
+                if (product) openCustomizeModal(product);
             });
-            function filterCategory(catId) { filterCatalog(); }
+            function filterCategory() { filterCatalog(); }
+            // Avoid sending one database search request for every keystroke.
+            function scheduleCatalogFilter() {
+                clearTimeout(catalogSearchTimer);
+                catalogSearchTimer = setTimeout(() => filterCatalog(), 250);
+            }
+
             async function favoriteProduct(id, button) {
                 if (!document.body.dataset.accountId) { window.location.href='/login?redirect=/'; return; }
                 try {
                     const enabled=button.dataset.favorite!=='true';
                     await MilkTeaApi.put('/api/v1/account/favorites/'+id+'?enabled='+enabled);
                     button.dataset.favorite=String(enabled);
-                    button.textContent=enabled?'♥ Đã yêu thích':'♡ Yêu thích';
+                    button.innerHTML = enabled ? '<i class="bi bi-heart-fill"></i> Đã yêu thích' : '<i class="bi bi-heart"></i> Yêu thích';
                 } catch(e) { MilkTeaApi.showToast(e.message,'error'); }
             }
 

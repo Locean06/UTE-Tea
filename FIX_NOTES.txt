@@ -1,0 +1,16 @@
+UTE-Tea - Bản chỉnh sửa luồng đặt hàng (28/10/2026)
+
+ĐÃ SỬA
+1) MarketService.checkout: bắt buộc cartVersion và so khớp giỏ server.
+2) customer.js: thêm clearCartIfVersion để tránh xóa giỏ cập nhật từ tab khác; gửi Idempotency-Key khi đặt counter.
+3) delivery-checkout.js: chỉ xóa giỏ nếu phiên bản vẫn đúng với checkout.
+
+CHƯA ĐƯỢC KIỂM CHỨNG
+- Không có Maven và database trong môi trường xử lý: chưa chạy compile/integration test.
+- Đã điều chỉnh fixture MarketIntegrationTest và MarketConcurrencyTest cho cartVersion; chưa thể chạy suite để xác nhận.
+- VNPAY hết hạn/hủy giao dịch hoàn kho, đồng bộ callback và token khách vãng lai cần kiểm thử thực tế.
+- Backend counter replay hiện không trả token xem đơn cho guest: nếu mạng lỗi và retry cùng khóa, guest có thể không có token xem đơn. Chưa sửa backend token do cần kiểm tra thiết kế bảo mật.
+
+LỆNH CHẠY
+mvn clean test
+mvn spring-boot:run
