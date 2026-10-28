@@ -118,7 +118,8 @@ public class NeonLocalCatalogSeed implements CommandLineRunner {
         }
 
         var uniqueMenu = new HashSet<String>();
-        for (Product p : products.findAllByActiveTrue()) {
+        // Include discontinued items too: a later restart must never re-create deleted demo products.
+        for (Product p : products.findAll()) {
             if (p.getShop() == null) uniqueMenu.add(p.getName().toLowerCase(java.util.Locale.ROOT) + "|" + p.getSize().toLowerCase(java.util.Locale.ROOT));
         }
 
