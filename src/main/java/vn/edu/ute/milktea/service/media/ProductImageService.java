@@ -206,10 +206,13 @@ public class ProductImageService {
                     "overwrite", true));
             secureUrl = (String) uploadResult.get("secure_url");
             publicId = (String) uploadResult.get("public_id");
-        } catch (IOException e) {
-            log.error("Lỗi khi tải logo quán lên Cloudinary: {}", e.getMessage());
+            if (secureUrl == null || secureUrl.isBlank() || publicId == null || publicId.isBlank()) {
+                throw new IllegalStateException("Cloudinary upload result missing secure_url or public_id");
+            }
+        } catch (Exception e) {
+            log.error("Cloudinary logo upload failed; check CLOUDINARY_CLOUD_NAME, API_KEY, API_SECRET and upload permissions", e);
             throw BusinessException.badRequest(ErrorCode.IMAGE_UPLOAD_FAILED,
-                    "Không thể tải logo lên Cloudinary: " + e.getMessage());
+                    "Không thể tải logo lên Cloudinary. Vui lòng kiểm tra cấu hình Cloudinary hoặc xem Render Logs.");
         }
 
         // Lưu DB và cleanup ảnh mới nếu thất bại
