@@ -13,15 +13,20 @@ import vn.edu.ute.milktea.repository.market.VoucherRepository;
 
 /** Seed demo voucher once; local/prod SQL Server uses migration 14. */
 @Component
-@Profile("demo")
+@Profile({"demo", "prod"})
 @Order(12)
 @RequiredArgsConstructor
 public class PromotionDemoData implements CommandLineRunner {
     private final VoucherRepository vouchers;
+    private final org.springframework.core.env.Environment environment;
+
+    @org.springframework.beans.factory.annotation.Value("${DEMO_SEED_ENABLED:false}")
+    private boolean demoSeedEnabled;
 
     @Override
     @Transactional
     public void run(String... args) {
+        if (environment.acceptsProfiles(org.springframework.core.env.Profiles.of("prod")) && !demoSeedEnabled) return;
         if (vouchers.findByCode("GIAMGIA10").isPresent()) return;
         Voucher v = new Voucher();
         v.setCode("GIAMGIA10");
