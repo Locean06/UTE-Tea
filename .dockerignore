@@ -1,0 +1,15 @@
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+target
+.idea
+.vscode
+*.log
+logs
+node_modules
+*.pem
+*.key
+UTE-Tea-test
+UTE-Tea-test/**
