@@ -239,7 +239,7 @@ public class AdminService {
     // ==========================================
     @Transactional(readOnly = true)
     public List<AdminDto.CategoryResponse> listCategories() {
-        return categoryRepository.findAll().stream().filter(c -> c.getShop() == null).map(c -> AdminDto.CategoryResponse.builder()
+        return categoryRepository.findAll().stream().filter(c -> c.getShop() == null && Boolean.TRUE.equals(c.getActive())).map(c -> AdminDto.CategoryResponse.builder()
                 .id(c.getId())
                 .name(c.getName())
                 .active(c.getActive())
@@ -318,7 +318,7 @@ public class AdminService {
     // ==========================================
     @Transactional(readOnly = true)
     public List<AdminDto.ProductResponse> listProducts() {
-        return productRepository.findAll().stream().filter(p -> p.getShop() == null).map(this::mapProduct).toList();
+        return productRepository.findAll().stream().filter(p -> p.getShop() == null && Boolean.TRUE.equals(p.getActive())).map(this::mapProduct).toList();
     }
 
     @Transactional(readOnly = true)
@@ -369,7 +369,7 @@ public class AdminService {
 
         String productName = request.getName().trim();
         String productSize = request.getSize().trim().toUpperCase();
-        if (productRepository.existsByNameIgnoreCaseAndSizeIgnoreCase(productName, productSize)) {
+        if (productRepository.existsByShopIsNullAndActiveTrueAndNameIgnoreCaseAndSizeIgnoreCase(productName, productSize)) {
             throw BusinessException.conflict(
                     ErrorCode.VALIDATION_FAILED,
                     "Món uống này đã tồn tại với cùng size"
