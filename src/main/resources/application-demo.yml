@@ -24,3 +24,9 @@ app:
   jwt:
     secret-base64: dGhpc0lzQVZlcnlTZWN1cmVCYXNlNjRTZWNyZXRLZXlGb3JNaWxrVGVhQXBwMjAyNg==
     ttl-minutes: 120
+
+# In local/demo, SMTP credentials are optional: do not mark health DOWN.
+management:
+  health:
+    mail:
+      enabled: false
