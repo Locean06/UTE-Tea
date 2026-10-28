@@ -665,10 +665,17 @@
                     </div>
 
                     <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-outline-primary rounded-pill px-3" data-bs-toggle="modal"
-                            data-bs-target="#createCategoryModal">
-                            <i class="bi bi-folder-plus me-1"></i> Thêm Danh Mục
-                        </button>
+                        <div class="d-flex flex-wrap align-items-center gap-3">
+                            <label class="d-flex align-items-center gap-2 small mb-0" for="showHiddenCategories">
+                                <input type="checkbox" id="showHiddenCategories" class="form-check-input mt-0"
+                                       onchange="toggleHiddenCategories()">
+                                Hiện danh mục đã xóa
+                            </label>
+                            <button type="button" class="btn btn-outline-primary rounded-pill px-3" data-bs-toggle="modal"
+                                    data-bs-target="#createCategoryModal">
+                                <i class="bi bi-folder-plus me-1"></i> Thêm Danh Mục
+                            </button>
+                        </div>
 
                         <button type="button" class="btn btn-primary-custom rounded-pill px-3" data-bs-toggle="modal"
                             data-bs-target="#createProductModal">
@@ -682,7 +689,7 @@
                         <div>
                             <h5 class="brand-font mb-1">Danh Mục</h5>
                             <p class="text-muted small mb-0">
-                                Thêm, sửa và bật/tắt danh mục món uống
+                                Thêm, sửa và xóa khỏi thực đơn; có thể khôi phục danh mục đã ẩn
                             </p>
                         </div>
 
@@ -700,12 +707,14 @@
                                     <th>Tên Danh Mục</th>
                                     <th>Topping Đi Kèm</th>
                                     <th>Trạng Thái</th>
-                                    <th style="width: 180px;">Thao Tác</th>
+                                    <th style="width: 225px;">Thao Tác</th>
                                 </tr>
                             </thead>
 
-                            <tbody>
-                                <tr th:each="cat : ${categories}">
+                            <tbody id="categoryTableBody">
+                                <tr th:each="cat : ${categories}"
+                                    th:attr="data-category-hidden=${!cat.active}"
+                                    th:classappend="${cat.active} ? '' : 'd-none'">
                                     <td class="fw-semibold text-muted" th:text="'#' + ${cat.id}">#1</td>
                                     <td><strong th:text="${cat.name}">Trà Sữa Truyền Thống</strong></td>
                                     <td>
@@ -734,15 +743,16 @@
                                             <button th:if="${cat.active}" type="button"
                                                 class="btn btn-sm btn-outline-danger rounded-pill px-2" th:attr="data-category-id=${cat.id},
                                                      data-category-name=${cat.name}" onclick="deactivateCategory(this)"
-                                                title="Ẩn danh mục">
-                                                <i class="bi bi-trash"></i>
+                                                title="Xóa danh mục khỏi thực đơn">
+                                                <i class="bi bi-trash me-1"></i> Xóa
                                             </button>
 
                                             <button th:unless="${cat.active}" type="button"
                                                 class="btn btn-sm btn-outline-success rounded-pill px-2" th:attr="data-category-id=${cat.id},
-                                                     data-category-name=${cat.name}" onclick="restoreCategory(this)"
-                                                title="Bật lại danh mục">
-                                                <i class="bi bi-arrow-counterclockwise"></i>
+                                                     data-category-name=${cat.name},
+                                                     data-category-allow-topping=${cat.allowTopping}" onclick="restoreCategory(this)"
+                                                title="Khôi phục danh mục">
+                                                <i class="bi bi-arrow-counterclockwise me-1"></i> Khôi phục
                                             </button>
                                         </div>
                                     </td>
@@ -792,9 +802,9 @@
                             <div class="col-12 col-md-6 col-lg-3">
                                 <select id="productFilterActive" class="form-select rounded-pill"
                                     aria-label="Lọc theo trạng thái" onchange="AdminApp.loadProducts(1)">
+                                    <option value="true" selected>Đang bán</option>
+                                    <option value="false">Ngừng bán / Đã xóa</option>
                                     <option value="">Tất cả trạng thái</option>
-                                    <option value="true">Đang bán</option>
-                                    <option value="false">Ngừng bán</option>
                                 </select>
                             </div>
 
@@ -819,7 +829,7 @@
                                     <th>Size</th>
                                     <th>Giá Bán</th>
                                     <th>Trạng Thái</th>
-                                    <th style="width: 210px;">Thao Tác</th>
+                                    <th style="width: 300px;">Thao Tác</th>
                                 </tr>
                             </thead>
 
@@ -874,6 +884,20 @@
                                                     accept="image/jpeg,image/png,image/webp"
                                                     th:attr="onchange=|AdminApp.uploadProductImage(${p.id}, this)|">
                                             </label>
+                                            <button th:if="${p.active}" type="button"
+                                                class="btn btn-sm btn-outline-danger rounded-pill px-2"
+                                                th:attr="data-product-id=${p.id}"
+                                                onclick="AdminApp.deleteProduct(this.dataset.productId, this)"
+                                                title="Xóa món khỏi thực đơn">
+                                                <i class="bi bi-trash me-1"></i> Xóa
+                                            </button>
+                                            <button th:unless="${p.active}" type="button"
+                                                class="btn btn-sm btn-outline-success rounded-pill px-2"
+                                                th:attr="data-product-id=${p.id}"
+                                                onclick="AdminApp.restoreProduct(this.dataset.productId, this)"
+                                                title="Khôi phục món">
+                                                <i class="bi bi-arrow-counterclockwise me-1"></i> Khôi phục
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -1458,22 +1482,25 @@
                 AdminApp.updateCategory(id, name, active, allowTopping);
             }
 
+            function toggleHiddenCategories() {
+                const checked = document.getElementById('showHiddenCategories')?.checked === true;
+                document.querySelectorAll('#categoryTableBody tr[data-category-hidden="true"]').forEach(row => {
+                    row.classList.toggle('d-none', !checked);
+                });
+            }
+
             function deactivateCategory(button) {
                 const id = button.dataset.categoryId;
                 const name = button.dataset.categoryName || 'danh mục này';
-
-                if (!confirm(`Ẩn danh mục "${name}"? Các món trong danh mục này vẫn được giữ nguyên.`)) {
-                    return;
-                }
-
+                if (!confirm(`Xóa danh mục "${name}" khỏi thực đơn?\\nDanh mục không có món sẽ được xóa hẳn. Danh mục đã có món sẽ được ẩn để giữ công thức, đơn hàng và có thể khôi phục.`)) return;
                 AdminApp.deleteCategory(id);
             }
 
             function restoreCategory(button) {
                 const id = button.dataset.categoryId;
                 const name = button.dataset.categoryName || '';
-
-                AdminApp.updateCategory(id, name, true);
+                const allowTopping = button.dataset.categoryAllowTopping === 'true';
+                AdminApp.updateCategory(id, name, true, allowTopping);
             }
 
             let currentRecipeRows = [];
