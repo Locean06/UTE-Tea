@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,12 +42,16 @@ import java.util.List;
 
 @Slf4j
 @Component
-@Profile({ "test", "demo" })
+@Profile({ "test", "demo", "prod" })
 @RequiredArgsConstructor
 @org.springframework.core.annotation.Order(0)
 public class DataInitializer implements CommandLineRunner {
 
         private final AccountRepository accountRepository;
+        private final Environment environment;
+
+        @Value("${DEMO_SEED_ENABLED:false}")
+        private boolean demoSeedEnabled;
         private final GlobalSettingsRepository settingsRepository;
         private final DiningTableRepository tableRepository;
         private final CategoryRepository categoryRepository;
@@ -66,18 +73,33 @@ public class DataInitializer implements CommandLineRunner {
         @Override
         @Transactional
         public void run(String... args) {
-                if (accountRepository.count() > 0) {
-                        log.info("Dữ liệu hệ thống đã tồn tại. Bỏ qua khởi tạo tự động.");
+                boolean productionDemo = environment.acceptsProfiles(Profiles.of("prod"));
+                if (productionDemo && !demoSeedEnabled) return;
+                if (settingsRepository.existsById(1)
+                        || (!productionDemo && accountRepository.count() > 0)) {
+                        log.info("Dữ liệu demo đã có; bỏ qua khởi tạo nội dung ban đầu.");
                         return;
                 }
 
                 log.info("Bắt đầu khởi tạo dữ liệu mẫu cho hệ thống UTE Tea...");
 
+                // 1. Reuse separately generated BCrypt demo logins on production.
+                //    Existing test/demo profiles retain their original test fixture users.
+                Account admin;
+                Account cashier;
+                Account kitchen;
+                Account customer;
+                if (productionDemo) {
+                    admin = accountRepository.findByEmail("nguyenthienan@utetea.vn").orElseThrow();
+                    cashier = accountRepository.findByEmail("phamthuha@utetea.vn").orElseThrow();
+                    kitchen = accountRepository.findByEmail("nguyenducminh@utetea.vn").orElseThrow();
+                    customer = accountRepository.findByEmail("maiphuongthao@utetea.vn").orElseThrow();
+                } else {
                 // 1. Tài khoản mẫu
                 String passHash = passwordEncoder.encode(
                                 defaultAdminPassword != null && !defaultAdminPassword.isBlank() ? defaultAdminPassword
                                                 : "Password@123");
-                Account admin = accountRepository.save(Account.builder()
+                admin = accountRepository.save(Account.builder()
                                 .email("admin@utetea.vn")
                                 .passwordHash(passHash)
                                 .fullName("Quản Trị Viên")
@@ -88,7 +110,7 @@ public class DataInitializer implements CommandLineRunner {
                                 .createdAt(Instant.now())
                                 .build());
 
-                Account cashier = accountRepository.save(Account.builder()
+                cashier = accountRepository.save(Account.builder()
                                 .email("cashier@utetea.vn")
                                 .passwordHash(passHash)
                                 .fullName("Thu Ngân Quỳnh")
@@ -99,7 +121,7 @@ public class DataInitializer implements CommandLineRunner {
                                 .createdAt(Instant.now())
                                 .build());
 
-                Account kitchen = accountRepository.save(Account.builder()
+                kitchen = accountRepository.save(Account.builder()
                                 .email("kitchen@utetea.vn")
                                 .passwordHash(passHash)
                                 .fullName("Bếp Trưởng Lân")
@@ -110,7 +132,7 @@ public class DataInitializer implements CommandLineRunner {
                                 .createdAt(Instant.now())
                                 .build());
 
-                Account customer = accountRepository.save(Account.builder()
+                customer = accountRepository.save(Account.builder()
                                 .email("customer@utetea.vn")
                                 .passwordHash(passHash)
                                 .fullName("Khách Hàng Mai")
@@ -120,6 +142,9 @@ public class DataInitializer implements CommandLineRunner {
                                 .tokenVersion(1L)
                                 .createdAt(Instant.now())
                                 .build());
+
+
+                }
 
                 // 2. Cấu hình chung
                 settingsRepository.save(GlobalSettings.builder()
