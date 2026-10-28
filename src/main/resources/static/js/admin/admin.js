@@ -217,10 +217,52 @@ const AdminApp = (() => {
 
         try {
             await MilkTeaApi.delete(`/api/v1/admin/categories/${id}`);
-            MilkTeaApi.showToast('Đã ẩn danh mục thành công!', 'success');
+            MilkTeaApi.showToast('Đã xóa danh mục khỏi thực đơn. Danh mục có món sẽ được lưu để có thể khôi phục.', 'success');
             setTimeout(() => window.location.reload(), 500);
         } catch (e) {
             MilkTeaApi.showToast(e.message || 'Lỗi ẩn danh mục', 'error');
+        }
+    }
+
+    async function deleteProduct(id, button) {
+        const productId = Number(id);
+        if (!Number.isSafeInteger(productId) || productId <= 0) return;
+        const name = button?.closest('tr')?.querySelector('td:nth-child(2) strong')?.textContent?.trim() || 'món uống này';
+        if (!window.confirm(`Xóa "${name}" khỏi thực đơn?\\nMón sẽ ngừng bán và không hiển thị trong danh sách mặc định. Lịch sử đơn hàng và công thức vẫn được giữ lại.`)) return;
+
+        if (button) button.disabled = true;
+        try {
+            await MilkTeaApi.delete(`/api/v1/admin/products/${productId}`);
+            MilkTeaApi.showToast('Đã xóa món khỏi thực đơn. Có thể tìm lại ở bộ lọc Ngừng bán / Đã xóa.', 'success');
+            await loadProducts(currentProductPage);
+        } catch (e) {
+            MilkTeaApi.showToast(e.message || 'Không xóa được món uống', 'error');
+        } finally {
+            if (button?.isConnected) button.disabled = false;
+        }
+    }
+
+    async function restoreProduct(id, button) {
+        const productId = Number(id);
+        if (!Number.isSafeInteger(productId) || productId <= 0) return;
+        if (button) button.disabled = true;
+        try {
+            const p = await MilkTeaApi.get(`/api/v1/admin/products/${productId}`);
+            await MilkTeaApi.put(`/api/v1/admin/products/${productId}`, {
+                categoryId: p.categoryId,
+                name: p.name,
+                size: p.size,
+                description: p.description,
+                price: p.price,
+                imageUrl: p.imageUrl,
+                active: true
+            });
+            MilkTeaApi.showToast('Đã khôi phục món uống.', 'success');
+            await loadProducts(currentProductPage);
+        } catch (e) {
+            MilkTeaApi.showToast(e.message || 'Không thể khôi phục món uống', 'error');
+        } finally {
+            if (button?.isConnected) button.disabled = false;
         }
     }
 
@@ -533,7 +575,7 @@ const AdminApp = (() => {
         const searchInput = document.getElementById('productSearchInput');
 
         if (catSelect) catSelect.value = '';
-        if (activeSelect) activeSelect.value = '';
+        if (activeSelect) activeSelect.value = 'true';
         if (searchInput) searchInput.value = '';
 
         loadProducts(1);
@@ -584,6 +626,16 @@ const AdminApp = (() => {
                             <input type="file" class="d-none" accept="image/jpeg,image/png,image/webp"
                                    onchange="AdminApp.uploadProductImage(${p.id}, this)">
                         </label>
+                        ${p.active
+                            ? `<button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2"
+                                       onclick="AdminApp.deleteProduct(${Number(p.id)}, this)" title="Xóa món khỏi thực đơn">
+                                   <i class="bi bi-trash me-1"></i>Xóa
+                               </button>`
+                            : `<button type="button" class="btn btn-sm btn-outline-success rounded-pill px-2"
+                                       onclick="AdminApp.restoreProduct(${Number(p.id)}, this)" title="Khôi phục món">
+                                   <i class="bi bi-arrow-counterclockwise me-1"></i>Khôi phục
+                               </button>`
+                        }
                     </div>
                 </td>
             </tr>`;
@@ -832,6 +884,8 @@ const AdminApp = (() => {
         createCategory,
         updateCategory,
         deleteCategory,
+        deleteProduct,
+        restoreProduct,
         createProduct,
         updateRecipe,
         createTable,
