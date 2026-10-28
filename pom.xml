@@ -118,6 +118,13 @@
             <version>2.5.0</version>
         </dependency>
 
+        <!-- PostgreSQL / Neon (production) -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- H2 -->
         <dependency>
             <groupId>com.h2database</groupId>
