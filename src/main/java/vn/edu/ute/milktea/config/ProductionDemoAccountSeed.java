@@ -29,27 +29,27 @@ public class ProductionDemoAccountSeed implements CommandLineRunner {
 
     // role | email | display name | precomputed BCrypt password hash
     private static final String[][] USERS = {
-        {"ADMIN", "nguyenthienan@utetea.vn", "Nguyễn Thiên An", "$2y$11$6lyZMpHOSKgaw2og8NGWZeHEKMMJBqZJWyK5Xy9iPqdGbpf3fRw5q"},
-        {"ADMIN", "tranminhkhoa@utetea.vn", "Trần Minh Khoa", "$2y$11$uqNCYdbLMYnf6I9lwNv2Q.2HCY1cWptjlMuToPt.62zc/eYBwznbu"},
-        {"ADMIN", "lehoangphuc@utetea.vn", "Lê Hoàng Phúc", "$2y$11$rGrj0Y9nJ5OLXx6U.Y76xOPugO/MnmoXR8UkZwnQX72vI7NHeTbom"},
-        {"CASHIER", "phamthuha@utetea.vn", "Phạm Thu Hà", "$2y$11$FkLK4sNehKacmAyEw9KxlesvouAUBGLvo2L1BblJ2E8REX7orToXu"},
-        {"CASHIER", "vongoclinh@utetea.vn", "Võ Ngọc Linh", "$2y$11$Egf9gdxkWHZKXe5Cux5Q9uSMT7H1m6DzGnRkxC24GchhIqQ9HB7gS"},
-        {"CASHIER", "buitramanh@utetea.vn", "Bùi Trâm Anh", "$2y$11$FiMmTdWzPcEw2/anE7Zh..YoeEQc2UDQK/UramC.JJzWv/DA2JfQi"},
-        {"KITCHEN", "nguyenducminh@utetea.vn", "Nguyễn Đức Minh", "$2y$11$EKYKKnjZCI9JcnujzjoJTu9DsZST0cBmD7C2PaFInL16ygVwg2Tcm"},
-        {"KITCHEN", "tranduylong@utetea.vn", "Trần Duy Long", "$2y$11$uKZZ1.DlaV9y46hHm3SMC.12qYJtbbwBVwtJFsmMGSz9abQYFcYCa"},
-        {"KITCHEN", "hoangbaotran@utetea.vn", "Hoàng Bảo Trân", "$2y$11$0ftnT.m0d2uxbaQ2b5d1Yu.cFbJTOqTe9lFfpbE4RIOHYzMj9ury2"},
-        {"CUSTOMER", "maiphuongthao@utetea.vn", "Mai Phương Thảo", "$2y$11$t6nhpFr2CF6tk/VVIHJCxOm3VAXdC2wj/tMXXgM3xVc1654qNDlnC"},
-        {"CUSTOMER", "nguyenkhanhvy@utetea.vn", "Nguyễn Khánh Vy", "$2y$11$69KvPwuyDzay1pKlqQmQV.2Q6MFti0J8yzPB.jS4QO3tzQqxHCdfm"},
-        {"CUSTOMER", "levanhoan@utetea.vn", "Lê Văn Hoàn", "$2y$11$RpE1MnM055uzeR2XeGpoQuR2v3JJhtGPWsm2UnWgojbaLpzcS7gcq"},
-        {"VENDOR", "dangthanhbinh@utetea.vn", "Đặng Thanh Bình", "$2y$11$WVqy0h7aNTh2Xp9TPAyjju/A2JfCXpRrGhkHGlpgfoCNXhmn4Vl3e"},
-        {"VENDOR", "phamgiahan@utetea.vn", "Phạm Gia Hân", "$2y$11$XzD5uU80qhA2QwKMoZpUfuaeSB5KzFewOFwqV3l1FtgamYEX5wUXq"},
-        {"VENDOR", "truonghieunghia@utetea.vn", "Trương Hiếu Nghĩa", "$2y$11$5wuPc6CC0sRJnxv8/ED3yuflJ6S.7nwOQ3UvNMp8jaZkAqD7ZNdn."},
-        {"MANAGER", "dohongnhung@utetea.vn", "Đỗ Hồng Nhung", "$2y$11$9.huofGkmZaUIH5tuU2wfOQvZK.D96dBShrSrkXZ8z7udoaXfHypK"},
-        {"MANAGER", "nguyentuananh@utetea.vn", "Nguyễn Tuấn Anh", "$2y$11$IE7cbJWsfPlLWCY/SWmh/OzGgwQlZLhtRPmtknkI4MmnbVk8wnfue"},
-        {"MANAGER", "lethanhthao@utetea.vn", "Lê Thanh Thảo", "$2y$11$lePX9Vq3BKb4.2RS21egwOG7VmGdkAz1w8pYz/zsUTCJQIns2tPeK"},
-        {"SHIPPER", "vominhquan@utetea.vn", "Võ Minh Quân", "$2y$11$u3AxES7Lg9qRzgYGfaCWaetrEVJmpBB8nueqnqeBrKPKQB1joX3zS"},
-        {"SHIPPER", "tranhuyhoang@utetea.vn", "Trần Huy Hoàng", "$2y$11$FGi5DpV8OIxSfZLWZOrcgeoCRWRoUVKlA6v4xAb1G4y0EWjkdxzPK"},
-        {"SHIPPER", "buiduckhang@utetea.vn", "Bùi Đức Khang", "$2y$11$Q0msuwvVqfye6Isf6.kTl.XZO0dLJ.UYTXeSKQmCW9.UKyE5rpufy"}
+        {"ADMIN", "nguyenthienan@utetea.vn", "Nguyễn Thiên An", "$2y$11$kHXxrdOTFR2u3jTclgJuBedhc2aFQKpyrIVis72pZhkgPX4EXioLm"},
+        {"ADMIN", "tranminhkhoa@utetea.vn", "Trần Minh Khoa", "$2y$11$KNux0KW5eWjXnsmek1ha/.D9.DN59ElePI7EpBS4P.lR3nF5aZ0wS"},
+        {"ADMIN", "lehoangphuc@utetea.vn", "Lê Hoàng Phúc", "$2y$11$SbPxlEb24hWbaXyoIuldx.B/niXynUjpkEVxWe96mxxC2B/kq3RM2"},
+        {"CASHIER", "phamthuha@utetea.vn", "Phạm Thu Hà", "$2y$11$c4gKqQEdthsogaZbM.yz9O3YtISwWfOA19ms.bAf.gPBy6D4ml.UK"},
+        {"CASHIER", "vongoclinh@utetea.vn", "Võ Ngọc Linh", "$2y$11$CE7a216kU82XTWg0ADzAt.P3dZMHNdNbEb307Pj.Tp8jT341FEaxK"},
+        {"CASHIER", "buitramanh@utetea.vn", "Bùi Trâm Anh", "$2y$11$EWpcsUUGoSUCRPMMUl/8ye9FEI4qizFFWbmYbneUVayErQcNsMi02"},
+        {"KITCHEN", "nguyenducminh@utetea.vn", "Nguyễn Đức Minh", "$2y$11$mlPY9AmjQOhDplG5SLLp1OA4Li5he1N.4v4xKIiWsEJ0i8EF4Lt9."},
+        {"KITCHEN", "tranduylong@utetea.vn", "Trần Duy Long", "$2y$11$6hx0chGpZ.WHdqrgJB/SMuyE4g7HqCNaqGemCIwSkV6QiZtX.eifO"},
+        {"KITCHEN", "hoangbaotran@utetea.vn", "Hoàng Bảo Trân", "$2y$11$iKR7eDGCRod.x6kqRG0sJeUCOyanXDEMQOIfAqKWa2wvPJEp9dIBa"},
+        {"CUSTOMER", "maiphuongthao@utetea.vn", "Mai Phương Thảo", "$2y$11$HV63ED89EXuUhHD570WltOTWCVOkuxMbIwDTtfwK0VX1Rt21oR2uy"},
+        {"CUSTOMER", "nguyenkhanhvy@utetea.vn", "Nguyễn Khánh Vy", "$2y$11$rjft1/yvpWfCbwqnox/ARuZKQ8xZ2HE1MwC63L8MKVTx1mDwoJiu6"},
+        {"CUSTOMER", "levanhoan@utetea.vn", "Lê Văn Hoàn", "$2y$11$gCWrt6gp.s/Fgi/KRL2xneAyh8a23c.mjSOZC/g7QsYNUmW.v7n2O"},
+        {"VENDOR", "dangthanhbinh@utetea.vn", "Đặng Thanh Bình", "$2y$11$GcOB15.evysN9C7XS.4bR.4kYIPIrz9VkaADOUmX2PDS7RJU0uLNK"},
+        {"VENDOR", "phamgiahan@utetea.vn", "Phạm Gia Hân", "$2y$11$qJK.VAsXdRJaMuCaKMEYTe7E58Q4hV8G1J.pV0JsOBdXx3qGMBHAy"},
+        {"VENDOR", "truonghieunghia@utetea.vn", "Trương Hiếu Nghĩa", "$2y$11$UPiOWX9.GnjwGNouAMDn0OnCQobqDO7XjNVp/3pKRqzcM2LJHoPj."},
+        {"MANAGER", "dohongnhung@utetea.vn", "Đỗ Hồng Nhung", "$2y$11$/xDP6/HWSP0MIIzEJ99FvONjFlAmoreK/ha3hiv0prIkFJQCHrE.2"},
+        {"MANAGER", "nguyentuananh@utetea.vn", "Nguyễn Tuấn Anh", "$2y$11$ULpGQCOGB12JctUtRrl/QOR6dCUMooL/NOdVgiNdYmbzVDyCNmXy6"},
+        {"MANAGER", "lethanhthao@utetea.vn", "Lê Thanh Thảo", "$2y$11$LzrFKtlNl0HUaDsA1z6JZODqP7nGRCRmXHZwkGEUSYQqMznfThb7u"},
+        {"SHIPPER", "vominhquan@utetea.vn", "Võ Minh Quân", "$2y$11$D7UQEaF3dcno5jkXoY8piuufnYfOUyxUtozK48eIDyrWPHvYwtsUS"},
+        {"SHIPPER", "tranhuyhoang@utetea.vn", "Trần Huy Hoàng", "$2y$11$OtyIrFsjEkGNKIssDu3UiubvvcqtBAATitwM.xrTLDtURzpv9hI.W"},
+        {"SHIPPER", "buiduckhang@utetea.vn", "Bùi Đức Khang", "$2y$11$renhnl.o2/UEwW9fchA59eCH4wDB4iCQL6zJZRk.E/vsSoOiWX37O"}
     };
 
     @Override
