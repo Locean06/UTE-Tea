@@ -239,7 +239,7 @@ public class AdminService {
     // ==========================================
     @Transactional(readOnly = true)
     public List<AdminDto.CategoryResponse> listCategories() {
-        return categoryRepository.findAll().stream().map(c -> AdminDto.CategoryResponse.builder()
+        return categoryRepository.findAll().stream().filter(c -> c.getShop() == null).map(c -> AdminDto.CategoryResponse.builder()
                 .id(c.getId())
                 .name(c.getName())
                 .active(c.getActive())
@@ -302,12 +302,12 @@ public class AdminService {
     // ==========================================
     @Transactional(readOnly = true)
     public List<AdminDto.ProductResponse> listProducts() {
-        return productRepository.findAll().stream().map(this::mapProduct).toList();
+        return productRepository.findAll().stream().filter(p -> p.getShop() == null).map(this::mapProduct).toList();
     }
 
     @Transactional(readOnly = true)
     public AdminDto.ProductPageResponse searchProducts(Long categoryId, Boolean active, String query, int page, int limit) {
-        List<Product> all = productRepository.findAll();
+        List<Product> all = productRepository.findAll().stream().filter(p -> p.getShop() == null).toList();
         var stream = all.stream();
         if (categoryId != null) {
             stream = stream.filter(p -> p.getCategory() != null && categoryId.equals(p.getCategory().getId()));
