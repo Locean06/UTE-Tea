@@ -53,7 +53,10 @@ public class CatalogService {
 
     @Transactional(readOnly = true)
     public List<CatalogDto.CategoryItem> getCategories() {
-        return categoryRepository.findAllByActiveTrue().stream().map(cat ->
+        // Public filters must reference the canonical (non-branch) catalog categories.
+        return categoryRepository.findAllByActiveTrue().stream()
+                .filter(cat -> cat.getShop() == null)
+                .map(cat ->
                 CatalogDto.CategoryItem.builder()
                         .id(cat.getId())
                         .name(cat.getName())
