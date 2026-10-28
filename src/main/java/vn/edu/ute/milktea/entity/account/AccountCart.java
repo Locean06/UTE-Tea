@@ -7,6 +7,6 @@ import lombok.*;
 public class AccountCart {
     @Id @Column(name="AccountId") private Long accountId;
     @ManyToOne(fetch=FetchType.LAZY) @JoinColumn(name="AccountId",insertable=false,updatable=false) private Account account;
-    @Lob @Column(name="ItemsJson",nullable=false) private String itemsJson="[]";
+    @Column(name="ItemsJson",nullable=false,columnDefinition="text") private String itemsJson="[]";
     @Column(name="Revision",nullable=false) private long revision;
 }
