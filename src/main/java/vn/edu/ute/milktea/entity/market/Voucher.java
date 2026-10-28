@@ -8,7 +8,9 @@ public class Voucher {
 @Id @GeneratedValue(strategy=GenerationType.IDENTITY) @Column(name="Id") private Long id;
 @Column(name="Code",nullable=false,unique=true,length=32) private String code;
 @ManyToOne(fetch=FetchType.LAZY) @JoinColumn(name="ShopId") private Shop shop;
-@Column(name="DiscountAmount",nullable=false,precision=18,scale=2) private java.math.BigDecimal discountAmount;
+@Column(name="DiscountAmount",nullable=false,precision=18,scale=2) private java.math.BigDecimal discountAmount=java.math.BigDecimal.ZERO;
+@Column(name="DiscountType",nullable=false,length=16) private String discountType="FIXED_AMOUNT";
+@Column(name="DiscountPercent",nullable=false,precision=5,scale=2) private java.math.BigDecimal discountPercent=java.math.BigDecimal.ZERO;
 @Column(name="MinimumAmount",nullable=false,precision=18,scale=2) private java.math.BigDecimal minimumAmount=java.math.BigDecimal.ZERO;
 @Column(name="StartsAt",nullable=false) private java.time.Instant startsAt;
 @Column(name="EndsAt",nullable=false) private java.time.Instant endsAt;

@@ -184,7 +184,7 @@ const KitchenApp = (() => {
         let html = '';
         kitchenOrders.forEach(o => {
             const isCooking = o.status === 'DANG_CHE_BIEN';
-            const tableLabel = o.tableName ? o.tableName : 'Quầy / mang về';
+            const tableLabel = o.tableName || o.pickupShopName || 'Quầy / mang về';
 
             let itemsHtml = '';
             (o.items || []).forEach(it => {
@@ -271,7 +271,7 @@ const KitchenApp = (() => {
         document.getElementById('orderDetailTitle').innerHTML = `<i class="bi bi-receipt me-1 text-primary"></i> Chi Tiết Đơn Hàng #${order.orderId}`;
         document.getElementById('orderDetailSubtitle').textContent = order.source ? `Nguồn: ${order.source}` : '';
         document.getElementById('orderDetailCode').textContent = `#${order.orderId}`;
-        document.getElementById('orderDetailTable').textContent = order.tableName || 'Quầy / mang về';
+        document.getElementById('orderDetailTable').textContent = order.tableName || order.pickupShopName || 'Quầy / mang về';
 
         const statusEl = document.getElementById('orderDetailStatus');
         const isCooking = order.status === 'DANG_CHE_BIEN';

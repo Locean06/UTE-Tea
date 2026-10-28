@@ -32,6 +32,13 @@ const MilkTeaApi = (() => {
         return csrfRequest;
     }
 
+    // Refresh only when CSRF cookie was explicitly cleared after a 403.
+    async function refreshCsrf() {
+        csrfToken = null;
+        csrfRequest = null;
+        return initCsrf();
+    }
+
     // Format tiền tệ VND
     function formatVND(amount) {
         if (amount === null || amount === undefined) return '0 ₫';
@@ -102,6 +109,7 @@ const MilkTeaApi = (() => {
                 const err = new Error(errorMessage || 'Đã có lỗi xảy ra');
                 err.status = response.status;
                 err.code = errorCode;
+                err.traceId = result && result.traceId ? result.traceId : null;
                 err.details = result && result.error ? result.error.details : null;
                 throw err;
             }
@@ -149,7 +157,8 @@ const MilkTeaApi = (() => {
         upload: (url, formData) => request(url, { method: 'POST', body: formData }),
         formatVND,
         showToast,
-        initCsrf
+        initCsrf,
+        refreshCsrf
     };
 })();
 

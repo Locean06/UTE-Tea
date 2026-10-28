@@ -501,7 +501,6 @@
                 </div>
 
                 <aside class="ute-pickup-notice" role="note"><i class="bi bi-bag-check"></i>
-                  <span><strong>Chọn món trước, chọn cơ sở sau.</strong> Giá trong giỏ là tạm tính; tổng tiền được kiểm tra theo cơ sở trước khi bạn xác nhận. Dùng tại bàn vẫn theo phiên bàn của thu ngân.</span>
                 </aside>
 
                 <div class="card border-0 shadow-sm rounded-4 mb-4 cart-zoom-fade">
@@ -550,12 +549,13 @@
     </div>
 
     <th:block th:fragment="scripts">
+        <script th:src="@{/js/customer/order-success.js}"></script>
         <script th:src="@{/js/customer/customer.js}"></script>
         <script th:src="@{/js/customer/menu-selection.js}"></script>
         <script th:src="@{/js/customer/delivery-checkout.js}"></script>
         <script th:inline="javascript">
             const discountType = /*[[${settings != null && settings.discountType != null ? settings.discountType : 'PERCENT'}]]*/ 'PERCENT';
-            const discountValue = /*[[${settings != null && settings.discountValue != null ? settings.discountValue : (settings != null && settings.discountPercent != null ? settings.discountPercent : 0)}]]*/ 0;
+            const discountValue = /*[[${settings != null && settings.discountType == 'FIXED_AMOUNT' ? (settings.discountValue != null ? settings.discountValue : 0) : (settings != null && settings.discountValue != null && settings.discountValue > 0 ? settings.discountValue : (settings != null && settings.discountPercent != null ? settings.discountPercent : 0))}]]*/ 0;
 
             let cartEntranceShown = false;
             let previousCartQuantities = null;
@@ -569,7 +569,7 @@
             document.addEventListener('DOMContentLoaded', async () => {
                 await CustomerApp.initContext();
 
-                const items = CustomerApp.getLocalCart();
+                const items = window.MilkTeaContext.sessionId ? CustomerApp.getServerCart() : CustomerApp.getLocalCart();
                 const total = items.reduce((acc, it) => acc + (it.lineTotal || ((it.price || it.unitPrice || 0) + (it.toppings ? it.toppings.reduce((s,t)=>s+(t.price||0),0) : 0)) * it.quantity), 0);
                 renderCartItems(items, total);
             });
@@ -594,7 +594,7 @@
                 if (list) list.classList.remove('d-none');
                 if (summary) summary.style.display = 'block';
                 const checkoutButton = document.getElementById('checkoutBtn');
-                if (checkoutButton) checkoutButton.textContent = 'Gửi đơn hàng';
+                if (checkoutButton) checkoutButton.textContent = 'Xác nhận đặt nhận tại quầy';
 
                 const playEntrance = !cartEntranceShown;
                 const currentQuantities = items.map(it => ({
@@ -644,7 +644,7 @@
                                 </div>
                                 <span class="fw-bold product-price ms-2" style="min-width: 85px; text-align: right;">${MilkTeaApi.formatVND(lineTotal)}</span>
                                 <button class="btn btn-sm btn-outline-secondary" type="button" onclick="MenuSelection.open(${it.productId}, ${idx}).catch(e => MilkTeaApi.showToast(e.message, 'error'))">Sửa</button>
-                                <button type="button" class="btn btn-sm btn-outline-danger border-0 p-1 ms-1" title="Xóa món" onclick="CustomerApp.removeItem(${idx})">
+                                <button class="btn btn-sm btn-outline-danger border-0 p-1 ms-1" title="Xóa món" onclick="CustomerApp.removeItem(${idx})">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </div>
@@ -675,7 +675,7 @@
                 } else {
                     const percent = parseFloat(discountValue) || 0;
                     if (percent > 0) {
-                        discountAmount = Math.min(sub, (sub * percent) / 100);
+                        discountAmount = Math.min(sub, Math.round(sub * percent) / 100);
                         document.getElementById('discountRow').style.display = 'flex';
                         document.getElementById('discountPercentVal').textContent = percent + '%';
                         document.getElementById('discountVal').textContent = '-' + MilkTeaApi.formatVND(discountAmount);

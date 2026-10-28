@@ -29,6 +29,7 @@ public class CustomerPageController {
     private final GlobalSettingsRepository settingsRepository;
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
+    private final vn.edu.ute.milktea.repository.market.VoucherRepository voucherRepository;
 
     // Table service is POS-only. Public ordering intentionally does not load a table from URL/cookie.
 
@@ -68,6 +69,19 @@ public class CustomerPageController {
         } catch (org.springframework.dao.DataAccessException ex) {
             dataUnavailable = true;
             log.error("UTE Tea storefront product query failed. Check MonUong columns/migrations.", ex);
+        }
+        // Only advertise a coupon that currently exists and is actually usable.
+        try {
+            voucherRepository.findByCode("GIAMGIA10").ifPresent(v -> {
+                var now = java.time.Instant.now();
+                if (v.isActive() && v.getShop()==null && "PERCENT".equals(v.getDiscountType())
+                    && now.isAfter(v.getStartsAt()) && now.isBefore(v.getEndsAt())
+                    && v.getUsedCount()<v.getUsageLimit()) {
+                    model.addAttribute("promoDiscountPercent",v.getDiscountPercent());
+                }
+            });
+        } catch (org.springframework.dao.DataAccessException ex) {
+            log.warn("Promo banner hidden: Voucher schema not ready", ex);
         }
         model.addAttribute("catalogUnavailable", dataUnavailable);
 

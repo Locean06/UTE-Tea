@@ -8,7 +8,6 @@ import vn.edu.ute.milktea.common.ErrorCode;
 import vn.edu.ute.milktea.entity.account.Account;
 import vn.edu.ute.milktea.entity.audit.BusinessAudit;
 import vn.edu.ute.milktea.entity.order.Invoice;
-import vn.edu.ute.milktea.entity.order.Order;
 import vn.edu.ute.milktea.entity.order.InvoiceStatus;
 import vn.edu.ute.milktea.entity.table.*;
 import vn.edu.ute.milktea.repository.account.AccountRepository;
@@ -27,7 +26,6 @@ import java.util.List;
 public class TableSessionService {
 
     private final DiningTableRepository tableRepository;
-    private final vn.edu.ute.milktea.service.order.OrderBranchService branchService;
     private final TableSessionRepository sessionRepository;
     private final SessionCartRepository cartRepository;
     private final SessionCartItemRepository cartItemRepository;
@@ -43,7 +41,6 @@ public class TableSessionService {
     public TableSession openByCashier(Long tableId, Long cashierId) {
         DiningTable table = tableRepository.findByIdWithLock(tableId)
                 .orElseThrow(() -> BusinessException.notFound(ErrorCode.TABLE_NOT_FOUND, "Không tìm thấy bàn"));
-        if (table.getShop() != null) branchService.assertStaff(Order.builder().shop(table.getShop()).build(), cashierId);
 
         if (table.getActiveSessionId() != null) {
             var existingOpt = sessionRepository.findById(table.getActiveSessionId());
@@ -101,7 +98,6 @@ public class TableSessionService {
     private void closeSession(Long tableId, Long cashierId, boolean requireCompleted) {
         DiningTable table = tableRepository.findByIdWithLock(tableId)
                 .orElseThrow(() -> BusinessException.notFound(ErrorCode.TABLE_NOT_FOUND, "Không tìm thấy bàn"));
-        if (table.getShop() != null) branchService.assertStaff(Order.builder().shop(table.getShop()).build(), cashierId);
 
         if (table.getActiveSessionId() == null) {
             throw BusinessException.badRequest(ErrorCode.TABLE_SESSION_CLOSED, "Bàn chưa có phiên mở");

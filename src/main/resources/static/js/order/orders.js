@@ -11,7 +11,10 @@ const OrdersApp = (() => {
     let orders = [], cancellations = [], staff = false, busy = false, cancelId = null;
     let currentTab = 'all';
     let currentPage = 1;
-    let requestSeq = 0;
+    // Avoid duplicate polling/realtime GETs and back off when the API returns 500.
+    let ordersLoading = false;
+    let failedLoads = 0;
+    let nextAutomaticRetryAt = 0;
     const pageSize = 10;
     const detailActions = new Map();
 
@@ -162,7 +165,7 @@ const OrdersApp = (() => {
                 return `<tr>
                     <td>
                         <b>${MilkTeaReceipts.code(o.orderId)}</b>
-                        <small class="d-block text-muted mt-1">${e(o.tableName || (o.staffCreated ? 'Quầy thu ngân' : 'Quầy / mang về'))}</small>
+                        <small class="d-block text-muted mt-1">${e(o.tableName || o.pickupShopName || (o.staffCreated ? 'Quầy thu ngân' : 'Quầy / mang về'))}</small>
                     </td>
                     <td class="text-end fw-semibold text-nowrap">${MilkTeaApi.formatVND(o.totalAmount)}</td>
                     <td>${refundCell}</td>
@@ -331,29 +334,68 @@ const OrdersApp = (() => {
         render();
     }
 
-    async function load() {
-        const seq = ++requestSeq;
+    async function load(force = false) {
+        // Realtime callbacks can pass an event object; only the explicit boolean
+        // true (e.g. a user retry) bypasses the temporary server-error backoff.
+        if (ordersLoading || (force !== true && Date.now() < nextAutomaticRetryAt)) return;
+        ordersLoading = true;
         try {
             let fetchedOrders = [];
             let fetchedCancels = [];
             if (staff) {
+                // Keep the cancellation inbox independent: a noncritical failure
+                // must not hide a successfully loaded cashier order list.
                 fetchedOrders = await MilkTeaApi.get('/api/v1/cashier/orders') || [];
-                fetchedCancels = await MilkTeaApi.get('/api/v1/cashier/cancellation-requests') || [];
+                try {
+                    fetchedCancels = await MilkTeaApi.get('/api/v1/cashier/cancellation-requests') || [];
+                } catch (cancelError) {
+                    console.warn('Không thể nạp yêu cầu hủy; vẫn hiển thị đơn hàng:', cancelError);
+                    fetchedCancels = cancellations;
+                }
             } else {
                 fetchedOrders = await MilkTeaApi.get('/api/v1/customer/orders') || [];
-                fetchedCancels = [];
             }
-            if (seq !== requestSeq) return; // Tránh race condition đè response cũ
             orders = fetchedOrders;
             cancellations = fetchedCancels;
+            failedLoads = 0;
+            nextAutomaticRetryAt = 0;
             document.getElementById('ordersError').classList.add('d-none');
             render();
-        } catch(err) {
-            if (seq !== requestSeq) return;
+        } catch (err) {
+            failedLoads += 1;
+            // A persistent HTTP 500 is a backend/schema failure. Realtime events and
+            // polling should not flood the server with the same failing GET.
+            // User can still retry explicitly after applying the database fix.
+            if (Number(err.status) >= 500 && Number(err.status) <= 599) {
+                nextAutomaticRetryAt = Number.POSITIVE_INFINITY;
+            } else {
+                nextAutomaticRetryAt = Date.now() + Math.min(60000, 12000 * Math.pow(2, failedLoads - 1));
+            }
             const box = document.getElementById('ordersError');
-            box.textContent = err.message || 'Không thể tải danh sách đơn hàng. Nhấn Làm mới để thử lại.';
+            box.replaceChildren();
+            const message = document.createElement('div');
+            message.textContent = err.message || 'Không thể tải danh sách đơn hàng.';
+            box.appendChild(message);
+            if (err.traceId) {
+                const trace = document.createElement('small');
+                trace.className = 'd-block mt-1';
+                trace.textContent = 'Mã lỗi máy chủ: ' + err.traceId;
+                box.appendChild(trace);
+            }
+            const retry = document.createElement('button');
+            retry.type = 'button';
+            retry.className = 'btn btn-sm btn-outline-danger mt-2';
+            retry.textContent = 'Thử tải lại đơn hàng';
+            retry.addEventListener('click', () => load(true));
+            box.appendChild(retry);
             box.classList.remove('d-none');
-            document.getElementById('ordersList').textContent = '';
+            // Do not erase the last successfully loaded orders during a transient
+            // network/server error; an empty list here looks like lost orders.
+            if (!orders.length) {
+                document.getElementById('ordersList').textContent = 'Chưa tải được danh sách đơn hàng.';
+            }
+        } finally {
+            ordersLoading = false;
         }
     }
 
@@ -386,7 +428,7 @@ const OrdersApp = (() => {
                 if (actionModal) bootstrap.Modal.getInstance(actionModal)?.hide();
                 render();
                 window.PendingOrders?.refresh();
-                await load();
+                await load(true);
             } catch(err) {
                 MilkTeaApi.showToast(err.message || 'Lỗi khi xác nhận thanh toán', 'error');
             }
@@ -398,7 +440,7 @@ const OrdersApp = (() => {
             try {
                 await MilkTeaApi.post(`/api/v1/cashier/orders/${id}/refund-bank-request`);
                 MilkTeaApi.showToast('Đã gửi yêu cầu hoàn tiền chuyển khoản tới Admin thành công.', 'success');
-                await load();
+                await load(true);
             } catch(err) {
                 MilkTeaApi.showToast(err.message || 'Lỗi khi gửi yêu cầu hoàn tiền', 'error');
             }
@@ -410,7 +452,7 @@ const OrdersApp = (() => {
             try {
                 await MilkTeaApi.post(`/api/v1/cashier/orders/${id}/refund-cash`);
                 MilkTeaApi.showToast('Đã ghi nhận hoàn tiền mặt thành công.', 'success');
-                await load();
+                await load(true);
             } catch(err) {
                 MilkTeaApi.showToast(err.message || 'Lỗi khi ghi nhận hoàn tiền mặt', 'error');
             }
@@ -424,7 +466,7 @@ const OrdersApp = (() => {
                 MilkTeaApi.showToast('Đã ghi nhận chi tiền hoàn thành công.', 'success');
                 const actionModal = document.getElementById('orderActionModal');
                 bootstrap.Modal.getInstance(actionModal)?.hide();
-                await load();
+                await load(true);
             } catch(err) {
                 MilkTeaApi.showToast(err.message || 'Lỗi khi chi trả hoàn tiền', 'error');
             }
@@ -438,7 +480,7 @@ const OrdersApp = (() => {
 
             modal('Chi tiết ' + MilkTeaReceipts.code(id),
                 `${transferNoticeBanner}
-                 <p><b>${e(o.tableName || (o.staffCreated ? 'Quầy thu ngân' : 'Quầy / mang về'))}</b> · ${MilkTeaReceipts.date(o.createdAt)}</p>
+                 <p><b>${e(o.tableName || o.pickupShopName || (o.staffCreated ? 'Quầy thu ngân' : 'Quầy / mang về'))}</b> · ${MilkTeaReceipts.date(o.createdAt)}</p>
                  ${MilkTeaReceipts.lines(o)}
                  <p class="mt-2">Tổng cộng: <b>${MilkTeaApi.formatVND(o.totalAmount)}</b> · ${paymentState(o).label}</p>
                  ${o.paymentRequestMethod && !o.transferNotified ? '<p class="text-warning"><i class="bi bi-exclamation-triangle me-1"></i> Khách chọn thanh toán ' + (o.paymentRequestMethod === 'CASH' ? 'tiền mặt' : 'chuyển khoản') + '.</p>' : ''}`,
@@ -503,7 +545,7 @@ const OrdersApp = (() => {
                     method: name === 'cash' ? 'CASH' : 'BANK_TRANSFER',
                     reference: 'RECEIPT_' + id
                 });
-                await load();
+                await load(true);
             } else if (name === 'confirm') {
                 await MilkTeaApi.post(`/api/v1/cashier/orders/${id}/confirm`);
             } else if (name === 'sendCancel') {
@@ -537,7 +579,7 @@ const OrdersApp = (() => {
                 actionModal.addEventListener('shown.bs.modal', hideAction, { once: true });
             }
             MilkTeaApi.showToast('Đã ghi nhận thành công.', 'success');
-            await load();
+            await load(true);
         } catch(err) {
             MilkTeaApi.showToast(err.message, 'error');
         } finally {
@@ -619,8 +661,12 @@ const OrdersApp = (() => {
         MilkTeaRealtime.onReconnect(load);
         MilkTeaRealtime.connect();
 
-        await load();
+        await load(true);
 
+        const requestedTab = new URLSearchParams(location.search).get('tab');
+        if (staff && ['all', 'confirm', 'cooking', 'transfer', 'completed', 'cancel', 'refund'].includes(requestedTab)) {
+            switchTab(requestedTab);
+        }
         const focusOrder = new URLSearchParams(location.search).get('order');
         if (focusOrder && orders.some(o => String(o.orderId) === focusOrder)) {
             await action('details', focusOrder);

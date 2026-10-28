@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main :: html(~{::content}, ~{::scripts})}" lang="vi">
+<head><title>Mã khuyến mãi – UTE Tea</title></head>
+<body>
+<div th:fragment="content" class="container-fluid takeaway-admin-page">
+  <link rel="stylesheet" th:href="@{/css/takeaway-admin.css}" href="/css/takeaway-admin.css">
+  <div class="ta-page-shell">
+  <div class="ta-breadcrumb"><a th:href="@{/admin/reports}" href="/admin/reports">Quản trị</a><i class="bi bi-chevron-right"></i><span>Mã khuyến mãi</span></div>
+  <div class="ta-layout">
+    <aside class="ta-sidebar" aria-label="Điều hướng quản trị">
+  <div class="ta-sidebar-brand"><div class="ta-brand-mark"><i class="bi bi-cup-hot-fill"></i></div><div><strong>UTE Tea</strong><small>ADMIN WORKSPACE</small></div></div>
+  <div class="ta-nav-label">QUẢN TRỊ HỆ THỐNG</div>
+  <nav class="ta-navigation"><a th:href="@{/admin/reports}" class="ta-nav-link"><i class="bi bi-graph-up-arrow" aria-hidden="true"></i><span>Báo cáo doanh thu</span></a>
+<a th:href="@{/admin/catalog}" class="ta-nav-link"><i class="bi bi-cup-straw" aria-hidden="true"></i><span>Món & danh mục</span></a>
+<a th:href="@{/admin/orders}" class="ta-nav-link"><i class="bi bi-receipt-cutoff" aria-hidden="true"></i><span>Quản lý đơn hàng</span></a>
+<a th:href="@{/admin/staff}" class="ta-nav-link"><i class="bi bi-people" aria-hidden="true"></i><span>Tài khoản nhân viên</span></a>
+<a th:href="@{/admin/inventory}" class="ta-nav-link"><i class="bi bi-box-seam" aria-hidden="true"></i><span>Kho hàng</span></a>
+<a th:href="@{/admin/documents}" class="ta-nav-link"><i class="bi bi-files" aria-hidden="true"></i><span>Chứng từ</span></a>
+<a th:href="@{/admin/promotions}" class="ta-nav-link is-active" aria-current="page"><i class="bi bi-ticket-perforated" aria-hidden="true"></i><span>Mã khuyến mãi</span><i class="bi bi-chevron-right ta-nav-arrow"></i></a>
+<a th:href="@{/admin/branches}" class="ta-nav-link"><i class="bi bi-shop-window" aria-hidden="true"></i><span>Cập nhật chi nhánh</span></a>
+<a th:href="@{/admin/settings}" class="ta-nav-link"><i class="bi bi-sliders2" aria-hidden="true"></i><span>Cài đặt hệ thống</span></a></nav>
+  <div class="ta-sidebar-foot"><i class="bi bi-shield-check"></i><span>Không gian quản trị<br><b>Take Away</b></span></div>
+</aside>
+    <main class="ta-body" id="taMain">
+       <header class="ta-page-heading">
+    <div><div class="ta-kicker"><i class="bi bi-stars"></i> QUẢN LÝ ƯU ĐÃI</div><h1>Mã khuyến mãi</h1><p>Tạo và theo dõi voucher dành cho đơn giao hàng online của các chi nhánh.</p></div>
+    <button type="button" id="promoNew" class="btn ta-btn-primary"><i class="bi bi-plus-lg"></i> Tạo mã khuyến mãi</button>
+  </header>
+  <div id="taAlert" class="ta-alert d-none" role="status" aria-live="polite"></div>
+  <section class="ta-stats" aria-label="Tổng quan khuyến mãi">
+    <div class="ta-stat"><div class="ta-stat-icon olive"><i class="bi bi-ticket-perforated"></i></div><div class="ta-stat-label">Tổng mã khuyến mãi</div><strong id="promoTotal" class="ta-stat-value">—</strong><span class="ta-stat-caption">Trong hệ thống</span></div>
+    <div class="ta-stat"><div class="ta-stat-icon emerald"><i class="bi bi-check-circle"></i></div><div class="ta-stat-label">Đang có hiệu lực</div><strong id="promoActiveCount" class="ta-stat-value">—</strong><span class="ta-stat-caption">Có thể sử dụng ngay</span></div>
+    <div class="ta-stat"><div class="ta-stat-icon amber"><i class="bi bi-calendar-event"></i></div><div class="ta-stat-label">Sắp bắt đầu</div><strong id="promoScheduled" class="ta-stat-value">—</strong><span class="ta-stat-caption">Chưa đến thời gian</span></div>
+    <div class="ta-stat"><div class="ta-stat-icon blue"><i class="bi bi-bag-check"></i></div><div class="ta-stat-label">Lượt đã sử dụng</div><strong id="promoUsedCount" class="ta-stat-value">—</strong><span class="ta-stat-caption">Tổng lượt áp dụng</span></div>
+  </section>
+  <section class="ta-card" aria-labelledby="promoListTitle">
+    <div class="ta-card-heading"><div><h2 id="promoListTitle">Danh sách mã giảm giá</h2><p>Quản lý trạng thái, điều kiện và phạm vi áp dụng của từng mã.</p></div><button id="promoReload" type="button" class="btn ta-btn-light"><i class="bi bi-arrow-clockwise"></i> Làm mới</button></div>
+    <div class="ta-toolbar">
+      <div class="ta-search-wrap"><i class="bi bi-search" aria-hidden="true"></i><input id="promoSearch" type="search" class="form-control" placeholder="Tìm theo mã voucher..." aria-label="Tìm mã khuyến mãi"></div>
+      <select id="promoFilterShop" class="form-select" aria-label="Lọc theo chi nhánh"><option value="">Tất cả chi nhánh</option></select>
+      <select id="promoFilterStatus" class="form-select" aria-label="Lọc theo trạng thái"><option value="all">Tất cả trạng thái</option><option value="active">Đang hiệu lực</option><option value="upcoming">Sắp diễn ra</option><option value="expired">Đã hết hạn</option><option value="inactive">Đã tắt</option></select>
+    </div>
+    <div class="table-responsive ta-table-wrap"><table class="table ta-table align-middle"><thead><tr><th>MÃ KHUYẾN MÃI</th><th>PHẠM VI</th><th>GIÁ TRỊ</th><th>THỜI HẠN</th><th>LƯỢT DÙNG</th><th>TRẠNG THÁI</th><th class="text-end">THAO TÁC</th></tr></thead><tbody id="promoRows"><tr><td colspan="7" class="ta-empty"><i class="bi bi-arrow-repeat"></i><p>Đang tải mã khuyến mãi...</p></td></tr></tbody></table></div>
+    <div class="ta-table-foot"><span id="promoResultCount">Đang tải dữ liệu</span><span><i class="bi bi-info-circle"></i> Mã có hiệu lực dựa trên trạng thái và thời gian</span></div>
+  </section>
+  <div class="ta-hint"><i class="bi bi-lightbulb"></i><span><strong>Lưu ý:</strong> Voucher trang này dành cho thanh toán giao hàng online. Giảm giá POS tự động là cơ chế riêng, không bị thay đổi.</span></div>
+  <aside id="promoEditor" class="ta-drawer" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="promoFormTitle" tabindex="-1">
+    <div class="ta-drawer-head"><div><span class="ta-drawer-eyebrow">THIẾT LẬP ƯU ĐÃI</span><h2 id="promoFormTitle">Tạo mã khuyến mãi</h2><p>Điền thông tin và điều kiện áp dụng.</p></div><button type="button" class="ta-icon-button" id="promoClose" aria-label="Đóng biểu mẫu"><i class="bi bi-x-lg"></i></button></div>
+    <form id="promoForm" class="ta-drawer-form"><input type="hidden" id="promoId">
+      <div class="ta-form-section"><h3><span>01</span> Thông tin cơ bản</h3><div class="row g-3">
+        <div class="col-12"><label for="promoCode" class="form-label">Mã khuyến mãi <em>*</em></label><input id="promoCode" class="form-control text-uppercase" required maxlength="32" pattern="[A-Za-z0-9_-]{3,32}" placeholder="VD: CHAOHE2026"><small class="ta-field-note">3–32 ký tự, không có khoảng trắng</small></div>
+        <div class="col-12"><label for="promoShop" class="form-label">Áp dụng tại</label><select id="promoShop" class="form-select"><option value="">Toàn bộ chi nhánh</option></select></div>
+        <div class="col-6"><label for="promoType" class="form-label">Hình thức giảm <em>*</em></label><select id="promoType" class="form-select"><option value="PERCENT">Phần trăm (%)</option><option value="FIXED_AMOUNT">Số tiền (VNĐ)</option></select></div>
+        <div class="col-6"><label for="promoValue" class="form-label">Giá trị giảm <em>*</em></label><div class="input-group"><input id="promoValue" type="number" step="0.01" min="0.01" class="form-control" required placeholder="10"><span id="promoUnit" class="input-group-text">%</span></div></div>
+      </div></div>
+      <div class="ta-form-section"><h3><span>02</span> Điều kiện sử dụng</h3><div class="row g-3">
+        <div class="col-12"><label for="promoMin" class="form-label">Đơn hàng tối thiểu (₫)</label><input type="number" id="promoMin" class="form-control" min="0" step="1" value="0" required></div>
+        <div class="col-6"><label for="promoLimit" class="form-label">Tổng lượt dùng <em>*</em></label><input type="number" id="promoLimit" min="1" step="1" class="form-control" value="100" required></div>
+        <div class="col-6"><label for="promoPerAccount" class="form-label">Lượt mỗi khách <em>*</em></label><input type="number" id="promoPerAccount" min="1" step="1" class="form-control" value="1" required></div>
+      </div></div>
+      <div class="ta-form-section"><h3><span>03</span> Lịch áp dụng</h3><div class="row g-3">
+        <div class="col-12"><label for="promoStart" class="form-label">Thời điểm bắt đầu <em>*</em></label><input type="datetime-local" id="promoStart" class="form-control" required></div>
+        <div class="col-12"><label for="promoEnd" class="form-label">Thời điểm kết thúc <em>*</em></label><input type="datetime-local" id="promoEnd" class="form-control" required></div>
+        <div class="col-12"><label class="ta-toggle-label" for="promoActive"><div><strong>Kích hoạt mã giảm giá</strong><small>Có thể tắt bất kỳ lúc nào</small></div><input id="promoActive" type="checkbox" class="form-check-input" checked></label></div>
+      </div></div>
+      <div class="ta-drawer-actions"><button type="button" id="promoCancel" class="btn ta-btn-light">Hủy</button><button type="submit" id="promoSave" class="btn ta-btn-primary"><i class="bi bi-check-lg"></i> Lưu mã</button></div>
+    </form>
+  </aside>
+    </main>
+  </div>
+  </div>
+  <div id="taOverlay" class="ta-overlay" aria-hidden="true"></div>
+</div>
+<th:block th:fragment="scripts"><script th:src="@{/js/admin/takeaway-management.js}" src="/js/admin/takeaway-management.js"></script></th:block>
+</body></html>

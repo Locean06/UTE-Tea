@@ -78,17 +78,21 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse response) {
 
-        if (actor != null && actor.getAccountId() != null) {
-            authService.logout(actor.getAccountId());
+        try {
+            if (actor != null && actor.getAccountId() != null) {
+                authService.logout(actor.getAccountId());
+            }
+        } finally {
+            // Luôn xóa cookie JWT và CSRF token
+            csrfTokens.saveToken(null, request, response);
+            Cookie cookie = new Cookie(JwtAuthenticationFilter.ACCESS_TOKEN_COOKIE, "");
+            cookie.setHttpOnly(true);
+            cookie.setPath("/");
+            cookie.setMaxAge(0);
+            cookie.setSecure(secureCookie);
+            cookie.setAttribute("SameSite", "Lax");
+            response.addCookie(cookie);
         }
-
-        // Xóa cookie JWT
-        csrfTokens.saveToken(null, request, response);
-        Cookie cookie = new Cookie(JwtAuthenticationFilter.ACCESS_TOKEN_COOKIE, "");
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
 
         return ResponseEntity.ok(ApiResponse.ok(null));
     }

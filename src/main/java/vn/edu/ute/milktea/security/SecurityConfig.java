@@ -54,7 +54,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Staff pages require an authenticated staff JWT.
-                        .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/admin", "/admin/**", "/merchant").hasRole("ADMIN")
                         .requestMatchers("/cashier", "/cashier/**").hasAnyRole("ADMIN", "CASHIER")
                         .requestMatchers("/kitchen", "/kitchen/**").hasAnyRole("ADMIN", "KITCHEN")
                         .requestMatchers("/delivery", "/delivery/**").hasRole("SHIPPER")
@@ -81,6 +81,13 @@ public class SecurityConfig {
                                 "/actuator/health",
                                 "/actuator/info"
                         ).permitAll()
+                        // Dine-in orders and the retired QR context require real POS credentials.
+                        .requestMatchers(org.springframework.http.HttpMethod.POST,
+                                "/api/v1/orders/table", "/api/v1/customer/orders")
+                            .hasAnyRole("ADMIN", "CASHIER")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET,
+                                "/api/v1/public/table-context", "/api/v1/tables/context")
+                            .hasAnyRole("ADMIN", "CASHIER")
                         // 2. Role-based staff routes
                         // Listing customer history is account-only, including when a table QR exists.
                         .requestMatchers(org.springframework.http.HttpMethod.GET,
@@ -109,7 +116,7 @@ public class SecurityConfig {
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
                             String uri = request.getRequestURI();
-                            boolean staffPage = uri.equals("/merchant") || uri.equals("/admin") || uri.startsWith("/admin/")
+                            boolean staffPage = uri.equals("/orders") || uri.equals("/merchant") || uri.equals("/admin") || uri.startsWith("/admin/")
                                     || uri.equals("/cashier") || uri.startsWith("/cashier/")
                                     || uri.equals("/kitchen") || uri.startsWith("/kitchen/")
                                     || uri.equals("/staff") || uri.startsWith("/staff/")
@@ -124,7 +131,7 @@ public class SecurityConfig {
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
                     String uri = request.getRequestURI();
-                    boolean staffPage = uri.equals("/merchant") || uri.equals("/admin") || uri.startsWith("/admin/")
+                    boolean staffPage = uri.equals("/orders") || uri.equals("/merchant") || uri.equals("/admin") || uri.startsWith("/admin/")
                             || uri.equals("/cashier") || uri.startsWith("/cashier/")
                             || uri.equals("/kitchen") || uri.startsWith("/kitchen/")
                             || uri.equals("/staff") || uri.startsWith("/staff/")

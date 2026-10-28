@@ -78,7 +78,7 @@ public class DataInitializer implements CommandLineRunner {
                                 defaultAdminPassword != null && !defaultAdminPassword.isBlank() ? defaultAdminPassword
                                                 : "Password@123");
                 Account admin = accountRepository.save(Account.builder()
-                                .email("admin@milktea.vn")
+                                .email("admin@utetea.vn")
                                 .passwordHash(passHash)
                                 .fullName("Quản Trị Viên")
                                 .phone("0901000001")
@@ -89,7 +89,7 @@ public class DataInitializer implements CommandLineRunner {
                                 .build());
 
                 Account cashier = accountRepository.save(Account.builder()
-                                .email("cashier@milktea.vn")
+                                .email("cashier@utetea.vn")
                                 .passwordHash(passHash)
                                 .fullName("Thu Ngân Quỳnh")
                                 .phone("0901000002")
@@ -100,7 +100,7 @@ public class DataInitializer implements CommandLineRunner {
                                 .build());
 
                 Account kitchen = accountRepository.save(Account.builder()
-                                .email("kitchen@milktea.vn")
+                                .email("kitchen@utetea.vn")
                                 .passwordHash(passHash)
                                 .fullName("Bếp Trưởng Lân")
                                 .phone("0901000003")
@@ -111,7 +111,7 @@ public class DataInitializer implements CommandLineRunner {
                                 .build());
 
                 Account customer = accountRepository.save(Account.builder()
-                                .email("customer@milktea.vn")
+                                .email("customer@utetea.vn")
                                 .passwordHash(passHash)
                                 .fullName("Khách Hàng Mai")
                                 .phone("0901000004")
@@ -126,6 +126,9 @@ public class DataInitializer implements CommandLineRunner {
                                 .id(1)
                                 .shopName("UTE Tea")
                                 .address("Số 1 Võ Văn Ngân, TP. Thủ Đức")
+                                .bankName("Vietcombank")
+                                .bankAccountNumber("08881706888")
+                                .bankAccountHolder("DANG NGUYEN MINH KHOA")
                                 .discountPercent(new BigDecimal("10.00"))
                                 .modifiedBy(admin)
                                 .modifiedAt(Instant.now())

@@ -10,9 +10,6 @@ import java.util.Optional;
 @Repository
 public interface EmailVerificationOtpRepository extends JpaRepository<EmailVerificationOtp, Long> {
 
-    Optional<EmailVerificationOtp> findTopByEmailAndPurposeOrderByCreatedAtDesc(String email, String purpose);
-
-    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
     Optional<EmailVerificationOtp> findTopByEmailAndPurposeAndRevokedAtIsNullAndUsedAtIsNullOrderByCreatedAtDesc(
             String email, String purpose);
 

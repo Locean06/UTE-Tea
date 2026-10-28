@@ -8,6 +8,7 @@ public class DeliveryOrder {
 @Id @GeneratedValue(strategy=GenerationType.IDENTITY) @Column(name="Id") private Long id;
 public enum Status { NEW, CONFIRMED, SHIPPING, DELIVERED, DELIVERY_FAILED, CANCELLED, RETURN_REQUESTED, RETURNED, REFUNDED }
 public enum Method { COD, VNPAY }
+public enum Preparation { PENDING, PREPARING, READY }
 @ManyToOne(fetch=FetchType.LAZY,optional=false) @JoinColumn(name="AccountId") private Account account;
 @ManyToOne(fetch=FetchType.LAZY,optional=false) @JoinColumn(name="ShopId") private Shop shop;
 @ManyToOne(fetch=FetchType.LAZY) @JoinColumn(name="ShipperId") private Account shipper;
@@ -23,6 +24,7 @@ public enum Method { COD, VNPAY }
 @Column(name="CommissionPercent",nullable=false,precision=5,scale=2) private java.math.BigDecimal commissionPercent;
 @Enumerated(EnumType.STRING) @Column(name="Status",nullable=false,length=24) private Status status=Status.NEW;
 @Enumerated(EnumType.STRING) @Column(name="PaymentMethod",nullable=false,length=16) private Method paymentMethod=Method.COD;
+@Enumerated(EnumType.STRING) @Column(name="PreparationStatus",nullable=false,length=16) private Preparation preparationStatus=Preparation.PENDING;
 @Column(name="Paid",nullable=false) private boolean paid;
 @Column(name="GatewayReference",length=120) private String gatewayReference;
 @Column(name="RefundReference",length=120) private String refundReference;

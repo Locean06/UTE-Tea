@@ -14,8 +14,6 @@ public class TableDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class TableContextResponse {
-        private Long shopId;
-        private String shopName;
         private Long tableId;
         private String tableName;
         private String qrCode;

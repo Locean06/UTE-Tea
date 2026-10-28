@@ -85,15 +85,7 @@ public class CatalogSearchService {
                 .filter(p -> shop == null || (p.getShop() != null && Objects.equals(p.getShop().getId(), shop)))
                 .toList();
 
-        // Checkout resolves a menu variant to a branch later. Do not show the same
-        // variant once per branch/category, or collapse distinct sizes into one SKU.
-        Map<String, Product> unique = new LinkedHashMap<>();
-        matched.stream().sorted(Comparator
-                .comparingInt((Product p) -> p.getShop() == null ? 0 : 1)
-                .thenComparing(Product::getPrice)
-                .thenComparing(Product::getId))
-                .forEach(p -> unique.putIfAbsent(p.menuVariantIdentity(), p));
-        List<Product> displayProducts = new ArrayList<>(unique.values());
+        List<Product> displayProducts = new ArrayList<>(MenuCatalogSupport.toDisplayProducts(matched));
         if (min != null) {
             displayProducts.removeIf(p -> p.getPrice() == null || p.getPrice().compareTo(min) < 0);
         }

@@ -34,7 +34,6 @@ spring:
           auth: true
           starttls:
             enable: true
-            required: true
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
@@ -61,10 +60,6 @@ management:
         enabled: true
 
 app:
-  payment:
-    vietqr-bank-bin: ${VIETQR_BANK_BIN:}
-  pos:
-    shop-id: ${POS_SHOP_ID:0}
   vnpay:
     tmn-code: ${VNPAY_TMN_CODE:}
     hash-secret: ${VNPAY_HASH_SECRET:}
@@ -92,10 +87,10 @@ app:
     api-key: ${CLOUDINARY_API_KEY:}
     api-secret: ${CLOUDINARY_API_SECRET:}
   mail:
-    from: ${MAIL_FROM:${MAIL_USERNAME:}}
-    sender-name: ${MAIL_SENDER_NAME:UTE TEA}
+    from: ${MAIL_FROM:${MAIL_USERNAME:khoalkopwk@gmail.com}}
+    sender-name: ${MAIL_SENDER_NAME:UTE Tea}
   otp:
-    secret: ${OTP_SECRET:}
+    secret: ${OTP_SECRET:milktea_secure_otp_secret_key_2026_very_long_and_safe}
     expiry-minutes: 10
     cooldown-seconds: 60
     max-attempts: 5

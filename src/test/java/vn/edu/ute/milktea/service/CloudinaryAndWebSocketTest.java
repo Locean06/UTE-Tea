@@ -213,7 +213,7 @@ class CloudinaryAndWebSocketTest {
         @Test
         @DisplayName("Upload Avatar nhân viên thành công: lưu Account và phát STAFF_CHANGED")
         void testUploadAvatarSuccess() throws IOException {
-                Account staff = Account.builder().id(5L).email("staff@milktea.vn").role(Role.CASHIER).build();
+                Account staff = Account.builder().id(5L).email("staff@utetea.vn").role(Role.CASHIER).build();
                 when(accountRepository.findById(5L)).thenReturn(Optional.of(staff));
                 when(cloudinary.uploader()).thenReturn(uploader);
                 when(uploader.upload(any(byte[].class), anyMap())).thenReturn(Map.of(

@@ -21,7 +21,7 @@ class CsrfHttpIntegrationTest {
  @Test void authenticatedReadsMustNotInvalidateCsrfForNextCartMutation()throws Exception{
   var cookies=new CookieManager(null,CookiePolicy.ACCEPT_ALL);var client=HttpClient.newBuilder().cookieHandler(cookies).build();
   var token=mapper.readTree(get(client,"/api/v1/auth/csrf").body()).path("data");
-  var login=send(client,"/api/v1/auth/login","POST","{\"email\":\"customer@milktea.vn\",\"password\":\"Password@123\"}",Map.of(token.path("headerName").asText(),token.path("token").asText()));
+  var login=send(client,"/api/v1/auth/login","POST","{\"email\":\"customer@utetea.vn\",\"password\":\"Password@123\"}",Map.of(token.path("headerName").asText(),token.path("token").asText()));
   assertEquals(200,login.statusCode());
   token=mapper.readTree(get(client,"/api/v1/auth/csrf").body()).path("data");
   assertEquals(200,get(client,"/api/v1/auth/me").statusCode());
@@ -30,6 +30,6 @@ class CsrfHttpIntegrationTest {
   assertEquals(200,updated.statusCode(),updated.body());
  }
  @Test void loginStillRejectsMissingCsrf()throws Exception{
-  assertEquals(403,send(HttpClient.newHttpClient(),"/api/v1/auth/login","POST","{\"email\":\"customer@milktea.vn\",\"password\":\"Password@123\"}",Map.of()).statusCode());
+  assertEquals(403,send(HttpClient.newHttpClient(),"/api/v1/auth/login","POST","{\"email\":\"customer@utetea.vn\",\"password\":\"Password@123\"}",Map.of()).statusCode());
  }
 }

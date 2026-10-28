@@ -32,8 +32,10 @@ class StorefrontFallbackTest {
         when(settings.findById(1)).thenReturn(Optional.empty());
         when(categories.findAllByActiveTrue()).thenThrow(new DataAccessResourceFailureException("Migration missing"));
         when(products.findAllByActiveTrue()).thenReturn(List.of());
+        var promos = mock(vn.edu.ute.milktea.repository.market.VoucherRepository.class);
+        when(promos.findByCode("GIAMGIA10")).thenReturn(Optional.empty());
         var model = new ExtendedModelMap();
-        assertEquals("customer/menu", new CustomerPageController(settings,categories,products).menuPage(null,null,null,null,model));
+        assertEquals("customer/menu", new CustomerPageController(settings,categories,products,promos).menuPage(null,null,null,null,model));
         assertEquals(true, model.get("catalogUnavailable"));
         assertEquals(List.of(), model.get("products"));
     }

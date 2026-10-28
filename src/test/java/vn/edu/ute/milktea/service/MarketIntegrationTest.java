@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.edu.ute.milktea.common.BusinessException;
 import vn.edu.ute.milktea.dto.MarketDto.*;
 import vn.edu.ute.milktea.dto.CustomerDataDto;
+import vn.edu.ute.milktea.dto.CartDto;
 import vn.edu.ute.milktea.entity.account.*;
 import vn.edu.ute.milktea.entity.market.DeliveryOrder;
 import vn.edu.ute.milktea.repository.account.AccountRepository;
@@ -38,8 +39,9 @@ class MarketIntegrationTest {
   product=market.saveProduct(vendor,shop,null,new ProductInput(category,"Trà thử nghiệm","M","Món kiểm thử",new BigDecimal("25000.00"),10,true)).id();
   address=data.saveAddress(buyer,null,new CustomerDataDto.AddressInput("Người mua","0901000001","3 Võ Văn Ngân",true)).id();
   carrier=market.saveCarrier(admin,null,null,new CarrierInput("Giao thử nghiệm",new BigDecimal("10000.00"),true)).id();
+  data.replaceCart(buyer,CartDto.ReplaceCartRequest.builder().items(List.of(CartDto.CartItemRequest.builder().productId(product).quantity(2).build())).build(),data.cart(buyer).getVersion());
  }
- Checkout input(String voucher){return new Checkout(shop,address,carrier,voucher,DeliveryOrder.Method.COD,List.of(new BuyLine(product,2)));}
+ Checkout input(String voucher){return new Checkout(shop,address,carrier,voucher,DeliveryOrder.Method.COD,List.of(new BuyLine(product,2)),null,data.cart(buyer).getVersion());}
  @Test void vendorAndManagerCannotCrossShopBoundary(){
   assertThrows(BusinessException.class,()->market.shopProducts(other,shop));
   assertThrows(BusinessException.class,()->market.shopProducts(manager,shop));

@@ -303,7 +303,50 @@
 .pos-workspace.pos-refresh .pos-delivery-live-item {padding:10px 0;border-bottom:1px solid #edf0eb;display:flex;justify-content:space-between;gap:12px;align-items:center}
 .pos-workspace.pos-refresh .pos-delivery-live-item:last-child {border-bottom:0}
 .pos-workspace.pos-refresh .pos-delivery-live-item small {display:block;color:#738472;font-size:11px;margin-top:3px}
+/* POS take-away: service choice, clear invoice breakdown, accessible payment state */
+.pos-workspace.pos-refresh .pos-delivery-live { margin: 0 0 18px; padding: 10px 16px; }
+.pos-workspace.pos-refresh .pos-delivery-summary { display:flex; align-items:center; gap:8px; font-weight:750; color:#3d573e; cursor:pointer; font-size:12px; list-style:none; }
+.pos-workspace.pos-refresh .pos-delivery-summary::-webkit-details-marker { display:none; }
+.pos-workspace.pos-refresh .pos-delivery-summary::before { content:'▸'; color:#688469; }
+.pos-workspace.pos-refresh details[open] > .pos-delivery-summary::before { content:'▾'; }
+.pos-workspace.pos-refresh .pos-service-toggle { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.pos-workspace.pos-refresh .pos-service-toggle label { cursor:pointer; margin:0; }
+.pos-workspace.pos-refresh .pos-service-toggle input { position:absolute; opacity:0; }
+.pos-workspace.pos-refresh .pos-service-toggle span { display:flex; align-items:center; justify-content:center; gap:8px; border:1px solid #d8e4d6; border-radius:11px; min-height:46px; font-weight:750; font-size:12px; color:#527052; background:#fff; }
+.pos-workspace.pos-refresh .pos-service-toggle input:checked + span { background:#edf5e9; border:2px solid #597954; color:#324d32; }
+.pos-workspace.pos-refresh .pos-service-toggle input:focus-visible + span { outline:3px solid #b2cfae; outline-offset:2px; }
+.pos-workspace.pos-refresh [hidden] { display:none !important; }
+.pos-workspace.pos-refresh .pos-form-title { margin-bottom:10px; }
+.pos-workspace.pos-refresh .pos-summary { margin-top:14px; }
+.pos-workspace.pos-refresh .pos-price-line { display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:6px 0; font-size:12px; }
+.pos-workspace.pos-refresh .pos-price-line > strong { color:#344c36; white-space:nowrap; }
+.pos-workspace.pos-refresh .pos-price-grand { border-top:1px solid #ceddca; margin-top:7px; padding-top:12px; font-weight:800; }
+.pos-workspace.pos-refresh .pos-price-grand strong { font-size:21px !important; }
+.pos-workspace.pos-refresh .pos-change-row { display:flex; justify-content:space-between; gap:12px; margin:9px 0 12px; color:#536c53; font-size:12px; }
+.pos-workspace.pos-refresh .pos-change-row strong { font-size:15px; }
+.pos-workspace.pos-refresh .pos-transfer-confirm { display:flex; gap:10px; align-items:start; padding:12px; margin-top:12px; background:#f7f9f3; border:1px solid #dbe8d7; border-radius:10px; font-size:12px; }
+.pos-workspace.pos-refresh .pos-transfer-confirm input { width:18px; height:18px; flex:none; accent-color:#4d744c; }
+.pos-workspace.pos-refresh .pos-success-modal { border:0; border-radius:22px; }
+.pos-workspace.pos-refresh .pos-success-icon { display:grid; place-items:center; width:64px; height:64px; margin:auto; border-radius:50%; background:#e3f2dd; color:#417445; font-size:30px; }
+.pos-workspace.pos-refresh .pos-success-details { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:17px; border-radius:12px; background:#f5f8f2; text-align:left; font-size:12px; }
+.pos-workspace.pos-refresh .pos-success-details strong { text-align:right; color:#294b32; }
+
 </style>
+
+        <style>
+        /* Quầy bán mang về · 3 luồng riêng, không sử dụng bàn */
+        .pos-workspace.pos-refresh .pos-pickup-live {margin:0 0 14px;border:1px solid #dbe7d6;border-radius:14px;background:#fff;padding:13px 17px}
+        .pos-workspace.pos-refresh .pos-pickup-live summary {cursor:pointer;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:750;color:#345a3d;list-style:none}
+        .pos-workspace.pos-refresh .pos-pickup-live summary::-webkit-details-marker {display:none}
+        .pos-workspace.pos-refresh .pos-pickup-live .pos-delivery-live-item {display:flex;justify-content:space-between;gap:10px;align-items:center;padding:9px;border-top:1px solid #edf1e9}
+        .pos-workspace.pos-refresh .pos-pickup-live .pos-delivery-live-item small {display:block;color:#697a6b}
+        .pos-workspace.pos-refresh .pos-bank-card {display:flex;gap:12px;align-items:center;padding:12px;border:1px solid #dce6d7;background:#fbfdf9;border-radius:12px}
+        .pos-workspace.pos-refresh .pos-bank-card img {width:116px;max-height:158px;object-fit:contain;border:1px solid #e3e5e0;border-radius:9px;background:white}
+        .pos-workspace.pos-refresh .pos-bank-details {font-size:12px;min-width:0;word-break:break-word}
+        .pos-workspace.pos-refresh .pos-bank-details strong {display:block;margin-bottom:6px}
+        .pos-workspace.pos-refresh #posShopStatus {line-height:1.6}
+        @media(max-width:600px){.pos-workspace.pos-refresh .pos-bank-card {align-items:flex-start}.pos-workspace.pos-refresh .pos-bank-card img {width:95px}}
+        </style>
 
         <span id="posRole" hidden th:attr="data-role=${actor.role}"></span>
 
@@ -324,22 +367,35 @@
             <div>
                 <span class="pos-eyebrow"><i class="bi bi-leaf"></i> UTE TEA <span aria-hidden="true">/</span> ĐIỂM BÁN HÀNG</span>
                 <h1>Quầy thu ngân</h1>
-                <p>Chọn món, xác nhận hình thức phục vụ và hoàn tất thanh toán trên một màn hình.</p>
+                <p>Bán mang đi tại quầy · Xử lý đơn khách đặt trước · Điều phối giao hàng nội bộ.</p>
             </div>
             <div class="d-flex flex-wrap gap-2 align-items-center">
                 <span class="pos-shortcut pos-shortcut-active"><i class="bi bi-credit-card-2-front" aria-hidden="true"></i> Thu ngân · POS</span>
+                <a class="pos-shortcut" href="/orders?tab=confirm">
+                    <i class="bi bi-bag-check" aria-hidden="true"></i> Khách đặt trước
+                    <span id="posPickupPendingCount" class="badge rounded-pill text-bg-warning" aria-label="Đơn chờ xác nhận">0</span>
+                </a>
                 <a class="pos-shortcut" th:href="@{/cashier/delivery-orders}">
-                    <i class="bi bi-receipt-cutoff" aria-hidden="true"></i> Đơn giao hàng <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
+                    <i class="bi bi-truck" aria-hidden="true"></i> Đơn giao hàng
+                    <span id="posDeliveryShortcutCount" class="badge rounded-pill text-bg-warning" aria-label="Đơn giao mới">0</span>
                 </a>
             </div>
         </header>
 
-        <section class="pos-delivery-live" aria-labelledby="posDeliveryHeading">
-            <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap mb-2">
-                <h2 id="posDeliveryHeading"><i class="bi bi-truck me-2" aria-hidden="true"></i>Đơn giao hàng mới <span id="posDeliveryNewCount" class="badge rounded-pill text-bg-warning">0</span></h2>
-            </div>
-            <div id="posDeliveryNewList" class="small text-muted" aria-live="polite">Đang kiểm tra đơn giao hàng...</div>
-        </section>
+        <details class="pos-delivery-live" aria-labelledby="posDeliveryHeading">
+            <summary class="pos-delivery-summary"><i class="bi bi-truck me-2"></i> Đơn giao hàng trực tuyến <span id="posDeliveryNewCount" class="badge rounded-pill text-bg-warning">0</span><span class="small text-muted ms-auto">Bấm để xem đơn mới</span></summary>
+            <h2 id="posDeliveryHeading" class="visually-hidden">Đơn giao hàng mới</h2>
+            <div id="posDeliveryNewList" class="small text-muted mt-2" aria-live="polite">Đang kiểm tra đơn giao hàng...</div>
+        </details>
+
+        <details class="pos-pickup-live" aria-labelledby="posPickupHeading">
+            <summary class="pos-delivery-summary"><i class="bi bi-bag-heart me-2"></i> Đơn đặt trước đến lấy
+                <span id="posPickupPreviewCount" class="badge rounded-pill text-bg-warning">0</span>
+                <span class="small text-muted ms-auto">Mở để xem đơn cần xác nhận</span>
+            </summary>
+            <h2 id="posPickupHeading" class="visually-hidden">Đơn khách đặt trước đang chờ xác nhận</h2>
+            <div id="posPickupNewList" class="small mt-2" aria-live="polite">Đang tải đơn khách đặt trước...</div>
+        </details>
 
         <div class="pos-layout">
             <!-- Menu bên trái: giữ nguyên API renderProducts và topping mode. -->
@@ -398,40 +454,53 @@
                     </div>
                 </div>
                 <div class="pos-cart-separator"></div>
-                <h3 class="pos-form-title"><i class="bi bi-sliders2" aria-hidden="true"></i> Thông tin đơn hàng</h3>
+                <h3 class="pos-form-title"><i class="bi bi-geo-alt" aria-hidden="true"></i> 1. Chi nhánh bán hàng</h3>
                 <div class="pos-field-line">
-                    <label class="pos-field-label" for="counterTableId">Hình thức phục vụ / Bàn</label>
-                    <button type="button" id="posTableSessionBtn" class="pos-session-btn" hidden>
-                        <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i> Mở phiên
-                    </button>
+                    <label class="pos-field-label" for="posShopId">Chi nhánh giao món cho khách <span class="text-danger">*</span></label>
                 </div>
-                <select id="counterTableId" class="form-select">
-                    <option value="">Tại quầy / Mang về</option>
-                    <option th:each="t : ${tables}" th:value="${t.id}" th:text="${t.name}"></option>
+                <select id="posShopId" class="form-select" required disabled>
+                    <option value="">Đang tải chi nhánh...</option>
                 </select>
-                <p id="posTableAssignmentHelp" data-assignment="takeaway">
-                    <i class="bi bi-info-circle" aria-hidden="true"></i>
-                    Chọn bàn nếu khách dùng tại quán. Để trống nếu khách mua mang về.
-                </p>
+                <p id="posShopStatus" class="small text-muted mt-2 mb-0" role="status">Đơn tại quầy là đơn mang đi, không tính phí giao hàng.</p>
+                <h3 class="pos-form-title mt-3 mb-2"><i class="bi bi-wallet2" aria-hidden="true"></i> 2. Thu tiền</h3>
                 <div class="pos-field-line">
-                    <label class="pos-field-label" for="counterPayMethod">Thanh toán bằng</label>
+                    <label class="pos-field-label" for="counterPayMethod">Phương thức thanh toán</label>
                 </div>
                 <select id="counterPayMethod" class="form-select">
                     <option value="CASH">Tiền mặt</option>
                     <option value="BANK_TRANSFER">Chuyển khoản</option>
                 </select>
-                <div class="pos-summary">
-                    <div class="d-flex justify-content-between align-items-center gap-2">
-                        <span class="pos-summary-label">Tạm tính</span>
-                        <strong id="counterCartTotal" class="pos-summary-value">0 ₫</strong>
-                    </div>
-                    <div class="pos-summary-note">Giá và giảm giá sẽ được kiểm tra lại khi lập hóa đơn.</div>
+                <div id="posCashTender" class="mt-2">
+                    <label class="pos-field-label mb-2" for="counterCashReceived">Tiền khách đưa (₫)</label>
+                    <input id="counterCashReceived" type="number" min="0" step="1000" inputmode="numeric"
+                           class="form-control" placeholder="Nhập số tiền khách đưa">
+                    <div class="pos-change-row"><span>Tiền thối lại</span><strong id="posChangeDue">0 ₫</strong></div>
                 </div>
-                <button id="counterSubmitBtn" type="button" class="pos-submit mt-3"
-                        onclick="CashierApp.submitCounterOrder()">
-                    <i class="bi bi-check-circle-fill" aria-hidden="true"></i> Thanh toán
+                <div id="posTransferConfirmation" hidden>
+                    <div class="pos-bank-card mt-3">
+                        <img id="posBankQr" src="/images/mb-vietqr-payment.png" alt="Mã VietQR nhận tiền MB Bank" hidden>
+                        <div class="pos-bank-details">
+                            <strong id="posBankTitle">Thông tin tài khoản nhận tiền</strong>
+                            <div id="posBankAccount">Đang tải thông tin nhận tiền...</div>
+                            <small id="posBankHolder" class="text-muted"></small>
+                            <small class="text-muted d-block mt-2">Chỉ xác nhận sau khi nhìn thấy giao dịch tiền vào tài khoản.</small>
+                        </div>
+                    </div>
+                    <label class="pos-transfer-confirm">
+                        <input id="counterTransferConfirmed" type="checkbox">
+                        <span>Đã đối chiếu tài khoản và nhận đủ tiền chuyển khoản</span>
+                    </label>
+                </div>
+                <div class="pos-summary" aria-live="polite">
+                    <div class="pos-price-line"><span>Tạm tính (gồm topping)</span><strong id="counterCartTotal">0 ₫</strong></div>
+                    <div class="pos-price-line"><span>Giảm giá cửa hàng</span><strong id="posDiscountAmount">−0 ₫</strong></div>
+                    <div class="pos-price-line pos-price-grand"><span>Khách cần thanh toán</span><strong id="posFinalTotal" class="pos-summary-value">0 ₫</strong></div>
+                    <p id="posPriceStatus" class="pos-summary-note mb-0" role="status">Giá sẽ được đối chiếu với hệ thống trước khi thu.</p>
+                </div>
+                <button id="counterSubmitBtn" type="button" class="pos-submit mt-3" onclick="CashierApp.submitCounterOrder()">
+                    <i class="bi bi-check-circle-fill" aria-hidden="true"></i> Xác nhận thu tiền &amp; tạo đơn
                 </button>
-                <p class="pos-smallprint"><i class="bi bi-shield-check" aria-hidden="true"></i> Thanh toán thành công sẽ phát hành hóa đơn.</p>
+                <p class="pos-smallprint"><i class="bi bi-shield-check" aria-hidden="true"></i> Bấm một lần sau khi thu đủ tiền; đơn được gửi cho bếp và hóa đơn được lưu vào hệ thống.</p>
             </section>
         </div>
 
@@ -441,28 +510,24 @@
             <strong id="posMobileCartTotal">0 ₫ <i class="bi bi-arrow-down-short" aria-hidden="true"></i></strong>
         </a>
 
-        <div class="modal fade" id="tableBlockersModal" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content rounded-4">
-
-                    <div class="modal-header">
-                        <h5 id="tableBlockersTitle">
-                            Chưa thể đóng phiên
-                        </h5>
-
-                        <button class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        <div class="modal fade" id="posPaymentSuccessModal" tabindex="-1" aria-labelledby="posPaymentSuccessTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered"><div class="modal-content pos-success-modal">
+                <div class="modal-body text-center p-4">
+                    <div class="pos-success-icon"><i class="bi bi-check-lg"></i></div>
+                    <h2 id="posPaymentSuccessTitle" class="h4 mt-3">Thanh toán thành công!</h2>
+                    <p id="posSuccessMessage" class="text-muted small">Đơn đã ghi nhận và chuyển đến khu vực pha chế.</p>
+                    <div class="pos-success-details">
+                        <span>Đơn hàng</span><strong id="posSuccessOrderCode">—</strong>
+                        <span>Đã thanh toán</span><strong id="posSuccessAmount">0 ₫</strong>
+                        <span>Phương thức</span><strong id="posSuccessMethod">—</strong>
+                        <span>Chi nhánh</span><strong id="posSuccessBranch">—</strong>
                     </div>
-
-                    <div class="modal-body" id="tableBlockersBody"></div>
-
-                    <div class="modal-footer">
-                        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                            Quay lại kiểm tra
-                        </button>
+                    <div class="d-grid gap-2 mt-3">
+                        <button type="button" id="posSuccessReceiptBtn" class="btn btn-primary-custom">Xem / In hóa đơn</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Tạo đơn tiếp theo</button>
                     </div>
-
                 </div>
-            </div>
+            </div></div>
         </div>
 
     </div>

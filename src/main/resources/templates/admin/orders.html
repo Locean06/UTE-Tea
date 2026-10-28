@@ -541,10 +541,6 @@
                         <i class="bi bi-cup-hot-fill"></i> Món & Danh Mục
                     </a>
 
-                    <a th:href="@{/admin/tables}" class="admin-nav-link">
-                        <i class="bi bi-grid-3x3-gap-fill"></i> Sơ đồ bàn
-                    </a>
-
                     <a th:href="@{/admin/orders}" class="admin-nav-link active" aria-current="page">
                         <i class="bi bi-receipt"></i> Quản Lý Đơn Hàng
                     </a>
@@ -564,9 +560,16 @@
                             0
                         </span>
                     </a>
+                    <a th:href="@{/admin/promotions}" class="admin-nav-link">
+                        <i class="bi bi-ticket-perforated-fill"></i> Mã Khuyến Mãi
+                    </a>
+                    <a th:href="@{/admin/branches}" class="admin-nav-link">
+                        <i class="bi bi-shop-window"></i> Cập Nhật Chi Nhánh
+                    </a>
+
 
                     <a th:href="@{/admin/settings}" class="admin-nav-link">
-                        <i class="bi bi-gear-fill"></i> Cài Đặt & Giảm Giá
+                        <i class="bi bi-gear-fill"></i> Cài Đặt Hệ Thống
                     </a>
                 </div>
             </div>
@@ -577,8 +580,8 @@
                     <p class="text-muted mb-0">
                         Lịch sử tất cả đơn hàng đã được tạo tại quán
                     </p>
-                    <a th:href="@{/merchant}" class="btn btn-outline-success btn-sm mt-3 rounded-pill px-3">
-                        <i class="bi bi-truck me-1"></i> Quản lý & phân công đơn giao hàng
+                    <a th:href="@{/cashier/delivery-orders}" class="btn btn-outline-success btn-sm mt-3 rounded-pill px-3">
+                        <i class="bi bi-truck me-1"></i> Quản lý đơn giao hàng
                     </a>
                 </div>
 

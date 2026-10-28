@@ -192,4 +192,4 @@ END
 GO
 ```
 
-Tất cả các tài khoản demo cũ (`admin@milktea.vn`, `cashier@milktea.vn`, `kitchen@milktea.vn`, `customer@milktea.vn`) đều được bảo lưu nguyên vẹn quyền đăng nhập (`EmailXacThuc = 1`), trong khi mọi đăng ký mới đều bắt buộc trải qua bước xác thực email qua mã OTP 6 số.
+Tất cả các tài khoản demo cũ (`admin@utetea.vn`, `cashier@utetea.vn`, `kitchen@utetea.vn`, `customer@utetea.vn`) đều được bảo lưu nguyên vẹn quyền đăng nhập (`EmailXacThuc = 1`), trong khi mọi đăng ký mới đều bắt buộc trải qua bước xác thực email qua mã OTP 6 số.

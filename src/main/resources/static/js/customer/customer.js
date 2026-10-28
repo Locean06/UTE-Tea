@@ -65,25 +65,48 @@ const CustomerApp = (() => {
         localStorage.removeItem(getLocalCartStorageKey());
     }
 
+    // Chỉ xóa giỏ đúng phiên bản đã checkout; If-Match bảo vệ khi tab khác cập nhật giỏ.
+    async function clearCartIfVersion(expectedVersion) {
+        if (!accountId || expectedVersion == null) return false;
+        await cartWrite.catch(() => {});
+        const current = await MilkTeaApi.get('/api/v1/account/cart');
+        accountCartVersion = current.version;
+        if (String(current.version) !== String(expectedVersion)) {
+            localCart = current.items.map(it => ({...it, price: it.unitPrice}));
+            updateCartBadge();
+            return false;
+        }
+        try {
+            const cleared = await MilkTeaApi.put('/api/v1/account/cart', {items: []}, {'If-Match': expectedVersion});
+            accountCartVersion = cleared.version;
+            localCart = [];
+            updateCartBadge();
+            return true;
+        } catch (error) {
+            const latest = await MilkTeaApi.get('/api/v1/account/cart');
+            accountCartVersion = latest.version;
+            localCart = latest.items.map(it => ({...it, price: it.unitPrice}));
+            updateCartBadge();
+            if (error.status === 409) return false;
+            throw error;
+        }
+    }
+
     // Khách đặt hàng trực tuyến: nhận tại quầy / mang về. Bàn do thu ngân gán trong POS.
     function initContext() {
         if(!contextReady)contextReady=initializeContext().catch(error=>{contextReady=null;throw error;});
         return contextReady;
     }
     async function initializeContext() {
-        const params = new URLSearchParams(location.search);
-        const explicitQr = params.get('qrCode') || params.get('qr') || (params.get('table')?.startsWith('TABLE_QR_') ? params.get('table') : null);
-        const qr = explicitQr || sessionStorage.getItem('uteTea.scannedQr');
-        if (qr) {
-            try {
-                const context = await MilkTeaApi.get('/api/v1/public/table-context?qrCode='+encodeURIComponent(qr));
-                Object.assign(window.MilkTeaContext,context,{qrCode:qr});
-                sessionStorage.setItem('uteTea.scannedQr',qr);
-            } catch (e) {
-                sessionStorage.removeItem('uteTea.scannedQr');
-                if (explicitQr) throw e;
-            }
-        }
+        // Clear legacy browser table selections to avoid showing a previous guest's table.
+        window.MilkTeaContext.tableId = null;
+        window.MilkTeaContext.tableName = null;
+        window.MilkTeaContext.qrCode = null;
+        window.MilkTeaContext.sessionId = null;
+        window.MilkTeaContext.sessionStatus = null;
+        window.MilkTeaContext.tableToken = null;
+        localStorage.removeItem('milktea.lastTableQr');
+        localStorage.removeItem('milktea.lastTableId');
         window.MilkTeaContext.counterToken = sessionStorage.getItem('milktea.counterToken');
         if (accountId) {
             const cart = await MilkTeaApi.get('/api/v1/account/cart');
@@ -101,7 +124,7 @@ const CustomerApp = (() => {
     function setupRealtimeListeners() {
         MilkTeaRealtime.on('CART_CHANGED', (event) => {
             console.log('Giỏ hàng thay đổi từ thiết bị khác. Đang tải lại giỏ hàng...');
-            // Personal account cart is refreshed by its versioned write path.
+            loadServerCart();
         });
 
         MilkTeaRealtime.on('ORDER_STATUS_CHANGED', (event) => {
@@ -140,7 +163,9 @@ const CustomerApp = (() => {
 
         MilkTeaRealtime.onReconnect(() => {
             console.log('WebSocket reconnect: Làm mới dữ liệu từ server...');
-
+            if (window.MilkTeaContext.sessionId) {
+                loadServerCart();
+            }
             if (typeof loadOrdersList === 'function') {
                 loadOrdersList();
             }
@@ -167,6 +192,11 @@ const CustomerApp = (() => {
             lineTotal: lineTotal
         };
 
+        if (window.MilkTeaContext.sessionId) {
+            // Đã có phiên -> Gửi lên giỏ server
+            await addServerCartItem(item);
+        } else {
+            // Chưa có phiên -> Lưu giỏ RAM, chỉ gộp nếu cùng productId, note VÀ cùng toppings
             const tKey = toppingIds.join(',');
             const existing = localCart.find(it =>
                 it.productId === item.productId &&
@@ -184,6 +214,7 @@ const CustomerApp = (() => {
             await saveLocalCart();
             updateCartBadge();
             MilkTeaApi.showToast(`Đã thêm ${item.productName} vào giỏ`, 'success');
+        }
     }
 
     function extractToppingIds(item) {
@@ -264,7 +295,7 @@ const CustomerApp = (() => {
     }
 
     async function updateQuantity(index, delta) {
-        const currentItems = localCart;
+        const currentItems = window.MilkTeaContext.sessionId ? serverCart : localCart;
         if (!currentItems[index]) return;
 
         const newQty = currentItems[index].quantity + delta;
@@ -276,12 +307,37 @@ const CustomerApp = (() => {
             currentItems[index].lineTotal = ((currentItems[index].price || currentItems[index].unitPrice || 0) + toppingSum) * newQty;
         }
 
-        updateCartBadge(true);
-        try { await saveLocalCart(); } catch (_) { return false; }
+        if (window.MilkTeaContext.sessionId) {
+            const itemsToSend = currentItems.map(it => ({
+                productId: it.productId,
+                quantity: it.quantity,
+                note: it.note,
+                toppingIds: extractToppingIds(it)
+            }));
+            try {
+                const ifMatch = `"${window.MilkTeaContext.cartVersion}"`;
+                const updatedCart = await MilkTeaApi.put(
+                    `/api/v1/table-sessions/${window.MilkTeaContext.sessionId}/cart`,
+                    { items: itemsToSend },
+                    { 'If-Match': ifMatch }
+                );
+                window.MilkTeaContext.cartVersion = updatedCart.version;
+                serverCart = (updatedCart.items || []).map(it => ({
+                    ...it,
+                    toppingIds: extractToppingIds(it)
+                }));
+            } catch (e) {
+                MilkTeaApi.showToast('Không thể cập nhật giỏ hàng: ' + e.message, 'error');
+                await loadServerCart();
+            }
+        } else {
+            updateCartBadge(true);
+            try { await saveLocalCart(); } catch (_) { return false; }
+        }
 
         updateCartBadge();
         if (typeof renderCartItems === 'function') {
-            const updatedItems=localCart;
+            const updatedItems=window.MilkTeaContext.sessionId?serverCart:localCart;
             const total = updatedItems.reduce((acc, it) => acc + (it.lineTotal || (it.price || it.unitPrice || 0) * it.quantity), 0);
             renderCartItems(updatedItems, total);
         }
@@ -292,7 +348,7 @@ const CustomerApp = (() => {
         await updateQuantity(index, -999999);
     }
     async function replaceItem(index,product,quantity,note,toppings) {
-        const items=localCart;
+        const items=window.MilkTeaContext.sessionId?serverCart:localCart;
         if(!items[index])throw Error('Món trong giỏ đã thay đổi. Vui lòng tải lại.');
         items[index]={productId:product.id,productName:product.name,size:product.size,price:Number(product.price),quantity,note,
             toppings,toppingIds:toppings.map(t=>t.id),lineTotal:(Number(product.price)+toppings.reduce((sum,t)=>sum+Number(t.price),0))*quantity};
@@ -301,7 +357,7 @@ const CustomerApp = (() => {
 
     function updateCartBadge(pending=false) {
         const badges = document.querySelectorAll('#cartCountBadge, [data-cart-count]');
-        const currentItems = localCart;
+        const currentItems = window.MilkTeaContext.sessionId ? serverCart : localCart;
         const count = currentItems.reduce((acc, it) => acc + it.quantity, 0);
         badges.forEach(badge => {
             badge.textContent = count;
@@ -311,9 +367,15 @@ const CustomerApp = (() => {
     }
 
     // Đặt đơn hàng
-    async function submitOrder(checkout = {}) {
-        await cartWrite;
-        const currentItems = localCart;
+    async function submitOrder() {
+        const pickupSelect = document.getElementById('counterShop');
+        // Customer self-pickup requires an explicit branch; staff POS has its own order flow.
+        if (pickupSelect && (!pickupSelect.value || pickupSelect.disabled)) {
+            MilkTeaApi.showToast('Vui lòng chọn chi nhánh đến nhận món.', 'warning');
+            pickupSelect.focus();
+            return;
+        }
+        const currentItems = window.MilkTeaContext.sessionId ? serverCart : localCart;
         if (currentItems.length === 0) {
             MilkTeaApi.showToast('Giỏ hàng đang trống!', 'warning');
             return;
@@ -330,22 +392,16 @@ const CustomerApp = (() => {
                 toppingIds: extractToppingIds(it)
             }));
 
-            const dine = checkout.fulfillmentMode === 'DINE_IN';
-            const ctx = window.MilkTeaContext;
-            if (dine && !ctx.tableId) throw new Error('Vui lòng quét QR bàn hợp lệ');
-            const body = {items,shopId:checkout.shopId,paymentMethod:checkout.paymentMethod || 'CASH',voucherCode:checkout.voucherCode,expectedTotal:checkout.expectedTotal};
-            if (dine) Object.assign(body,{tableId:ctx.tableId,expectedSessionId:ctx.sessionId,qrCode:ctx.qrCode,tableToken:ctx.tableToken});
-            const {tableToken,expectedSessionId,...logicalOrder} = body;
-            const signature = JSON.stringify(logicalOrder);
-            let attempt;
-            try { attempt = JSON.parse(sessionStorage.getItem('uteTea.checkoutAttempt') || 'null'); } catch (_) {}
+            const payload = { items, ...(pickupSelect ? { shopId: Number(pickupSelect.value) } : {}) };
+            const signature = JSON.stringify(payload);
+            let attempt = null;
+            try { attempt = JSON.parse(sessionStorage.getItem('uteTea.counterAttempt') || 'null'); } catch (_) {}
             if (!attempt || attempt.signature !== signature) {
-                attempt = {signature,key:crypto.randomUUID()};
-                sessionStorage.setItem('uteTea.checkoutAttempt',JSON.stringify(attempt));
+                attempt = {signature, key: globalThis.crypto?.randomUUID?.() || 'COUNTER_'+Date.now()+'_'+Math.random().toString(36).slice(2)};
             }
-            const order = await MilkTeaApi.post(dine ? '/api/v1/orders/table' : '/api/v1/orders/counter',body,{'Idempotency-Key':attempt.key});
-            sessionStorage.removeItem('uteTea.checkoutAttempt');
-            MilkTeaApi.showToast('Đặt đơn thành công! Đang chuyển hướng...', 'success');
+            try { sessionStorage.setItem('uteTea.counterAttempt', JSON.stringify(attempt)); } catch (_) {}
+            const order = await MilkTeaApi.post('/api/v1/orders/counter', payload, {'Idempotency-Key': attempt.key});
+            try { sessionStorage.removeItem('uteTea.counterAttempt'); } catch (_) {}
 
             // Cập nhật context phiên nếu là đơn đầu tiên mở phiên
             if (order.sessionId) {
@@ -376,16 +432,25 @@ const CustomerApp = (() => {
             } else {
                 sessionStorage.removeItem('uteTea.recentOrderToken');
             }
-            setTimeout(() => {
-                window.location.href = '/order-confirmation?order=' + encodeURIComponent(order.orderId);
-            }, 800);
-            return order;
+            // Chỉ thông báo thành công sau khi API đã tạo đơn; không tự chuyển trang.
+            const chosenBranch = pickupSelect?.selectedOptions?.[0]?.textContent?.trim() || order.shopName || 'UTE Tea';
+            const orderUrl = '/order-confirmation?order=' + encodeURIComponent(order.orderId);
+            if (!window.UTEOrderSuccess?.show({
+                orderId: order.orderId,
+                type: 'COUNTER',
+                branch: chosenBranch,
+                total: order.totalAmount,
+                detailsUrl: orderUrl,
+                note: 'Đơn nhận tại quán đã được tiếp nhận. Vui lòng theo dõi trạng thái trước khi đến lấy.'
+            })) {
+                MilkTeaApi.showToast('Đã tiếp nhận đơn #' + order.orderId, 'success');
+                window.location.href = orderUrl;
+            }
 
         } catch (e) {
             // Giữ giỏ hàng và hiển thị lỗi, không xóa giỏ hay chuyển trang
             MilkTeaApi.showToast(e.message || 'Không thể tạo đơn hàng', 'error');
             if (btn) btn.disabled = false;
-            throw e;
         }
     }
 
@@ -396,6 +461,7 @@ const CustomerApp = (() => {
         removeItem,
         replaceItem,
         clearCart: async()=>{await clearLocalCart();updateCartBadge();},
+        clearCartIfVersion,
         getCartVersion: ()=>accountCartVersion,
         submitOrder,
         loadServerCart,

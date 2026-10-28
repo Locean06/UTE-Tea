@@ -212,7 +212,7 @@ public class AdminPreparationRecipeAndStaffTest {
     void testStaffAccountRealtimeSynchronization() {
         Account staff = Account.builder()
                 .id(50L)
-                .email("cashier1@milktea.vn")
+                .email("cashier1@utetea.vn")
                 .fullName("Thu ngân 1")
                 .role(Role.CASHIER)
                 .active(true)

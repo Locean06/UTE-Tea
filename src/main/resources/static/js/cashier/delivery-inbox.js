@@ -18,7 +18,9 @@ const CashierDeliveryInbox = (() => {
         dataLine(details,'Địa chỉ giao',order.addressLine);
         dataLine(details,'Tổng thanh toán',currency(order.totalAmount));
         dataLine(details,'Thanh toán',order.paymentMethod==='COD'?'COD - '+(order.paid?'Đã thu':'Thu khi giao'):(order.paid?'Đã thanh toán':'Chờ VNPAY'));
-        dataLine(details,'Nhân viên giao',order.shipperId?'#'+order.shipperId:'Chưa phân công');card.append(details);
+        dataLine(details,'Nhân viên giao',order.shipperId?'#'+order.shipperId:'Chưa phân công');
+        dataLine(details,'Tiến độ pha chế',({PENDING:'Chờ bếp nhận',PREPARING:'Bếp đang pha',READY:'Đã pha xong'})[order.preparationStatus]||'Chưa có');
+        card.append(details);
         if(order.items?.length){card.append(el('p',order.items.map(x=>(x.name||'Món')+' ×'+x.quantity).join(' · '),'delivery-inbox-items'));}
         const actions=el('div',undefined,'delivery-inbox-order-actions');
         if(order.status==='NEW'){
@@ -29,6 +31,12 @@ const CashierDeliveryInbox = (() => {
             const placeholder=el('option','Chọn nhân viên giao hàng');placeholder.value='';select.append(placeholder);
             for(const shipper of shippers){const option=el('option',shipper.name);option.value=String(shipper.id);if(shipper.id===order.shipperId)option.selected=true;select.append(option);}
             const button=el('button',order.shipperId?'Đổi người giao':'Phân công giao hàng');button.type='button';button.onclick=()=>update(order,button,'assign',select.value);
+            if(!shippers.length){
+                select.disabled=true;button.disabled=true;
+                actions.append(el('span','Chưa có nhân viên giao hàng nội bộ đang hoạt động. Bật SHIPPER_BOOTSTRAP_ENABLED để tạo tài khoản demo.','small text-danger'));
+            } else {
+                actions.append(el('span',order.shipperId?'Được đổi người giao trước khi nhận hàng.':'Có thể phân công ngay khi xác nhận, không cần chờ bếp.','small text-muted'));
+            }
             actions.append(select,button);
         }
         if(order.status==='SHIPPING'){actions.append(el('span','Nhân viên giao hàng đang thực hiện đơn.','small text-muted'));}
@@ -40,6 +48,7 @@ const CashierDeliveryInbox = (() => {
         const groups={NEW:'deliveryStatNew',CONFIRMED:'deliveryStatConfirmed',SHIPPING:'deliveryStatShipping',DELIVERED:'deliveryStatDelivered'};
         for(const [status,id] of Object.entries(groups))if(byId(id))byId(id).textContent=orders.filter(o=>o.status===status).length;
         if(byId('posDeliveryNewCount'))byId('posDeliveryNewCount').textContent=orders.filter(o=>o.status==='NEW').length;
+        if(byId('posDeliveryShortcutCount'))byId('posDeliveryShortcutCount').textContent=orders.filter(o=>o.status==='NEW').length;
     }
     function renderPreview(){
         const list=byId('posDeliveryNewList');if(!list)return;list.replaceChildren();

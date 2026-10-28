@@ -14,8 +14,6 @@ spring:
         format_sql: false
 
 app:
-  otp:
-    secret: test-only-otp-secret-at-least-32-characters
   admin:
     default-password: Password@123
   cloudinary:

@@ -66,7 +66,7 @@ Chạy demo không cần SQL Server:
 mvn spring-boot:run -Dspring-boot.run.profiles=demo
 ```
 
-Các tài khoản demo mới: `vendor1@ute-tea.demo`, `vendor2@ute-tea.demo`, `vendor3@ute-tea.demo`, `manager@ute-tea.demo`, `shipper@ute-tea.demo`. Cùng mật khẩu cấu hình demo (`Password@123` mặc định); Manager chỉ được gán shop Campus. Admin/thu ngân/bếp/khách demo cũ tiếp tục sử dụng.
+Các tài khoản demo mới: `vendor1@utetea.vn`, `vendor2@utetea.vn`, `vendor3@utetea.vn`, `manager@utetea.vn`, `shipper@utetea.vn`. Cùng mật khẩu cấu hình demo (`Password@123` mặc định); Manager chỉ được gán shop Campus. Admin/thu ngân/bếp/khách demo cũ tiếp tục sử dụng.
 
 VNPAY dùng `VNPAY_TMN_CODE`, `VNPAY_HASH_SECRET`, `VNPAY_RETURN_URL`; đăng ký IPN HTTPS trỏ `/api/v1/public/vnpay/ipn`. Chỉ dùng endpoint sandbox cố định; thiếu khóa thì từ chối VNPAY và cho chọn COD. Đối chiếu [tài liệu VNPAY chính thức](https://sandbox.vnpayment.vn/apis/docs/thanh-toan-pay/pay.html).
 

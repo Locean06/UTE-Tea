@@ -74,9 +74,12 @@
             details.append(detailLine('Thanh toán', (o.paymentMethod === 'COD' ? 'Thanh toán khi nhận (COD)' : 'VNPAY') + (o.paid ? ' · Đã thanh toán' : ' · Chưa thanh toán')));
             details.append(detailLine('Tiền món',money(o.subtotal)));
             details.append(detailLine('Phí giao hàng',money(o.shippingFee)));
-            details.append(detailLine('Giảm giá',money(o.discountAmount)));
+            if (o.status === 'CONFIRMED') details.append(detailLine('Tiến độ pha chế', ({PENDING:'Chờ bếp nhận',PREPARING:'Đang pha chế',READY:'Đã pha xong'})[o.preparationStatus] || 'Chờ cập nhật'));
+            if (o.voucherCode) details.append(detailLine('Mã đã dùng',o.voucherCode));
+            details.append(detailLine('Giảm giá','-'+money(o.discountAmount)));
         } else {
             details.append(detailLine('Hình thức',o.tableName ? 'Tại bàn · '+o.tableName : 'Tại quầy / mang về'));
+            if(o.pickupShopName) details.append(detailLine('Chi nhánh nhận món',o.pickupShopName));
             details.append(detailLine('Thanh toán',o.paid ? 'Đã thanh toán' : 'Chưa thanh toán'));
             details.append(detailLine('Tiền món',money(o.subtotal)));
             details.append(detailLine('Giảm giá',money(o.discountAmount)));
@@ -204,4 +207,6 @@
     $('myOrdersStatus').addEventListener('change',render);
     $('myOrdersRefresh').addEventListener('click',()=>loadOrders().catch(e=>setError(e.message||'Không tải được đơn hàng.')));
     loadOrders().catch(e=>{$('myOrdersLoading').classList.add('d-none');setError(e.message||'Không thể tải lịch sử đơn hàng.');});
+    document.addEventListener('visibilitychange', () => {if (!document.hidden) void loadOrders().catch(e=>setError(e.message));});
+    window.setInterval(() => {if (!document.hidden) void loadOrders().catch(e=>setError(e.message));},30000);
 })();

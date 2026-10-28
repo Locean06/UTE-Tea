@@ -140,11 +140,11 @@
     const hint = el('div', null, 'shipper-order-footnote');
     const actions = el('div', null, 'shipper-order-actions');
     if (order.status === 'CONFIRMED') {
-      if (order.paymentMethod === 'COD' || order.paid) {
-        hint.append(el('i', null, 'bi bi-clock'), document.createTextNode('Sẵn sàng giao'));
-        actions.append(button('Bắt đầu giao', 'bi-arrow-right', 'SHIPPING', order));
+      if (order.preparationStatus === 'READY' && (order.paymentMethod === 'COD' || order.paid)) {
+        hint.append(el('i', null, 'bi bi-check-circle'), document.createTextNode('Bếp đã hoàn tất · Xác nhận đã nhận hàng từ quán để bắt đầu giao'));
+        actions.append(button('Đã lấy hàng · Bắt đầu giao', 'bi-arrow-right', 'SHIPPING', order));
       } else {
-        hint.append(el('i', null, 'bi bi-exclamation-circle'), document.createTextNode('Chờ khách thanh toán trực tuyến'));
+        hint.append(el('i', null, 'bi bi-exclamation-circle'), document.createTextNode(order.preparationStatus !== 'READY' ? 'Đang chờ bếp pha chế xong' : 'Chờ khách thanh toán trực tuyến'));
       }
     } else if (order.status === 'SHIPPING') {
       hint.append(el('i', null, 'bi bi-truck'), document.createTextNode('Đang trên đường giao'));

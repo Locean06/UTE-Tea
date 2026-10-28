@@ -478,19 +478,16 @@ const AdminApp = (() => {
     }
 
     // === 7. CẤU HÌNH QUÁN & KHUYẾN MÃI ===
-    async function updateSettings(shopName, address, bankName, bankAccountNumber, bankAccountHolder, discountPercent, discountType, discountValue) {
+    async function updateSettings(shopName, address, bankName, bankAccountNumber, bankAccountHolder) {
         try {
             await MilkTeaApi.put('/api/v1/admin/settings', {
                 shopName,
                 address,
                 bankName,
                 bankAccountNumber,
-                bankAccountHolder,
-                discountPercent: parseFloat(discountPercent || 0),
-                discountType: discountType || 'PERCENT',
-                discountValue: parseFloat(discountValue !== undefined && discountValue !== null ? discountValue : (discountPercent || 0))
+                bankAccountHolder
             });
-            MilkTeaApi.showToast('Cập nhật thông tin quán và khuyến mãi thành công!', 'success');
+            MilkTeaApi.showToast('Cập nhật cấu hình quán thành công!', 'success');
             setTimeout(() => window.location.reload(), 500);
         } catch (e) {
             MilkTeaApi.showToast(e.message || 'Lỗi cập nhật cài đặt', 'error');

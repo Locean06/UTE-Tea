@@ -49,7 +49,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Optional<Account> accountOpt = accountRepository.findById(accountId);
                 if (accountOpt.isPresent()) {
                     Account account = accountOpt.get();
-                    if (Boolean.TRUE.equals(account.getActive()) && Boolean.TRUE.equals(account.getEmailVerified()) && account.getTokenVersion().equals(claimVersion)) {
+                    // After database reset, identity IDs may be reused. An old signed
+                    // token must never become valid for a DIFFERENT new account.
+                    String claimEmail = claims.get("email") instanceof String value ? value : null;
+                    String claimRole = claims.get("role") instanceof String value ? value : null;
+                    if (Boolean.TRUE.equals(account.getActive())
+                            && Boolean.TRUE.equals(account.getEmailVerified())
+                            && account.getTokenVersion() != null
+                            && account.getTokenVersion().equals(claimVersion)
+                            && claimEmail != null && account.getEmail().equalsIgnoreCase(claimEmail)
+                            && account.getRole() != null && account.getRole().name().equals(claimRole)) {
                         Role role = account.getRole();
                         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role.name());
 

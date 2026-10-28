@@ -64,7 +64,7 @@ public class InventoryAdminManagementTest {
     void setUp() {
         adminUser = Account.builder()
                 .id(1L)
-                .email("admin@milktea.vn")
+                .email("admin@utetea.vn")
                 .fullName("Quản trị viên")
                 .role(Role.ADMIN)
                 .build();

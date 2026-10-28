@@ -85,7 +85,7 @@ public class AuthService {
     @Transactional
     public AuthDto.RegisterResponse register(AuthDto.RegisterRequest request) {
         String email = request.getEmail().trim().toLowerCase();
-        Optional<Account> existingOpt = accountRepository.findByEmailForUpdate(email);
+        Optional<Account> existingOpt = accountRepository.findByEmail(email);
 
         Account account;
         if (existingOpt.isPresent()) {
@@ -93,10 +93,7 @@ public class AuthService {
             if (Boolean.TRUE.equals(existing.getEmailVerified())) {
                 throw BusinessException.badRequest(ErrorCode.VALIDATION_FAILED, "Địa chỉ email này đã được sử dụng");
             }
-            if (existing.getRole() != Role.CUSTOMER || !Boolean.TRUE.equals(existing.getActive())) {
-                throw BusinessException.forbidden(ErrorCode.ACCESS_DENIED, "Tài khoản không thể đăng ký lại qua biểu mẫu công khai");
-            }
-            // Pending customers can retry after SMTP recovery.
+            // Nếu tài khoản cũ chưa xác thực email, cập nhật thông tin mới và gửi lại OTP
             existing.setPasswordHash(passwordEncoder.encode(request.getPassword()));
             if (request.getFullName() != null && !request.getFullName().isBlank()) {
                 existing.setFullName(request.getFullName().trim());
@@ -130,7 +127,7 @@ public class AuthService {
         return AuthDto.RegisterResponse.builder()
                 .email(email)
                 .maskedEmail(MailService.maskEmail(email))
-                .message("Tài khoản đang chờ kích hoạt. Mã xác thực 6 chữ số đã được gửi tới email của bạn. Vui lòng nhập mã để kích hoạt tài khoản.")
+                .message("Đăng ký thành công! Mã xác thực 6 chữ số đã được gửi tới email của bạn. Vui lòng nhập mã để kích hoạt tài khoản.")
                 .emailVerified(false)
                 .cooldownSeconds(60)
                 .build();
@@ -139,7 +136,7 @@ public class AuthService {
     /**
      * Xác thực email bằng mã OTP 6 chữ số.
      */
-    @Transactional(noRollbackFor = BusinessException.class)
+    @Transactional
     public String verifyEmail(AuthDto.VerifyEmailRequest request) {
         String email = request.getEmail().trim().toLowerCase();
         Account account = accountRepository.findByEmail(email)
@@ -166,7 +163,7 @@ public class AuthService {
     @Transactional
     public String resendRegisterOtp(String email) {
         String cleanEmail = email.trim().toLowerCase();
-        Account account = accountRepository.findByEmailForUpdate(cleanEmail)
+        Account account = accountRepository.findByEmail(cleanEmail)
                 .orElseThrow(() -> BusinessException.notFound(ErrorCode.VALIDATION_FAILED, "Địa chỉ email chưa được đăng ký trong hệ thống"));
 
         if (Boolean.TRUE.equals(account.getEmailVerified())) {
@@ -185,8 +182,9 @@ public class AuthService {
     public void logout(Long accountId) {
         if (accountId != null) {
             accountRepository.findById(accountId).ifPresent(account -> {
-                // Tăng tokenVersion để vô hiệu hóa mọi token cũ
-                account.setTokenVersion(account.getTokenVersion() + 1);
+                // Tăng tokenVersion để vô hiệu hóa mọi token cũ (xử lý an toàn nếu tokenVersion đang null)
+                long currentVersion = account.getTokenVersion() != null ? account.getTokenVersion() : 0L;
+                account.setTokenVersion(currentVersion + 1);
                 accountRepository.save(account);
             });
         }
@@ -228,7 +226,7 @@ public class AuthService {
     /**
      * Xác thực mã OTP đặt lại mật khẩu và cấp vé tạm thời (resetToken) có hiệu lực 15 phút.
      */
-    @Transactional(noRollbackFor = BusinessException.class)
+    @Transactional
     public String verifyPasswordResetOtp(String rawEmail, String otp) {
         if (rawEmail == null || rawEmail.isBlank()) {
             throw BusinessException.badRequest(ErrorCode.VALIDATION_FAILED, "Email không được để trống");
@@ -264,7 +262,7 @@ public class AuthService {
     /**
      * Xác nhận đặt lại mật khẩu bằng mã OTP 6 số hoặc token khôi phục hợp lệ.
      */
-    @Transactional(noRollbackFor = BusinessException.class)
+    @Transactional
     public void confirmPasswordReset(AuthDto.PasswordResetConfirmRequest request) {
         String tokenOrCode = request.getEffectiveToken();
         if (tokenOrCode.isBlank()) {
@@ -315,7 +313,8 @@ public class AuthService {
         account.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
 
         // Tăng tokenVersion để vô hiệu hóa toàn bộ session/JWT cũ
-        account.setTokenVersion(account.getTokenVersion() + 1);
+        long currentVersion = account.getTokenVersion() != null ? account.getTokenVersion() : 0L;
+        account.setTokenVersion(currentVersion + 1);
 
         // Lưu tài khoản (Lưu ý: Không tự ý mở khóa active nếu tài khoản bị khóa)
         accountRepository.save(account);
@@ -367,7 +366,8 @@ public class AuthService {
         }
 
         account.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
-        account.setTokenVersion(account.getTokenVersion() + 1);
+        long currentVersion = account.getTokenVersion() != null ? account.getTokenVersion() : 0L;
+        account.setTokenVersion(currentVersion + 1);
         accountRepository.save(account);
     }
 }

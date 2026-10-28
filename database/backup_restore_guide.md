@@ -42,13 +42,13 @@ docker exec -i milktea_db /opt/mssql-tools18/bin/sqlcmd \
 #### Danh sách tài khoản thử nghiệm (Mật khẩu đồng bộ: `Password@123`):
 | Email | Vai trò (Role) | Họ tên mô tả | Mục đích kiểm thử |
 |---|---|---|---|
-| `admin@milktea.vn` | `ADMIN` | Quản Trị Viên Hệ Thống | Cấu hình quán, giảm giá, quản lý tài khoản, xem kho tổng & duyệt hoàn tiền |
-| `admin2@milktea.vn` | `ADMIN` | Quản Lý Vận Hành Tuấn | Kiểm thử phân quyền quản trị viên phụ |
-| `cashier@milktea.vn` | `CASHIER` | Thu Ngân Quỳnh | Màn hình POS, duyệt đơn, xác nhận chuyển khoản, mở/đóng phiên bàn |
-| `cashier2@milktea.vn` | `CASHIER` | Thu Ngân Hoàng | Kiểm thử ca thu ngân 2 |
-| `kitchen@milktea.vn` | `KITCHEN` | Bếp Trưởng Lân | KDS nhận đơn pha chế, quản lý mẻ sơ chế, kết ca kiểm kê cuối ca |
-| `kitchen2@milktea.vn` | `KITCHEN` | Pha Chế Minh | Kiểm thử ca bếp 2 |
-| `customer@milktea.vn` | `CUSTOMER` | Khách Hàng Mai | Xem menu, đặt món tại bàn, theo dõi đơn hàng và giỏ phiên |
+| `admin@utetea.vn` | `ADMIN` | Quản Trị Viên Hệ Thống | Cấu hình quán, giảm giá, quản lý tài khoản, xem kho tổng & duyệt hoàn tiền |
+| `admin2@utetea.vn` | `ADMIN` | Quản Lý Vận Hành Tuấn | Kiểm thử phân quyền quản trị viên phụ |
+| `cashier@utetea.vn` | `CASHIER` | Thu Ngân Quỳnh | Màn hình POS, duyệt đơn, xác nhận chuyển khoản, mở/đóng phiên bàn |
+| `cashier2@utetea.vn` | `CASHIER` | Thu Ngân Hoàng | Kiểm thử ca thu ngân 2 |
+| `kitchen@utetea.vn` | `KITCHEN` | Bếp Trưởng Lân | KDS nhận đơn pha chế, quản lý mẻ sơ chế, kết ca kiểm kê cuối ca |
+| `kitchen2@utetea.vn` | `KITCHEN` | Pha Chế Minh | Kiểm thử ca bếp 2 |
+| `customer@utetea.vn` | `CUSTOMER` | Khách Hàng Mai | Xem menu, đặt món tại bàn, theo dõi đơn hàng và giỏ phiên |
 
 ---
 

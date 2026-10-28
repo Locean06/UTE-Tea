@@ -100,7 +100,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 
-<<<<<<< HEAD
     /** A missing page/static asset is HTTP 404, not an unhandled server crash. */
     @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
     public ResponseEntity<?> handleMissingResource(
@@ -120,13 +119,6 @@ public class GlobalExceptionHandler {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.TEXT_HTML).body(html);
         }
         return standardError(HttpStatus.NOT_FOUND, ErrorCode.INTERNAL_ERROR, "Không tìm thấy đường dẫn yêu cầu");
-=======
-    @ExceptionHandler({org.springframework.web.servlet.resource.NoResourceFoundException.class,
-            org.springframework.web.servlet.NoHandlerFoundException.class})
-    public ResponseEntity<ErrorResponse> handleNotFound(Exception ex) {
-        return standardError(HttpStatus.NOT_FOUND, ErrorCode.RESOURCE_NOT_FOUND,
-                "Không tìm thấy chức năng được yêu cầu. Vui lòng tải lại trang.");
->>>>>>> ai/ute-tea-fixes
     }
 
     @ExceptionHandler(Exception.class)

@@ -17,10 +17,7 @@ public class MarketController {
  private final CatalogSearchService catalog;
  private final BranchSelectionService branches;
  @GetMapping("/marketplace") public ModelAndView page(){return new ModelAndView("customer/marketplace");}
- @GetMapping("/merchant") public ModelAndView merchant(@AuthenticationPrincipal CurrentActor actor){
-  if(actor!=null && actor.hasRole(vn.edu.ute.milktea.entity.account.Role.SHIPPER))return new ModelAndView("redirect:/delivery");
-  return new ModelAndView("market/portal");
- }
+ @GetMapping("/merchant") public ModelAndView retiredMerchant(){return new ModelAndView("redirect:/admin/branches");}
  @GetMapping("/api/v1/public/market/catalog") public ApiResponse<CatalogPage> catalog(
   @RequestParam(required=false) String q,@RequestParam(required=false) Long category,@RequestParam(required=false) Long shop,
   @RequestParam(required=false) BigDecimal min,@RequestParam(required=false) BigDecimal max,
@@ -33,6 +30,9 @@ public class MarketController {
  @GetMapping("/api/v1/market/shops") public ApiResponse<List<ShopView>> shops(@AuthenticationPrincipal CurrentActor a){return ApiResponse.ok(service.shops(a,false));}
  @PostMapping("/api/v1/market/shops") public ApiResponse<ShopView> createShop(@AuthenticationPrincipal CurrentActor a,@Valid @RequestBody ShopInput input){return ApiResponse.ok(service.createShop(a,input));}
  @PutMapping("/api/v1/market/shops/{id}") public ApiResponse<ShopView> editShop(@AuthenticationPrincipal CurrentActor a,@PathVariable Long id,@Valid @RequestBody ShopInput input){return ApiResponse.ok(service.editShop(a,id,input));}
+ @DeleteMapping("/api/v1/admin/takeaway/branches/{id}") public ApiResponse<Void> deleteBranch(@AuthenticationPrincipal CurrentActor a,@PathVariable Long id){service.archiveShop(a,id);return ApiResponse.ok(null);}
+ @GetMapping("/api/v1/admin/takeaway/vouchers") public ApiResponse<List<VoucherView>> allVouchers(@AuthenticationPrincipal CurrentActor a){return ApiResponse.ok(service.allVouchers(a));}
+ @PutMapping("/api/v1/market/vouchers/{id}") public ApiResponse<VoucherView> updateVoucher(@AuthenticationPrincipal CurrentActor a,@PathVariable Long id,@Valid @RequestBody VoucherInput input){return ApiResponse.ok(service.updateVoucher(a,id,input));}
  @PutMapping("/api/v1/market/shops/{id}/config") public ApiResponse<ShopView> config(@AuthenticationPrincipal CurrentActor a,@PathVariable Long id,@Valid @RequestBody ShopConfig input){return ApiResponse.ok(service.configureShop(a,id,input));}
  @PutMapping("/api/v1/market/shops/{id}/managers/{accountId}") public ApiResponse<Void> manager(@AuthenticationPrincipal CurrentActor a,@PathVariable Long id,@PathVariable Long accountId,@RequestParam boolean enabled){service.assignManager(a,id,accountId,enabled);return ApiResponse.ok(null);}
  @GetMapping("/api/v1/market/shops/{id}/categories") public ApiResponse<List<CategoryView>> categories(@AuthenticationPrincipal CurrentActor a,@PathVariable Long id){return ApiResponse.ok(service.shopCategories(a,id));}
@@ -48,7 +48,7 @@ public class MarketController {
  @GetMapping("/api/v1/market/vouchers") public ApiResponse<List<VoucherView>> vouchers(@AuthenticationPrincipal CurrentActor a,@RequestParam(required=false) Long shopId){return ApiResponse.ok(service.vouchers(a,shopId));}
  @PostMapping("/api/v1/market/vouchers") public ApiResponse<VoucherView> voucher(@AuthenticationPrincipal CurrentActor a,@RequestParam(required=false) Long shopId,@Valid @RequestBody VoucherInput input){return ApiResponse.ok(service.saveVoucher(a,shopId,input));}
  @DeleteMapping("/api/v1/market/vouchers/{id}") public ApiResponse<Void> disableVoucher(@AuthenticationPrincipal CurrentActor a,@PathVariable Long id){service.disableVoucher(a,id);return ApiResponse.ok(null);}
- @PostMapping("/api/v1/market/orders") public ApiResponse<OrderView> checkout(@AuthenticationPrincipal CurrentActor a,@Valid @RequestBody Checkout input,@RequestHeader("Idempotency-Key") String key){throw vn.edu.ute.milktea.common.BusinessException.badRequest(vn.edu.ute.milktea.common.ErrorCode.VALIDATION_FAILED,"UTE-Tea chỉ phục vụ mang về hoặc tại quán. Vui lòng đặt món qua checkout mới.");}
+ @PostMapping("/api/v1/market/orders") public ApiResponse<OrderView> checkout(@AuthenticationPrincipal CurrentActor a,@Valid @RequestBody Checkout input,@RequestHeader("Idempotency-Key") String key){return ApiResponse.ok(service.checkout(a,input,key));}
  @GetMapping("/api/v1/market/orders") public ApiResponse<List<OrderView>> orders(@AuthenticationPrincipal CurrentActor a,@RequestParam(required=false) Long shopId){return ApiResponse.ok(service.orders(a,shopId));}
  @GetMapping("/api/v1/market/orders/{id}") public ApiResponse<OrderView> order(@AuthenticationPrincipal CurrentActor a,@PathVariable Long id){return ApiResponse.ok(service.order(a,id));}
  @PutMapping("/api/v1/market/orders/{id}/status") public ApiResponse<OrderView> status(@AuthenticationPrincipal CurrentActor a,@PathVariable Long id,@Valid @RequestBody Transition input){return ApiResponse.ok(service.transition(a,id,input));}

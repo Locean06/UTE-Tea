@@ -23,17 +23,11 @@ public class MailService {
 
     private final JavaMailSender mailSender;
 
-    @Value("${app.mail.from:${spring.mail.username:}}")
+    @Value("${app.mail.from:${spring.mail.username:khoalkopwk@gmail.com}}")
     private String mailFrom;
 
-    @Value("${app.mail.sender-name:UTE TEA}")
+    @Value("${app.mail.sender-name:UTE Tea}")
     private String senderName;
-
-    @Value("${spring.mail.username:}")
-    private String smtpUsername;
-
-    @Value("${spring.mail.password:}")
-    private String smtpPassword;
 
     /**
      * Gửi email mã OTP xác thực tài khoản đăng ký mới.
@@ -46,11 +40,7 @@ public class MailService {
         String htmlContent = buildOtpEmailHtml(
                 recipientName,
                 "Xác thực địa chỉ email đăng ký tài khoản",
-<<<<<<< HEAD
                 "Cảm ơn bạn đã lựa chọn UTE TEA! Vui lòng sử dụng mã xác thực dưới đây để hoàn tất kích hoạt tài khoản của bạn:",
-=======
-                "Cảm ơn bạn đã lựa chọn UTE TEA! Vui lòng sử dụng mã xác thực gồm 6 chữ số dưới đây để hoàn tất kích hoạt tài khoản của bạn:",
->>>>>>> ai/ute-tea-fixes
                 otpCode,
                 expiryMinutes,
                 "Nếu bạn không thực hiện yêu cầu đăng ký này, xin vui lòng bỏ qua email hoặc thông báo cho chúng tôi để bảo vệ tài khoản.");
@@ -68,11 +58,7 @@ public class MailService {
         String htmlContent = buildOtpEmailHtml(
                 recipientName,
                 "Yêu cầu đặt lại mật khẩu",
-<<<<<<< HEAD
                 "UTE TEA nhận được yêu cầu đặt lại mật khẩu cho tài khoản liên kết với địa chỉ email này. Vui lòng sử dụng mã xác thực dưới đây:",
-=======
-                "Hệ thống nhận được yêu cầu đặt lại mật khẩu cho tài khoản UTE TEA liên kết với địa chỉ email này. Vui lòng sử dụng mã xác thực dưới đây:",
->>>>>>> ai/ute-tea-fixes
                 resetCode,
                 expiryMinutes,
                 "Lưu ý quan trọng: Không cung cấp mã này cho bất kỳ ai, kể cả nhân viên quán. Nếu bạn không gửi yêu cầu này, hãy đổi mật khẩu ngay lập tức hoặc bỏ qua email.");
@@ -84,24 +70,6 @@ public class MailService {
      * Thực hiện gửi mail qua SMTP và ném lỗi rõ ràng nếu thất bại.
      */
     private void sendHtmlEmail(String toEmail, String subject, String htmlContent) {
-        // Commit pending account/OTP first. A failed external send must remain recoverable by resend.
-        if (org.springframework.transaction.support.TransactionSynchronizationManager.isActualTransactionActive()) {
-            org.springframework.transaction.support.TransactionSynchronizationManager.registerSynchronization(
-                    new org.springframework.transaction.support.TransactionSynchronization() {
-                        @Override public void afterCommit() { deliver(toEmail, subject, htmlContent); }
-                    });
-        } else {
-            deliver(toEmail, subject, htmlContent);
-        }
-    }
-
-    private void deliver(String toEmail, String subject, String htmlContent) {
-        if (mailFrom == null || mailFrom.isBlank() || smtpUsername == null || smtpUsername.isBlank()
-                || smtpPassword == null || smtpPassword.isBlank()) {
-            log.error("Thiếu cấu hình SMTP: cần MAIL_USERNAME, MAIL_PASSWORD (Gmail App Password) và MAIL_FROM");
-            throw BusinessException.badRequest(ErrorCode.MAIL_SEND_FAILED,
-                    "Tài khoản chưa kích hoạt đã được lưu nhưng chưa thể gửi email. Vui lòng thử gửi lại mã sau khi cấu hình SMTP được khôi phục.");
-        }
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, StandardCharsets.UTF_8.name());
@@ -116,31 +84,23 @@ public class MailService {
 
             mailSender.send(message);
             log.info("Đã gửi email thành công tới: {}", maskEmail(toEmail));
-        } catch (org.springframework.mail.MailAuthenticationException e) {
-            log.error("SMTP từ chối xác thực tới {}: kiểm tra MAIL_USERNAME và MAIL_PASSWORD; Gmail cần App Password hợp lệ", maskEmail(toEmail));
-            throw BusinessException.badRequest(ErrorCode.MAIL_SEND_FAILED,
-                    "Hệ thống chưa xác thực được với máy chủ email. Vui lòng liên hệ quản trị viên hoặc thử gửi lại mã sau.");
         } catch (MessagingException | MailException e) {
-            log.error("Lỗi gửi email SMTP tới {} ({})", maskEmail(toEmail), e.getClass().getSimpleName());
+            log.error("Lỗi gửi email SMTP tới {}: {}", maskEmail(toEmail), e.getMessage());
             throw BusinessException.badRequest(
                     ErrorCode.MAIL_SEND_FAILED,
                     "Không thể gửi email xác thực qua hệ thống SMTP. Vui lòng thử lại sau giây lát hoặc kiểm tra kết nối mạng.");
         } catch (Exception e) {
-            log.error("Lỗi tạo email tới {} ({})", maskEmail(toEmail), e.getClass().getSimpleName());
+            log.error("Lỗi không mong muốn khi gửi email tới {}: {}", maskEmail(toEmail), e.getMessage());
             throw BusinessException.badRequest(
                     ErrorCode.MAIL_SEND_FAILED,
-                    "Không thể tạo email xác thực. Vui lòng thử gửi lại mã sau.");
+                    "Gặp lỗi khi tạo thư điện tử xác thực: " + e.getMessage());
         }
     }
 
     /**
-<<<<<<< HEAD
      * Email template UTE TEA: bảng HTML + inline style cho Gmail/Outlook/mobile.
      * Tên người nhận, mã OTP và văn bản động được HTML-escape trước khi chèn.
      * Logo được nhúng bằng Content-ID (cid:uteTeaLogo), không cần URL công khai.
-=======
-     * Tạo template HTML responsive, thẩm mỹ thương hiệu UTE TEA
->>>>>>> ai/ute-tea-fixes
      */
     private String buildOtpEmailHtml(String recipientName, String title, String description,
             String code, int expiryMinutes, String warning) {
@@ -153,7 +113,6 @@ public class MailService {
                     <meta name="color-scheme" content="light">
                     <title>{{TITLE}}</title>
                     <style>
-<<<<<<< HEAD
                         @media screen and (max-width: 620px) {
                             .mail-shell { padding: 18px 12px !important; }
                             .mail-header { padding: 24px 24px !important; }
@@ -168,48 +127,6 @@ public class MailService {
                     <!-- Preheader: dùng trong phần xem trước của ứng dụng email. -->
                     <div style="display:none;font-size:1px;color:#f2f5ef;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">
                         UTE TEA gửi mã xác thực để bạn hoàn tất yêu cầu với tài khoản của mình.
-=======
-                        body { margin: 0; padding: 0; background-color: #f5f8f2; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; color: #333333; }
-                        .container { max-width: 580px; margin: 30px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
-                        .header { background-color: #2e7d32; background: linear-gradient(135deg, #2e7d32 0%%, #1b5e20 100%%); padding: 32px 24px; text-align: center; color: #ffffff; }
-                        .brand-title { font-size: 26px; font-weight: bold; margin: 0; letter-spacing: 1px; }
-                        .brand-subtitle { font-size: 13px; opacity: 0.85; margin-top: 6px; }
-                        .content { padding: 32px 28px; }
-                        .greeting { font-size: 17px; font-weight: 600; margin-bottom: 12px; }
-                        .intro { font-size: 14px; line-height: 1.6; color: #555555; margin-bottom: 24px; }
-                        .otp-box { background-color: #f1f8ef; border: 2px dashed #a5cba2; border-radius: 10px; padding: 20px; text-align: center; margin: 24px 0; }
-                        .otp-title { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: #4c7545; margin-bottom: 8px; font-weight: 600; }
-                        .otp-code { font-size: 34px; font-weight: 800; letter-spacing: 8px; color: #1b5e20; font-family: 'Courier New', monospace; margin: 4px 0; }
-                        .otp-expiry { font-size: 13px; color: #2e7d32; margin-top: 8px; font-weight: 500; }
-                        .warning-box { background-color: #eef7eb; border-left: 4px solid #66a65a; padding: 12px 16px; border-radius: 4px; font-size: 13px; color: #355e35; line-height: 1.5; margin-top: 24px; }
-                        .footer { background-color: #f5f8f2; border-top: 1px solid #dce8d7; padding: 20px; text-align: center; font-size: 12px; color: #888888; }
-                        .footer p { margin: 4px 0; }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="header">
-                            <div class="brand-title">🍵 UTE TEA</div>
-                            <div class="brand-subtitle">Hệ Thống Trà Sữa Tươi Cao Cấp</div>
-                        </div>
-                        <div class="content">
-                            <div class="greeting">Xin chào, %s!</div>
-                            <div class="intro">%s</div>
-                            <div class="otp-box">
-                                <div class="otp-title">MÃ XÁC THỰC CỦA BẠN</div>
-                                <div class="otp-code">%s</div>
-                                <div class="otp-expiry">⏳ Mã có hiệu lực trong vòng <strong>%d phút</strong></div>
-                            </div>
-                            <div class="warning-box">
-                                <strong>Lưu ý an toàn:</strong> %s
-                            </div>
-                        </div>
-                        <div class="footer">
-                            <p><strong>Cửa hàng Trà Sữa UTE TEA</strong></p>
-                            <p>Địa chỉ: Số 1 Võ Văn Ngân, TP. Thủ Đức, TP. Hồ Chí Minh</p>
-                            <p>Thư này được tạo tự động từ hệ thống. Xin vui lòng không trả lời thư này.</p>
-                        </div>
->>>>>>> ai/ute-tea-fixes
                     </div>
                     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
                            style="width:100%;border-collapse:collapse;background-color:#f2f5ef;">
@@ -280,7 +197,6 @@ public class MailService {
                     </table>
                 </body>
                 </html>
-<<<<<<< HEAD
                 """;
 
         return html.replace("{{TITLE}}", HtmlUtils.htmlEscape(title))
@@ -289,10 +205,6 @@ public class MailService {
                 .replace("{{OTP}}", HtmlUtils.htmlEscape(code))
                 .replace("{{EXPIRY}}", Integer.toString(expiryMinutes))
                 .replace("{{WARNING}}", HtmlUtils.htmlEscape(warning));
-=======
-                """
-                .formatted(title, org.springframework.web.util.HtmlUtils.htmlEscape(recipientName), description, code, expiryMinutes, warning);
->>>>>>> ai/ute-tea-fixes
     }
 
     /**

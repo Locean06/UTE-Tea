@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class OrderIdempotencyAccessTest {
- @Mock OrderRepository orders; @Mock vn.edu.ute.milktea.service.order.OrderBranchService branches;@InjectMocks OrderService service;
+ @Mock OrderRepository orders;@InjectMocks OrderService service;
  @Test void anotherAccountCannotReadCounterOrderByReusingKey(){
   when(orders.findByIdempotencyKey("known-key")).thenReturn(Optional.of(Order.builder().id(7L).source(OrderSource.COUNTER).account(Account.builder().id(1L).build()).build()));
   assertThrows(BusinessException.class,()->service.createCounterOrder(new OrderDto.CreateCounterOrderRequest(),CurrentActor.authenticated(2L,Role.CUSTOMER),"known-key"));

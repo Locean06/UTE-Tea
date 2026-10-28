@@ -16,7 +16,6 @@ import java.time.Instant;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    long countByAccountIdAndVoucherId(Long accountId, Long voucherId);
 
     List<Order> findBySessionId(Long sessionId);
 

@@ -69,9 +69,13 @@ public class StaffPageController {
         GlobalSettings settings = settingsRepository.findById(1).orElse(null);
         model.addAttribute("settings", settings);
         model.addAttribute("actor", actor);
-        model.addAttribute("categories", categoryRepository.findAllByActiveTrue());
-        model.addAttribute("products", productRepository.findAllByActiveTrue());
-        model.addAttribute("tables", tableRepository.findByActiveTrueOrderByIdAsc());
+        var posProducts = productRepository.findAllByActiveTrue().stream()
+                .filter(product -> product.getShop() == null).toList();
+        var posCategoryIds = posProducts.stream().map(product -> product.getCategory().getId())
+                .collect(java.util.stream.Collectors.toSet());
+        model.addAttribute("categories", categoryRepository.findAllByActiveTrue().stream()
+                .filter(category -> posCategoryIds.contains(category.getId())).toList());
+        model.addAttribute("products", posProducts);
         return "cashier/index";
     }
 
@@ -107,8 +111,10 @@ public class StaffPageController {
         }
         if ("catalog".equalsIgnoreCase(section)) {
             return adminCatalogPage(actor, model);
-        } else if ("tables".equalsIgnoreCase(section)) {
-            return adminTablesPage(actor, model);
+        } else if ("tables".equalsIgnoreCase(section) || "branches".equalsIgnoreCase(section)) {
+            return "redirect:/admin/branches";
+        } else if ("promotions".equalsIgnoreCase(section)) {
+            return "redirect:/admin/promotions";
         } else if ("orders".equalsIgnoreCase(section)) {
             return adminOrdersPage(actor, model);
         } else if ("staff".equalsIgnoreCase(section)) {
@@ -142,18 +148,26 @@ public class StaffPageController {
         return "admin/catalog";
     }
 
+    // Deprecated dine-in area: do not expose a table map on the Take Away dashboard.
     @GetMapping("/admin/tables")
-    public String adminTablesPage(@AuthenticationPrincipal CurrentActor actor, Model model) {
-        if (actor == null || actor.getRole() != Role.ADMIN) {
-            return "redirect:/login?redirect=/admin/tables";
-        }
-        GlobalSettings settings = settingsRepository.findById(1).orElse(null);
-        model.addAttribute("settings", settings);
+    public String retiredTablesPage() { return "redirect:/admin/branches"; }
+
+    @GetMapping("/admin/branches")
+    public String adminBranchesPage(@AuthenticationPrincipal CurrentActor actor, Model model) {
+        if (actor == null || actor.getRole() != Role.ADMIN) return "redirect:/login?redirect=/admin/branches";
         model.addAttribute("actor", actor);
-        model.addAttribute("baseUrl", baseUrl);
-        model.addAttribute("tables", tableRepository.findAll());
-        return "admin/tables";
+        model.addAttribute("pageTitle", "Cập nhật chi nhánh");
+        return "admin/branches";
     }
+
+    @GetMapping("/admin/promotions")
+    public String adminPromotionsPage(@AuthenticationPrincipal CurrentActor actor, Model model) {
+        if (actor == null || actor.getRole() != Role.ADMIN) return "redirect:/login?redirect=/admin/promotions";
+        model.addAttribute("actor", actor);
+        model.addAttribute("pageTitle", "Quản lý mã khuyến mãi");
+        return "admin/promotions";
+    }
+
     @GetMapping("/admin/orders")
     public String adminOrdersPage(@AuthenticationPrincipal CurrentActor actor, Model model) {
         if (actor == null || actor.getRole() != Role.ADMIN) {

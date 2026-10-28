@@ -33,8 +33,15 @@ public class SettingsService {
                         .build());
 
         String discountType = settings.getDiscountType() != null ? settings.getDiscountType() : "PERCENT";
-        BigDecimal discountValue = settings.getDiscountValue() != null ? settings.getDiscountValue()
-                : settings.getDiscountPercent();
+        // Align the public POS quote with OrderService.computeDiscount: old seed data
+        // stores TyLeGiam=10 while GiaTriGiam is still 0.
+        BigDecimal discountValue = settings.getDiscountValue();
+        if ("PERCENT".equalsIgnoreCase(discountType) &&
+                (discountValue == null || discountValue.signum() == 0) &&
+                settings.getDiscountPercent() != null) {
+            discountValue = settings.getDiscountPercent();
+        }
+        if (discountValue == null) discountValue = BigDecimal.ZERO;
 
         return SettingsDto.ShopInfoResponse.builder()
                 .shopName(settings.getShopName())
@@ -65,37 +72,41 @@ public class SettingsService {
         settings.setBankAccountNumber(request.getBankAccountNumber());
         settings.setBankAccountHolder(request.getBankAccountHolder());
 
-        String type = request.getDiscountType();
-        if (type == null || type.isBlank()) {
-            type = "PERCENT";
-        }
-        type = type.trim().toUpperCase();
-        if (!"PERCENT".equals(type) && !"FIXED_AMOUNT".equals(type)) {
-            type = "PERCENT";
-        }
-
-        BigDecimal val = request.getDiscountValue();
-        if (val == null) {
-            val = request.getDiscountPercent() != null ? request.getDiscountPercent() : BigDecimal.ZERO;
-        }
-
-        if ("PERCENT".equals(type)) {
-            if (val.compareTo(BigDecimal.ZERO) < 0 || val.compareTo(new BigDecimal("100")) > 0) {
-                throw vn.edu.ute.milktea.common.BusinessException.badRequest(
-                        vn.edu.ute.milktea.common.ErrorCode.VALIDATION_FAILED,
-                        "Phần trăm giảm giá phải từ 0% đến 100%");
+        // Discount fields are optional from the new settings page; keep existing POS values.
+        // Only callers that explicitly send discount fields may update the legacy POS promotion.
+        if (request.getDiscountType() != null || request.getDiscountValue() != null || request.getDiscountPercent() != null) {
+            String type = request.getDiscountType();
+            if (type == null || type.isBlank()) {
+                type = "PERCENT";
             }
-            settings.setDiscountType("PERCENT");
-            settings.setDiscountPercent(val);
-            settings.setDiscountValue(val);
-        } else {
-            if (val.compareTo(BigDecimal.ZERO) < 0) {
-                throw vn.edu.ute.milktea.common.BusinessException.badRequest(
-                        vn.edu.ute.milktea.common.ErrorCode.VALIDATION_FAILED, "Số tiền giảm cố định không được âm");
+            type = type.trim().toUpperCase();
+            if (!"PERCENT".equals(type) && !"FIXED_AMOUNT".equals(type)) {
+                type = "PERCENT";
             }
-            settings.setDiscountType("FIXED_AMOUNT");
-            settings.setDiscountValue(val);
-            settings.setDiscountPercent(BigDecimal.ZERO);
+    
+            BigDecimal val = request.getDiscountValue();
+            if (val == null) {
+                val = request.getDiscountPercent() != null ? request.getDiscountPercent() : BigDecimal.ZERO;
+            }
+    
+            if ("PERCENT".equals(type)) {
+                if (val.compareTo(BigDecimal.ZERO) < 0 || val.compareTo(new BigDecimal("100")) > 0) {
+                    throw vn.edu.ute.milktea.common.BusinessException.badRequest(
+                            vn.edu.ute.milktea.common.ErrorCode.VALIDATION_FAILED,
+                            "Phần trăm giảm giá phải từ 0% đến 100%");
+                }
+                settings.setDiscountType("PERCENT");
+                settings.setDiscountPercent(val);
+                settings.setDiscountValue(val);
+            } else {
+                if (val.compareTo(BigDecimal.ZERO) < 0) {
+                    throw vn.edu.ute.milktea.common.BusinessException.badRequest(
+                            vn.edu.ute.milktea.common.ErrorCode.VALIDATION_FAILED, "Số tiền giảm cố định không được âm");
+                }
+                settings.setDiscountType("FIXED_AMOUNT");
+                settings.setDiscountValue(val);
+                settings.setDiscountPercent(BigDecimal.ZERO);
+            }
         }
 
         settings.setModifiedBy(admin);

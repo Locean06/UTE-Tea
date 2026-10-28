@@ -55,10 +55,20 @@ public class MarketService {
   var owner=account(a);
   if(!Set.of(Role.CUSTOMER,Role.VENDOR,Role.ADMIN).contains(owner.getRole()))throw denied();
   Shop s=new Shop();s.setOwner(owner);s.setName(input.name().trim());s.setAddress(input.address().trim());location(s,input);
+  // ADMIN-created branches are operational immediately; vendor submissions still await approval.
+  s.setActive(admin(a));
   if(owner.getRole()==Role.CUSTOMER)owner.setRole(Role.VENDOR);
   return shopView(shops.save(s));
  }
  public ShopView editShop(CurrentActor a,Long shopId,ShopInput input){var s=scope(a,shopId);s.setName(input.name().trim());s.setAddress(input.address().trim());location(s,input);return shopView(s);}
+ /** Take Away uses archival deletion: preserve order/stock/voucher foreign keys and history.
+  * Archived branches disappear from public shop selection and can be reactivated by an admin.
+  */
+ public void archiveShop(CurrentActor a,Long shopId){
+  if(!admin(a))throw denied();
+  Shop s=scope(a,shopId);
+  s.setActive(false);
+ }
  private void location(Shop s,ShopInput input){s.setArea(input.area()==null?null:input.area().trim());s.setLatitude(input.latitude());s.setLongitude(input.longitude());}
  public ShopView configureShop(CurrentActor a,Long shopId,ShopConfig input){
   var s=scope(a,shopId);
@@ -68,7 +78,7 @@ public class MarketService {
  }
  public void assignManager(CurrentActor a,Long shopId,Long managerId,boolean enabled){
   if(!admin(a))throw denied();var s=scope(a,shopId);var m=accounts.findById(managerId).orElseThrow(this::denied);
-  if(m.getRole()!=Role.MANAGER && m.getRole()!=Role.CASHIER && m.getRole()!=Role.KITCHEN)throw invalid("Chỉ phân công quản lý, thu ngân hoặc bếp cho cơ sở");
+  if(m.getRole()!=Role.MANAGER)throw invalid("Tài khoản phải có vai trò MANAGER");
   if(enabled)s.getManagers().add(m);else s.getManagers().removeIf(x->x.getId().equals(managerId));
  }
  @Transactional(readOnly=true) public List<ShopView> shops(CurrentActor a,boolean publicOnly){
@@ -112,16 +122,35 @@ public class MarketService {
  public VoucherView saveVoucher(CurrentActor a,Long shopId,VoucherInput input){
   Shop shop=shopId==null?null:scope(a,shopId);if(shopId==null&&!admin(a))throw denied();
   if(!input.endsAt().isAfter(input.startsAt()))throw invalid("Ngày hết hạn phải sau ngày bắt đầu");
-  if(vouchers.findByCode(input.code()).isPresent())throw invalid("Mã đã tồn tại");
-  Voucher v=new Voucher();v.setShop(shop);v.setCode(input.code());v.setDiscountAmount(input.discountAmount());v.setMinimumAmount(input.minimumAmount());v.setStartsAt(input.startsAt());v.setEndsAt(input.endsAt());v.setUsageLimit(input.usageLimit());v.setPerAccountLimit(input.perAccountLimit());v.setActive(input.active());
+  String code=input.code().trim().toUpperCase(Locale.ROOT);
+  if(vouchers.findByCode(code).isPresent())throw invalid("Mã đã tồn tại");
+  Voucher v=new Voucher();v.setShop(shop);v.setCode(code);v.setDiscountAmount(input.discountAmount());v.setDiscountType("PERCENT".equals(input.discountType())?"PERCENT":"FIXED_AMOUNT");v.setDiscountPercent(input.discountPercent()==null?BigDecimal.ZERO:input.discountPercent());v.setMinimumAmount(input.minimumAmount());v.setStartsAt(input.startsAt());v.setEndsAt(input.endsAt());v.setUsageLimit(input.usageLimit());v.setPerAccountLimit(input.perAccountLimit());v.setActive(input.active());
   return voucherView(vouchers.save(v));
+ }
+ public VoucherView updateVoucher(CurrentActor a,Long voucherId,VoucherInput input){
+  Voucher v=vouchers.findById(voucherId).orElseThrow(this::denied);
+  if(v.getShop()==null){if(!admin(a))throw denied();}else scope(a,v.getShop().getId());
+  if(!input.endsAt().isAfter(input.startsAt()))throw invalid("Ngày hết hạn phải sau ngày bắt đầu");
+  String code=input.code().trim().toUpperCase(Locale.ROOT);
+  vouchers.findByCode(code).ifPresent(other->{if(!other.getId().equals(voucherId))throw invalid("Mã đã tồn tại");});
+  if(v.getUsedCount()>0&&!code.equals(v.getCode()))throw invalid("Không thể đổi tên mã đã được sử dụng");
+  if(input.usageLimit()<v.getUsedCount())throw invalid("Giới hạn lượt không thể nhỏ hơn số lượt đã dùng");
+  v.setCode(code);v.setDiscountType("PERCENT".equals(input.discountType())?"PERCENT":"FIXED_AMOUNT");
+  v.setDiscountAmount(input.discountAmount());v.setDiscountPercent(input.discountPercent()==null?BigDecimal.ZERO:input.discountPercent());
+  v.setMinimumAmount(input.minimumAmount());v.setStartsAt(input.startsAt());v.setEndsAt(input.endsAt());
+  v.setUsageLimit(input.usageLimit());v.setPerAccountLimit(input.perAccountLimit());v.setActive(input.active());
+  return voucherView(v);
+ }
+ @Transactional(readOnly=true) public List<VoucherView> allVouchers(CurrentActor a){
+  if(!admin(a))throw denied();
+  return vouchers.findAll().stream().sorted(Comparator.comparing(Voucher::getId).reversed()).map(this::voucherView).toList();
  }
  public void disableVoucher(CurrentActor a,Long voucherId){var selected=vouchers.findById(voucherId).orElseThrow(this::denied);if(selected.getShop()==null){if(!admin(a))throw denied();}else scope(a,selected.getShop().getId());var v=vouchers.lockCode(selected.getCode()).orElseThrow(this::denied);v.setActive(false);}
  @Transactional(readOnly=true) public List<VoucherView> vouchers(CurrentActor a,Long shopId){
   if(shopId==null&&!admin(a))throw denied();if(shopId!=null)scope(a,shopId);
   return vouchers.findAll().stream().filter(v->Objects.equals(shopId,v.getShop()==null?null:v.getShop().getId())).map(this::voucherView).toList();
  }
- private VoucherView voucherView(Voucher v){return new VoucherView(v.getId(),v.getCode(),v.getShop()==null?null:v.getShop().getId(),v.getDiscountAmount(),v.getMinimumAmount(),v.getStartsAt(),v.getEndsAt(),v.getUsageLimit(),v.getUsedCount(),v.getPerAccountLimit(),v.isActive());}
+ private VoucherView voucherView(Voucher v){return new VoucherView(v.getId(),v.getCode(),v.getShop()==null?null:v.getShop().getId(),v.getDiscountAmount(),v.getMinimumAmount(),v.getStartsAt(),v.getEndsAt(),v.getUsageLimit(),v.getUsedCount(),v.getPerAccountLimit(),v.isActive(),v.getDiscountType(),v.getDiscountPercent());}
  public OrderView checkout(CurrentActor a,Checkout input,String key){
   if(input.paymentMethod()==DeliveryOrder.Method.VNPAY)gateway.requireConfigured();
   var buyer=account(a);
@@ -129,7 +158,8 @@ public class MarketService {
   String hash=hash(input.toString());
   var duplicate=orders.findByAccountIdAndIdempotencyKey(buyer.getId(),key);
   if(duplicate.isPresent()){if(!duplicate.get().getRequestHash().equals(hash))throw BusinessException.conflict(ErrorCode.IDEMPOTENCY_CONFLICT,"Mã yêu cầu đã dùng cho nội dung khác");return orderView(duplicate.get());}
-  if(input.cartVersion()!=null) {
+  {
+   if(input.cartVersion()==null||input.cartVersion().isBlank())throw BusinessException.conflict(ErrorCode.CART_VERSION_CONFLICT,"Thiếu phiên bản giỏ hàng. Vui lòng tải lại và xác nhận đơn.");
    var cart=customerData.cart(a);
    if(!cart.getVersion().equals(input.cartVersion())||!selectionSignature(input.items()).equals(selectionSignature(branches.cartItems(a))))throw BusinessException.conflict(ErrorCode.CART_VERSION_CONFLICT,"Giỏ đã thay đổi hoặc chưa gửi đủ món. Vui lòng kiểm tra lại toàn bộ giỏ.");
   }
@@ -150,7 +180,7 @@ public class MarketService {
   o.setSubtotal(subtotal);
   if(input.voucherCode()!=null&&!input.voucherCode().isBlank()){
    var v=voucher(input.voucherCode(),buyer.getId(),shop.getId(),subtotal,true);
-   v.setUsedCount(v.getUsedCount()+1);o.setVoucher(v);o.setDiscountAmount(v.getDiscountAmount().min(subtotal));
+   v.setUsedCount(v.getUsedCount()+1);o.setVoucher(v);o.setDiscountAmount(calculateVoucherDiscount(v,subtotal,o.getShippingFee()));
   }
   o.setTotalAmount(subtotal.subtract(o.getDiscountAmount()).add(o.getShippingFee()));
   if(input.expectedTotal()!=null&&input.expectedTotal().compareTo(o.getTotalAmount())!=0)throw BusinessException.conflict(ErrorCode.ORDER_STATE_CONFLICT,"Giá, phí hoặc ưu đãi đã thay đổi. Vui lòng xem lại tổng tiền và xác nhận lại.");
@@ -161,6 +191,11 @@ public class MarketService {
  }
  private Map<String,Integer> selectionSignature(List<BuyLine> lines){
   Map<String,Integer> result=new TreeMap<>();for(var l:lines){var ids=l.toppingIds()==null?List.<Long>of():l.toppingIds().stream().sorted().toList();result.merge(l.productId()+"|"+ids+"|"+Objects.toString(l.note(),""),l.quantity(),Integer::sum);}return result;
+ }
+ /** For percent vouchers, discount applies to subtotal + delivery fee (the whole invoice). */
+ private BigDecimal calculateVoucherDiscount(Voucher voucher,BigDecimal subtotal,BigDecimal shippingFee){
+  return VoucherDiscountCalculator.discount(voucher.getDiscountType(),voucher.getDiscountAmount(),
+      voucher.getDiscountPercent(),subtotal,shippingFee);
  }
  private Voucher voucher(String code,Long accountId,Long shopId,BigDecimal subtotal,boolean lock){
   var v=(lock?vouchers.lockCode(code.trim().toUpperCase(Locale.ROOT)):vouchers.findByCode(code.trim().toUpperCase(Locale.ROOT))).orElseThrow(()->invalid("Mã giảm giá không tồn tại"));
@@ -173,7 +208,7 @@ public class MarketService {
   if(!plan.issues().isEmpty())throw BusinessException.conflict(ErrorCode.INVENTORY_INSUFFICIENT,String.join("; ",plan.issues()));
   var carrier=carriers.findById(input.carrierId()).filter(Carrier::isActive).orElseThrow(()->invalid("Đơn vị vận chuyển không khả dụng"));
   if(carrier.getShop()!=null&&!input.shopId().equals(carrier.getShop().getId()))throw denied();
-  var discount=input.voucherCode()==null||input.voucherCode().isBlank()?BigDecimal.ZERO:voucher(input.voucherCode(),id(a),input.shopId(),plan.subtotal(),false).getDiscountAmount().min(plan.subtotal());
+  var discount=input.voucherCode()==null||input.voucherCode().isBlank()?BigDecimal.ZERO:calculateVoucherDiscount(voucher(input.voucherCode(),id(a),input.shopId(),plan.subtotal(),false),plan.subtotal(),carrier.getFee());
   return new CartQuote(input.shopId(),cart.getVersion(),plan.subtotal(),carrier.getFee(),discount,plan.subtotal().subtract(discount).add(carrier.getFee()),plan.selections().stream().map(s->new LineView(s.product().getId(),s.product().getName(),s.quantity(),s.product().getPrice(),s.product().getSize(),s.note(),s.topping())).toList());
  }
  private String hash(String text){try{return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(text.getBytes(StandardCharsets.UTF_8)));}catch(Exception e){throw new IllegalStateException(e);}}
@@ -221,7 +256,7 @@ public class MarketService {
   if(before==next)return orderView(o);
   switch(next){
    case CONFIRMED -> allowed=seller&&before==DeliveryOrder.Status.NEW;
-   case SHIPPING -> allowed=(shipper||admin(a))&&before==DeliveryOrder.Status.CONFIRMED&&(o.getPaymentMethod()==DeliveryOrder.Method.COD||o.isPaid());
+   case SHIPPING -> allowed=o.getShipper()!=null&&(shipper||admin(a))&&before==DeliveryOrder.Status.CONFIRMED&&o.getPreparationStatus()==DeliveryOrder.Preparation.READY&&(o.getPaymentMethod()==DeliveryOrder.Method.COD||o.isPaid());
    case DELIVERED -> allowed=(shipper||admin(a))&&before==DeliveryOrder.Status.SHIPPING;
    case DELIVERY_FAILED -> allowed=(shipper||admin(a))&&before==DeliveryOrder.Status.SHIPPING;
    case CANCELLED -> allowed=(buyer&&before==DeliveryOrder.Status.NEW)||(seller&&(before==DeliveryOrder.Status.NEW||before==DeliveryOrder.Status.CONFIRMED||before==DeliveryOrder.Status.DELIVERY_FAILED));
@@ -233,7 +268,7 @@ public class MarketService {
    }
    default -> {}
   }
-  if(!allowed)throw BusinessException.conflict(ErrorCode.ORDER_STATE_CONFLICT,"Không đủ quyền hoặc chuyển trạng thái không hợp lệ");
+  if(!allowed)throw BusinessException.conflict(ErrorCode.ORDER_STATE_CONFLICT,"Không thể giao: đơn phải được xác nhận, có shipper được phân công, bếp đã pha xong và thanh toán online (nếu áp dụng) đã thành công");
   if(next==DeliveryOrder.Status.CANCELLED||next==DeliveryOrder.Status.RETURNED){
    for(var line:o.getLines().stream().sorted(Comparator.comparing(l->l.getProduct().getId())).toList()){
     var p=products.findByIdWithLock(line.getProduct().getId()).orElseThrow(this::denied);p.setDeliveryStock(Math.addExact(p.getDeliveryStock(),line.getQuantity()));
@@ -242,7 +277,41 @@ public class MarketService {
   if(next==DeliveryOrder.Status.DELIVERED){o.setDeliveredAt(Instant.now());if(o.getPaymentMethod()==DeliveryOrder.Method.COD)o.setPaid(true);}
   if(next==DeliveryOrder.Status.DELIVERY_FAILED)o.setDeliveryFailed(true);
   if(next==DeliveryOrder.Status.REFUNDED)o.setRefundReference(input.reference().trim());
-  o.setStatus(next);orders.flush();notifyCashierDeliveryChanged(o);return orderView(o);
+  o.setStatus(next);orders.flush();notifyCashierDeliveryChanged(o);
+  if(next==DeliveryOrder.Status.CONFIRMED)notifyKitchenDeliveryChanged(o);
+  return orderView(o);
+ }
+ /** The kitchen receives every confirmed, eligible delivery order. The payload contains no personal data. */
+ private void notifyKitchenDeliveryChanged(DeliveryOrder order){
+  realtime.publishAfterCommit("/topic/kitchen", "DELIVERY_ORDER_CHANGED",
+       String.valueOf(order.getId()),null,String.valueOf(order.getVersion()),
+       Map.of("orderId",order.getId(),"shopId",order.getShop().getId()));
+ }
+ @Transactional(readOnly=true)
+ public List<OrderView> kitchenDeliveryOrders(CurrentActor actor){
+  if(actor==null||!(actor.hasRole(Role.KITCHEN)||admin(actor)))throw denied();
+  return orders.findAll().stream()
+     .filter(o->o.getStatus()==DeliveryOrder.Status.CONFIRMED)
+     .filter(o->o.getPaymentMethod()==DeliveryOrder.Method.COD||o.isPaid())
+     .sorted(Comparator.comparing(DeliveryOrder::getId).reversed())
+     .map(this::orderView).toList();
+ }
+ public OrderView kitchenPrepare(CurrentActor actor,Long orderId,DeliveryOrder.Preparation target,Long expectedVersion){
+  if(actor==null||!(actor.hasRole(Role.KITCHEN)||admin(actor)))throw denied();
+  var order=orders.lockId(orderId).orElseThrow(this::denied);
+  version(order,expectedVersion);
+  if(order.getStatus()!=DeliveryOrder.Status.CONFIRMED ||
+     (order.getPaymentMethod()==DeliveryOrder.Method.VNPAY&&!order.isPaid()))
+    throw BusinessException.conflict(ErrorCode.ORDER_STATE_CONFLICT,"Đơn chưa được xác nhận hoặc chưa thanh toán");
+  var current=order.getPreparationStatus();
+  boolean valid=(current==DeliveryOrder.Preparation.PENDING&&target==DeliveryOrder.Preparation.PREPARING)||
+                (current==DeliveryOrder.Preparation.PREPARING&&target==DeliveryOrder.Preparation.READY);
+  if(!valid)throw BusinessException.conflict(ErrorCode.ORDER_STATE_CONFLICT,"Thứ tự pha chế không hợp lệ");
+  order.setPreparationStatus(target);
+  orders.flush();
+  notifyCashierDeliveryChanged(order);
+  notifyKitchenDeliveryChanged(order);
+  return orderView(order);
  }
  /** Notify staff only after the database transaction commits; no customer data in the event. */
  private void notifyCashierDeliveryChanged(DeliveryOrder order){
@@ -251,7 +320,7 @@ public class MarketService {
       java.util.Map.of("orderId", order.getId(), "shopId", order.getShop().getId()));
  }
  private void version(DeliveryOrder o,Long expected){if(!Objects.equals(o.getVersion(),expected))throw BusinessException.conflict(ErrorCode.ORDER_STATE_CONFLICT,"Đơn đã thay đổi; vui lòng tải lại");}
- public OrderView orderView(DeliveryOrder o){return new OrderView(o.getId(),o.getShop().getId(),o.getShop().getName(),o.getAccount().getId(),o.getShipper()==null?null:o.getShipper().getId(),o.getStatus(),o.getPaymentMethod(),o.isPaid(),o.getRecipient(),o.getPhone(),o.getAddressLine(),o.getSubtotal(),o.getShippingFee(),o.getDiscountAmount(),o.getTotalAmount(),o.getCommissionPercent(),o.getCreatedAt(),o.isDeliveryFailed(),o.getVersion(),o.getLines().stream().map(l->new LineView(l.getProduct().getId(),l.getProductName(),l.getQuantity(),l.getUnitPrice(),l.getSnapshotSize(),l.getNote(),l.isTopping())).toList());}
+ public OrderView orderView(DeliveryOrder o){return new OrderView(o.getId(),o.getShop().getId(),o.getShop().getName(),o.getAccount().getId(),o.getShipper()==null?null:o.getShipper().getId(),o.getStatus(),o.getPaymentMethod(),o.isPaid(),o.getRecipient(),o.getPhone(),o.getAddressLine(),o.getSubtotal(),o.getShippingFee(),o.getDiscountAmount(),o.getTotalAmount(),o.getCommissionPercent(),o.getCreatedAt(),o.isDeliveryFailed(),o.getVersion(),o.getLines().stream().map(l->new LineView(l.getProduct().getId(),l.getProductName(),l.getQuantity(),l.getUnitPrice(),l.getSnapshotSize(),l.getNote(),l.isTopping())).toList(),o.getVoucher()==null?null:o.getVoucher().getCode(),o.getPreparationStatus());}
  @Transactional(readOnly=true) public Summary summary(CurrentActor a,Long shopId){
   var list=orders(a,shopId);var paid=list.stream().filter(o->o.paid()&&Set.of(DeliveryOrder.Status.DELIVERED,DeliveryOrder.Status.RETURN_REQUESTED).contains(o.status())).toList();
   return new Summary(list.size(),list.stream().filter(o->Set.of(DeliveryOrder.Status.DELIVERED,DeliveryOrder.Status.RETURN_REQUESTED,DeliveryOrder.Status.RETURNED,DeliveryOrder.Status.REFUNDED).contains(o.status())).count(),list.stream().filter(OrderView::deliveryFailed).count(),paid.stream().map(OrderView::totalAmount).reduce(BigDecimal.ZERO,BigDecimal::add),paid.stream().map(o->o.subtotal().subtract(o.discountAmount()).multiply(o.commissionPercent()).divide(BigDecimal.valueOf(100),2,RoundingMode.HALF_UP)).reduce(BigDecimal.ZERO,BigDecimal::add));

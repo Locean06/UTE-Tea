@@ -77,7 +77,7 @@ public class InventoryRealUnitTest {
     void setUp() {
         kitchenUser = Account.builder()
                 .id(100L)
-                .email("kitchen1@milktea.vn")
+                .email("kitchen1@utetea.vn")
                 .fullName("Kitchen Staff 1")
                 .build();
 

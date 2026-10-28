@@ -6,17 +6,15 @@ Tài liệu này được lập nhằm phục vụ buổi báo cáo và kiểm t
 
 ## 1. Môi Trường & Dữ Liệu Khởi Tạo Mẫu
 
-Khi ứng dụng được khởi chạy với profile `demo` (`--spring.profiles.active=demo`), hệ thống dùng H2 lưu tại `data/ute-tea-demo.mv.db`. `DataInitializer` chỉ nạp dữ liệu mẫu khi database còn trống; tài khoản, giỏ và đơn được giữ qua các lần chạy lại IDE. Thư mục `data/` đã được loại khỏi Git. Có thể dùng `DEMO_DB_URL` để chọn database demo tách biệt khi kiểm thử.
-
-Chỉ chạy một phiên ứng dụng: nếu cổng 8080 đang có phiên UTE-Tea cũ, dừng đúng phiên đó trước khi chạy `bash mvnw spring-boot:run -Dspring-boot.run.profiles=demo`. Không cần đổi cổng của ứng dụng khách hàng.
+Khi ứng dụng được khởi chạy với profile `demo` (`--spring.profiles.active=demo`), hệ thống tự động kích hoạt `DataInitializer` nạp sẵn toàn bộ dữ liệu sạch phục vụ demo:
 
 ### 1.1 Danh sách tài khoản demo
 | Vai trò | Email đăng nhập | Mật khẩu | Họ và tên | Số điện thoại |
 | :--- | :--- | :--- | :--- | :--- |
-| **Quản trị viên (ADMIN)** | `admin@milktea.vn` | `Password@123` | Quản Trị Viên | `0901000001` |
-| **Thu ngân (CASHIER)** | `cashier@milktea.vn` | `Password@123` | Thu Ngân Quỳnh | `0901000002` |
-| **Bếp trưởng (KITCHEN)** | `kitchen@milktea.vn` | `Password@123` | Bếp Trưởng Lân | `0901000003` |
-| **Khách hàng (CUSTOMER)** | `customer@milktea.vn` | `Password@123` | Khách Hàng Mai | `0901000004` |
+| **Quản trị viên (ADMIN)** | `admin@utetea.vn` | `Password@123` | Quản Trị Viên | `0901000001` |
+| **Thu ngân (CASHIER)** | `cashier@utetea.vn` | `Password@123` | Thu Ngân Quỳnh | `0901000002` |
+| **Bếp trưởng (KITCHEN)** | `kitchen@utetea.vn` | `Password@123` | Bếp Trưởng Lân | `0901000003` |
+| **Khách hàng (CUSTOMER)** | `customer@utetea.vn` | `Password@123` | Khách Hàng Mai | `0901000004` |
 | **Khách vãng lai (GUEST)**| Không cần đăng nhập | Không | Khách Bàn | Quét mã QR tại bàn |
 
 ### 1.2 Dữ liệu bàn & mã QR
@@ -50,9 +48,9 @@ Thứ tự 12 bước tuần tự kiểm chứng toàn bộ luồng vận hành 
 | **01** | Khách quét mã QR tại bàn | Mở URL `/?tableCode=BAN-01` hoặc gọi `GET /api/v1/public/table-context?table=1` | Trang chủ hiển thị nhãn bàn "Bàn 01"; Trạng thái bàn: `TRONG`, chưa tạo phiên (`sessionId = null`). | **PASS** |
 | **02** | Chọn món, thêm giỏ & gửi đơn đầu tiên | Chọn 2 ly Trà Sữa Truyền Thống (Đường 70%, Đá 100%, Topping Trân Châu Đen). Gọi `POST /api/v1/orders/table`. | Đơn tạo thành công, mã trạng thái `CHO_XAC_NHAN`. Tự động áp dụng giảm giá 10% (50.000 -> 45.000 VND). Nhận `guestTableToken`. | **PASS** |
 | **03** | Khách tải lại trang / mở tab mới | Reload trang `/?tableCode=BAN-01` hoặc gọi `GET /api/v1/public/table-context?table=1`. | Hệ thống tự động phục hồi phiên: Trạng thái bàn chuyển sang `CO_KHACH`, phiên active `OPEN`. Giữ nguyên đơn và tổng tiền. | **PASS** |
-| **04** | Thu ngân đăng nhập hệ thống | Mở `/login`, đăng nhập với tài khoản `cashier@milktea.vn` / `Password@123`. | Đăng nhập thành công, nhận JWT Token với vai trò `ROLE_CASHIER`. | **PASS** |
+| **04** | Thu ngân đăng nhập hệ thống | Mở `/login`, đăng nhập với tài khoản `cashier@utetea.vn` / `Password@123`. | Đăng nhập thành công, nhận JWT Token với vai trò `ROLE_CASHIER`. | **PASS** |
 | **05** | Thu ngân xác nhận đơn hàng | Tại màn hình thu ngân, bấm xác nhận đơn hàng. Gọi `POST /api/v1/cashier/orders/{id}/confirm`. | Đơn hàng đổi trạng thái từ `CHO_XAC_NHAN` sang `CHO_CHE_BIEN`. Đẩy sang màn hình bếp. | **PASS** |
-| **06** | Bếp đăng nhập hệ thống | Đăng nhập bằng tài khoản `kitchen@milktea.vn` / `Password@123`. | Nhận JWT Token với vai trò `ROLE_KITCHEN`. | **PASS** |
+| **06** | Bếp đăng nhập hệ thống | Đăng nhập bằng tài khoản `kitchen@utetea.vn` / `Password@123`. | Nhận JWT Token với vai trò `ROLE_KITCHEN`. | **PASS** |
 | **07** | Bếp bấm Bắt đầu chế biến | Bếp tiếp nhận đơn, gọi `POST /api/v1/kitchen/orders/{id}/start`. | Đơn hàng đổi trạng thái sang `DANG_CHE_BIEN`. Khách và thu ngân thấy trạng thái realtime. | **PASS** |
 | **08** | Bếp bấm Hoàn thành toàn đơn | Bếp pha chế xong, gọi `POST /api/v1/kitchen/orders/{id}/complete`. | Đơn đổi trạng thái sang `HOAN_THANH`. Hệ thống tự động kích hoạt trừ kho tiêu hao nguyên liệu. | **PASS** |
 | **09** | Kiểm tra tiêu hao kho nguyên liệu | Gọi `GET /api/v1/inventory/stocks`. | Tồn kho tại vị trí `BEP` bị trừ chính xác theo định lượng công thức (Trà Đen: 19.97 kg, Sữa Đặc: 19.94 kg, Đường: 19.96 kg, Ly: 18 cái). | **PASS** |

@@ -4,7 +4,6 @@
  */
 
 const CashierApp = (() => {
-    let currentTables = [];
     let products = [];
     let selectedCategory = "";
     let filtersReady = false;
@@ -14,6 +13,17 @@ const CashierApp = (() => {
     let creationKey = null;
     let creationFingerprint = null;
     let realtimeReady = false;
+    let latestQuote = null;
+    let quotedItems = null;
+    let quoteRequest = 0;
+    let quoteTimer = null;
+    let lastPaymentMethod = null;
+    let activeBranches = [];
+    let bankAvailable = false;
+    let pickupLoading = false;
+    // randomUUID is unavailable on non-HTTPS LAN hosts. The key is for deduplication, not auth.
+    const newRequestKey = () => globalThis.crypto?.randomUUID?.()
+        || 'POS_' + Date.now() + '_' + Math.random().toString(36).slice(2);
 
     async function init() {
         window.MilkTeaContext = { role: document.getElementById('posRole')?.dataset.role || 'CASHIER' };
@@ -21,44 +31,126 @@ const CashierApp = (() => {
 
         if (!realtimeReady) { setupRealtime(); realtimeReady = true; }
         setupProducts();
-        await loadTables();
+        setupPaymentControls();
+        renderCounterCart();
+        await Promise.all([loadBranches(), loadBankSettings(), loadPickupOrders()]);
+        refreshSubmitState();
+        document.addEventListener('visibilitychange', () => { if (!document.hidden) void loadPickupOrders(); });
+        setInterval(() => { if (!document.hidden) void loadPickupOrders(); }, 30000);
+    }
+
+    function selectedShopId() { return document.getElementById('posShopId')?.value || ''; }
+
+    function refreshSubmitState() {
+        const button = document.getElementById('counterSubmitBtn');
+        if (!button) return;
+        const canQuote = !!latestQuote && quotedItems === JSON.stringify(cartItems());
+        button.disabled = submitting || !selectedShopId() || (!pendingCounterOrder && (!counterCart.length || !canQuote));
+        if (pendingCounterOrder) {
+            button.textContent = 'Ghi nhận thanh toán đơn #' + pendingCounterOrder.orderId;
+        } else {
+            button.innerHTML = '<i class="bi bi-check-circle-fill" aria-hidden="true"></i> Xác nhận thu tiền &amp; tạo đơn';
+        }
+    }
+
+    async function loadBranches() {
+        const select = document.getElementById('posShopId');
+        const status = document.getElementById('posShopStatus');
+        if (!select) return;
+        try {
+            const list = await MilkTeaApi.get('/api/v1/public/market/shops');
+            activeBranches = (Array.isArray(list) ? list : []).filter(s => s.active);
+            select.replaceChildren(new Option('Chọn chi nhánh đang bán hàng', ''));
+            for (const shop of activeBranches) select.add(new Option(shop.name, String(shop.id)));
+            if (activeBranches.length === 1) select.value = String(activeBranches[0].id);
+            select.disabled = !activeBranches.length;
+            status.textContent = activeBranches.length ? 'Đơn sẽ được ghi nhận tại chi nhánh đã chọn, phí giao bằng 0đ.' : 'Chưa có chi nhánh đang hoạt động. Liên hệ Admin để kích hoạt.';
+        } catch (error) {
+            select.replaceChildren(new Option('Không tải được chi nhánh', ''));
+            select.disabled = true;
+            status.textContent = 'Lỗi tải chi nhánh: ' + (error?.message || 'Không có kết nối');
+        }
+        select.addEventListener('change', refreshSubmitState);
+        refreshSubmitState();
+    }
+
+    async function loadBankSettings() {
+        const account = document.getElementById('posBankAccount');
+        const holder = document.getElementById('posBankHolder');
+        const title = document.getElementById('posBankTitle');
+        const image = document.getElementById('posBankQr');
+        const bankOption = document.querySelector('#counterPayMethod option[value="BANK_TRANSFER"]');
+        if (!account) return;
+        try {
+            const settings = await MilkTeaApi.get('/api/v1/public/shop-info');
+            const bank = String(settings?.bankName || '').trim();
+            const number = String(settings?.bankAccountNumber || '').trim();
+            const name = String(settings?.bankAccountHolder || '').trim();
+            bankAvailable = !!(bank && number && name);
+            title.textContent = bankAvailable ? 'Chuyển khoản ' + bank : 'Chưa có tài khoản nhận tiền';
+            account.textContent = bankAvailable ? 'STK: ' + number : 'Admin cần cấu hình ngân hàng trong Settings.';
+            holder.textContent = bankAvailable ? 'Chủ tài khoản: ' + name : '';
+            // Static QR is for one MB account only; never display it for a different recipient.
+            const mb = /(^|\W)(mb|mbbank|quan doi)(\W|$)/i.test(bank);
+            image.hidden = !(mb && number === '0934197505' && name.toUpperCase() === 'KIEN NGUYEN XUAN LUU');
+        } catch (error) {
+            bankAvailable = false;
+            title.textContent = 'Không thể tải tài khoản nhận tiền';
+            account.textContent = error?.message || 'Kiểm tra kết nối hệ thống.';
+            holder.textContent = '';
+            image.hidden = true;
+        }
+        if (bankOption) bankOption.disabled = !bankAvailable;
+        if (!bankAvailable && document.getElementById('counterPayMethod').value === 'BANK_TRANSFER') {
+            document.getElementById('counterPayMethod').value = 'CASH';
+        }
+        updatePaymentFields();
+    }
+
+    async function loadPickupOrders() {
+        if (pickupLoading) return;
+        pickupLoading = true;
+        try {
+            const list = await MilkTeaApi.get('/api/v1/cashier/orders?tab=confirm');
+            const incoming = (Array.isArray(list) ? list : []).filter(o => o.status === 'CHO_XAC_NHAN' && !o.staffCreated);
+            const pendingCount = String(incoming.length);
+            for (const id of ['posPickupPendingCount','posPickupPreviewCount']) {
+                const badge = document.getElementById(id);
+                if (badge) badge.textContent = pendingCount;
+            }
+            const container = document.getElementById('posPickupNewList');
+            if (!container) return;
+            container.replaceChildren();
+            if (!incoming.length) {container.textContent = 'Không có đơn đặt trước cần xác nhận.'; return;}
+            for (const order of incoming.slice(0,5)) {
+                const row = document.createElement('div'); row.className = 'pos-delivery-live-item';
+                const details = document.createElement('div');
+                const name = document.createElement('strong'); name.textContent = 'Đơn #' + order.orderId + ' · ' + (order.customerName || 'Khách hàng');
+                const note = document.createElement('small'); note.textContent = (order.pickupShopName || 'Chưa có chi nhánh') + ' · ' + MilkTeaApi.formatVND(order.totalAmount);
+                details.append(name,note);
+                const link = document.createElement('a'); link.href='/orders?order='+encodeURIComponent(order.orderId);
+                link.className='btn btn-sm btn-outline-success'; link.textContent='Xử lý đơn';
+                row.append(details,link); container.append(row);
+            }
+        } catch (error) {
+            const container = document.getElementById('posPickupNewList');
+            if (container) container.textContent = 'Chưa tải được đơn đặt trước: '+(error?.message || 'Lỗi kết nối');
+        } finally {pickupLoading=false;}
     }
 
     function setupRealtime() {
         MilkTeaRealtime.on('ORDER_CREATED', () => {
             MilkTeaApi.showToast('Có đơn hàng mới!', 'success');
-            loadTables();
+            void loadPickupOrders();
         });
 
         MilkTeaRealtime.on('ORDER_STATUS_CHANGED', () => {
-            loadTables();
+            void loadPickupOrders();
         });
 
-        MilkTeaRealtime.on('ORDER_ASSIGNED_TO_TABLE', () => {
-            loadTables();
-        });
-
-        MilkTeaRealtime.on('TABLE_SESSION_OPENED', () => {
-            loadTables();
-        });
-
-        MilkTeaRealtime.on('TABLE_SESSION_CLOSED', () => {
-            loadTables();
-        });
-
-        MilkTeaRealtime.on('PAYMENT_RECORDED', () => {
-            loadTables();
-        });
-
-        MilkTeaRealtime.on('REFUND_CHANGED', () => {
-            loadTables();
-        });
-
-        MilkTeaRealtime.on('PAYMENT_NOTICE_CREATED', (e) => {
-            MilkTeaApi.showToast('Có yêu cầu thanh toán mới. Mở Đơn Đã Đặt để kiểm tra và xác nhận thu tiền.', 'warning');
-        });
-
+        MilkTeaRealtime.on('PAYMENT_RECORDED', () => { void loadPickupOrders(); });
         MilkTeaRealtime.on('SETTINGS_CHANGED', async () => {
+            void loadBankSettings();
             try {
                 const info = await MilkTeaApi.get('/api/v1/public/shop-info');
                 if (info && info.logoUrl) {
@@ -86,85 +178,9 @@ const CashierApp = (() => {
         });
 
         MilkTeaRealtime.onReconnect(() => {
-            loadTables();
+            void loadPickupOrders();
+            void loadBankSettings();
         });
-    }
-
-    async function loadTables() {
-        try {
-            const tables = await MilkTeaApi.get('/api/v1/cashier/tables');
-            currentTables = tables || [];
-            renderTableSelect();
-        } catch (e) {
-            console.warn('Lỗi nạp danh sách bàn:', e);
-        }
-    }
-
-    // Không còn sơ đồ bàn: chỉ đồng bộ dropdown và nút quản lý phiên nhỏ gọn.
-    function renderTableSelect() {
-        const select = document.getElementById('counterTableId');
-        if (!select) return;
-
-        const previousValue = select.value;
-        const available = currentTables.filter(t => t.status !== 'BAO_TRI');
-        select.innerHTML = '<option value="">Tại quầy / Mang về</option>' +
-            available.map(t => `<option value="${t.id}">${MilkTeaReceipts.esc(t.name)}${t.status === 'CO_KHACH' ? ' · Đang phục vụ' : ''}</option>`).join('');
-        select.value = available.some(t => String(t.id) === previousValue) ? previousValue : '';
-
-        const syncSelection = () => {
-            const table = currentTables.find(t => String(t.id) === select.value);
-            const help = document.getElementById('posTableAssignmentHelp');
-            if (help) {
-                help.setAttribute('data-assignment', table ? 'dine-in' : 'takeaway');
-                help.innerHTML = table
-                    ? '<i class="bi bi-info-circle" aria-hidden="true"></i> Đơn sẽ được phục vụ tại ' + MilkTeaReceipts.esc(table.name) + '.'
-                    : '<i class="bi bi-info-circle" aria-hidden="true"></i> Chọn bàn nếu khách dùng tại quán. Để trống nếu khách mua mang về.';
-            }
-
-            const sessionBtn = document.getElementById('posTableSessionBtn');
-            if (!sessionBtn) return;
-            if (!table) {
-                sessionBtn.hidden = true;
-                sessionBtn.onclick = null;
-                return;
-            }
-            sessionBtn.hidden = false;
-            if (table.activeSessionId) {
-                sessionBtn.innerHTML = '<i class="bi bi-door-closed" aria-hidden="true"></i> Đóng phiên';
-                sessionBtn.onclick = () => closeSession(table.activeSessionId);
-            } else {
-                sessionBtn.innerHTML = '<i class="bi bi-box-arrow-in-right" aria-hidden="true"></i> Mở phiên';
-                sessionBtn.onclick = () => openSession(table.id);
-            }
-        };
-        select.onchange = syncSelection;
-        syncSelection();
-    }
-
-    async function openSession(tableId) {
-        try {
-            await MilkTeaApi.post(`/api/v1/cashier/tables/${tableId}/open-session`);
-            MilkTeaApi.showToast('Đã mở phiên cho bàn!', 'success');
-            await loadTables();
-        } catch (e) {
-            MilkTeaApi.showToast(e.message || 'Lỗi mở phiên bàn', 'error');
-        }
-    }
-
-    async function closeSession(sessionId) {
-        const tableName = currentTables.find(t => t.activeSessionId === sessionId)?.name || "bàn";
-        if (!confirm(`Bạn có chắc chắn muốn đóng phiên của ${tableName}?\nLưu ý: Mọi đơn hàng phải hoàn tất hoặc hủy và đã thanh toán đủ.`)) {
-            return;
-        }
-
-        try {
-            if (await showSessionBlockers(sessionId, tableName)) return;
-            await MilkTeaApi.post(`/api/v1/cashier/table-sessions/${sessionId}/close`);
-            MilkTeaApi.showToast(`Đã đóng phiên của ${tableName} thành công!`, 'success');
-            await loadTables();
-        } catch (e) {
-            if (!await showSessionBlockers(sessionId, tableName)) MilkTeaApi.showToast(e.message || 'Không thể đóng phiên bàn', 'error');
-        }
     }
 
     let activeToppingLineId = null;
@@ -229,6 +245,7 @@ const CashierApp = (() => {
     }
 
     function enterToppingMode(lineId) {
+        if (submitting || pendingCounterOrder) return;
         const item = counterCart.find(it => it.lineId === lineId);
         if (!item) return;
 
@@ -266,6 +283,7 @@ const CashierApp = (() => {
     }
 
     function changeLineSize(lineId, newProductId) {
+        if (submitting || pendingCounterOrder) return;
         const item = counterCart.find(it => it.lineId === lineId);
         const newProd = products.find(p => p.id === Number(newProductId));
         if (item && newProd) {
@@ -277,6 +295,7 @@ const CashierApp = (() => {
     }
 
     function toggleLineNote(lineId) {
+        if (submitting || pendingCounterOrder) return;
         const item = counterCart.find(it => it.lineId === lineId);
         if (item) {
             item.noteOpen = !item.noteOpen;
@@ -285,6 +304,7 @@ const CashierApp = (() => {
     }
 
     function updateLineNote(lineId, val) {
+        if (submitting || pendingCounterOrder) return;
         const item = counterCart.find(it => it.lineId === lineId);
         if (item) {
             item.note = val.trim();
@@ -292,6 +312,7 @@ const CashierApp = (() => {
     }
 
     function removeLineTopping(lineId, toppingId) {
+        if (submitting || pendingCounterOrder) return;
         const item = counterCart.find(it => it.lineId === lineId);
         if (item && item.toppings) {
             item.toppings = item.toppings.filter(t => t.id !== toppingId);
@@ -307,6 +328,7 @@ const CashierApp = (() => {
     }
 
     function renderCounterCart() {
+        if (!pendingCounterOrder) { latestQuote = null; quotedItems = null; }
         const container = document.getElementById('counterCartList');
         if (!container) return;
 
@@ -316,9 +338,8 @@ const CashierApp = (() => {
         if (mobileCount) mobileCount.textContent = itemCount + ' món';
         if (counterCart.length === 0) {
             container.innerHTML = '<div class="pos-empty-cart"><i class="bi bi-bag" aria-hidden="true"></i><strong>Giỏ hàng đang trống</strong><span>Chọn món ở phần thực đơn để bắt đầu tạo đơn.</span></div>';
-            document.getElementById('counterCartTotal').textContent = '0 ₫';
-            const mobileTotal = document.getElementById('posMobileCartTotal');
-            if (mobileTotal) mobileTotal.textContent = '0 ₫';
+            updateCheckoutSummary(0);
+            scheduleQuote();
             return;
         }
 
@@ -409,9 +430,11 @@ const CashierApp = (() => {
             `;
         });
         container.innerHTML = html;
-        document.getElementById('counterCartTotal').textContent = MilkTeaApi.formatVND(total);
-        const mobileTotal = document.getElementById('posMobileCartTotal');
-        if (mobileTotal) mobileTotal.textContent = MilkTeaApi.formatVND(total);
+        latestQuote = null;
+        quotedItems = null;
+        updateCheckoutSummary(total);
+        scheduleQuote();
+        refreshSubmitState();
     }
 
     function adjustCounterCart(lineId, delta) {
@@ -426,47 +449,214 @@ const CashierApp = (() => {
         }
     }
 
+    function cartItems() {
+        return counterCart.map(it => ({
+            productId: it.productId, quantity: it.quantity,
+            note: it.note || '', toppingIds: (it.toppings || []).map(t => t.id)
+        }));
+    }
+
+    function setPendingOrderControls(locked) {
+        const shopSelect = document.getElementById('posShopId');
+        if (shopSelect) shopSelect.disabled = locked || !activeBranches.length;
+        document.getElementById('counterPayMethod').disabled = locked;
+        const clear = document.querySelector('.pos-clear-btn');
+        if (clear) clear.disabled = locked;
+    }
+
+    function setupPaymentControls() {
+        document.getElementById('counterPayMethod').addEventListener('change', updatePaymentFields);
+        document.getElementById('counterCashReceived').addEventListener('input', updateChangeDue);
+        document.getElementById('posSuccessReceiptBtn').addEventListener('click', () => {
+            const id = document.getElementById('posSuccessReceiptBtn').dataset.orderId;
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('posPaymentSuccessModal')).hide();
+            if (id) MilkTeaReceipts.open(id);
+        });
+        updatePaymentFields();
+    }
+
+    function updatePaymentFields() {
+        const cash = document.getElementById('counterPayMethod').value === 'CASH';
+        document.getElementById('posCashTender').hidden = !cash;
+        document.getElementById('posTransferConfirmation').hidden = cash;
+        if (cash) document.getElementById('counterTransferConfirmed').checked = false;
+        updateChangeDue();
+    }
+
+    function updateChangeDue() {
+        const paid = Number(document.getElementById('counterCashReceived')?.value);
+        const total = Number(pendingCounterOrder?.totalAmount ?? latestQuote?.totalAmount ?? 0);
+        const change = Number.isFinite(paid) && paid >= total && total > 0 ? paid - total : 0;
+        document.getElementById('posChangeDue').textContent = MilkTeaApi.formatVND(change);
+    }
+
+    function updateCheckoutSummary(localSubtotal) {
+        const money = MilkTeaApi.formatVND;
+        document.getElementById('counterCartTotal').textContent = money(localSubtotal);
+        const final = pendingCounterOrder?.totalAmount ?? latestQuote?.totalAmount ?? localSubtotal;
+        const discount = pendingCounterOrder?.discountAmount ?? latestQuote?.discountAmount ?? 0;
+        document.getElementById('posDiscountAmount').textContent = '−' + money(discount);
+        document.getElementById('posFinalTotal').textContent = money(final);
+        document.getElementById('posMobileCartTotal').textContent = money(final);
+        updateChangeDue();
+    }
+
+    function showQuoteStatus(text, isError = false) {
+        const el = document.getElementById('posPriceStatus');
+        el.textContent = text;
+        el.classList.toggle('text-danger', isError);
+    }
+
+    function scheduleQuote() {
+        clearTimeout(quoteTimer);
+        const requestId = ++quoteRequest;
+        if (pendingCounterOrder) return;
+        latestQuote = null;
+        quotedItems = null;
+        if (!counterCart.length) {
+            showQuoteStatus('Thêm món để xem tổng tiền chính xác.');
+            refreshSubmitState();
+            return;
+        }
+        refreshSubmitState();
+        showQuoteStatus('Đang đối chiếu giá món và ưu đãi của cửa hàng...');
+        quoteTimer = setTimeout(async () => {
+            const items = cartItems();
+            const fingerprint = JSON.stringify(items);
+            try {
+                const quote = await MilkTeaApi.post('/api/v1/cashier/orders/quote', { items });
+                if (requestId !== quoteRequest) return;
+                latestQuote = quote;
+                quotedItems = fingerprint;
+                updateCheckoutSummary(Number(quote.subtotal));
+                showQuoteStatus('Đã kiểm tra giá với hệ thống. Tổng tiền gồm giảm giá hiện hành.');
+                refreshSubmitState();
+            } catch (e) {
+                if (requestId !== quoteRequest) return;
+                showQuoteStatus('Chưa xác minh được giá: ' + (e.message || 'Lỗi kết nối') + '. Không thu tiền trước khi kiểm tra lại.', true);
+                refreshSubmitState();
+            }
+        }, 200);
+    }
+
     async function submitCounterOrder() {
         if (submitting) return;
         if (counterCart.length === 0 && !pendingCounterOrder) {
             MilkTeaApi.showToast('Vui lòng chọn món trước khi tạo đơn', 'warning');
             return;
         }
-
+        const shopId = selectedShopId();
+        if (!pendingCounterOrder && !shopId) {
+            MilkTeaApi.showToast('Vui lòng chọn chi nhánh bán hàng trước khi thanh toán.', 'warning');
+            document.getElementById('posShopId')?.focus();
+            return;
+        }
+        if (!pendingCounterOrder && (!latestQuote || quotedItems !== JSON.stringify(cartItems()))) {
+            MilkTeaApi.showToast('Vui lòng chờ hệ thống kiểm tra giá món.', 'warning');
+            scheduleQuote();
+            return;
+        }
         submitting = true;
         const submitBtn = document.getElementById('counterSubmitBtn');
         submitBtn.disabled = true;
+        let paid = false;
         try {
-            const items = counterCart.map(it => ({
-                productId: it.productId,
-                quantity: it.quantity,
-                note: it.note || '',
-                toppingIds: (it.toppings || []).map(t => t.id)
-            }));
-
-            const tableId = document.getElementById('counterTableId').value;
-            const table = currentTables.find(t => String(t.id) === tableId);
-            const payload = tableId ? { tableId, expectedSessionId: table?.activeSessionId || null, items, remainingCartItems: [] } : { items };
-            const fingerprint = JSON.stringify(payload);
-            if (fingerprint !== creationFingerprint) { creationFingerprint = fingerprint; creationKey = crypto.randomUUID(); }
-            const created = pendingCounterOrder || await MilkTeaApi.post(tableId ? '/api/v1/orders/table' : '/api/v1/orders/counter', payload, { 'Idempotency-Key': creationKey });
-            pendingCounterOrder = created;
-            await MilkTeaApi.post(`/api/v1/cashier/orders/${created.orderId}/payments`, { method: document.getElementById('counterPayMethod').value, reference: 'POS_' + created.orderId }, { 'Idempotency-Key': 'POS_PAYMENT_' + created.orderId });
+            const items = cartItems();
+            let created = pendingCounterOrder;
+            if (!created) {
+                // Confirm the exact amount using the server's snapshot before creating an order.
+                const quoted = await MilkTeaApi.post('/api/v1/cashier/orders/quote', { items });
+                const newFingerprint = JSON.stringify(items);
+                if (!latestQuote || Number(latestQuote.totalAmount) !== Number(quoted.totalAmount)
+                        || Number(latestQuote.subtotal) !== Number(quoted.subtotal)) {
+                    latestQuote = quoted;
+                    quotedItems = newFingerprint;
+                    updateCheckoutSummary(Number(quoted.subtotal));
+                    showQuoteStatus('Giá vừa được cập nhật. Hãy xác nhận tổng tiền mới trước khi thu.', true);
+                    MilkTeaApi.showToast('Giá đã cập nhật. Vui lòng kiểm tra lại tổng tiền và bấm xác nhận lần nữa.', 'warning');
+                    return;
+                }
+            }
+            const paymentMethod = document.getElementById('counterPayMethod').value;
+            const amount = Number(created?.totalAmount ?? latestQuote?.totalAmount);
+            if (!Number.isFinite(amount) || amount <= 0) throw new Error('Tổng tiền hóa đơn không hợp lệ.');
+            if (paymentMethod === 'CASH') {
+                const cashField = document.getElementById('counterCashReceived');
+                const cash = Number(cashField.value);
+                if (cashField.value.trim() === '' || !Number.isFinite(cash) || cash < amount) {
+                    cashField.focus();
+                    MilkTeaApi.showToast('Tiền khách đưa phải lớn hơn hoặc bằng số tiền cần thanh toán.', 'warning');
+                    return;
+                }
+            } else if (!document.getElementById('counterTransferConfirmed').checked) {
+                MilkTeaApi.showToast('Hãy xác nhận đã nhận đủ tiền chuyển khoản trước khi ghi thu.', 'warning');
+                return;
+            }
+            if (!created) {
+                const payload = { shopId: Number(shopId), items };
+                const fingerprint = JSON.stringify(payload);
+                if (fingerprint !== creationFingerprint) {
+                    creationFingerprint = fingerprint;
+                    creationKey = newRequestKey();
+                }
+                created = await MilkTeaApi.post('/api/v1/orders/counter', payload, { 'Idempotency-Key': creationKey });
+                pendingCounterOrder = created;
+                lastPaymentMethod = paymentMethod;
+                setPendingOrderControls(true);
+                if (Number(created.totalAmount) !== Number(latestQuote.totalAmount)) {
+                    updateCheckoutSummary(Number(created.subtotal));
+                    showQuoteStatus('Hóa đơn đã lập với số tiền mới. Kiểm tra lại trước khi ghi thu.', true);
+                    MilkTeaApi.showToast('Giá thay đổi khi lập hóa đơn. Đơn đã được lưu, vui lòng kiểm tra lại số tiền trước khi xác nhận thu.', 'warning');
+                    return;
+                }
+            }
+            const method = lastPaymentMethod || paymentMethod;
+            if (document.getElementById('counterPayMethod').value !== method) {
+                document.getElementById('counterPayMethod').value = method;
+                updatePaymentFields();
+                MilkTeaApi.showToast('Phương thức đã cố định sau khi tạo đơn. Vui lòng xác nhận thu lại.', 'warning');
+                return;
+            }
+            await MilkTeaApi.post(`/api/v1/cashier/orders/${created.orderId}/payments`,
+                { method, reference: 'POS_' + created.orderId },
+                { 'Idempotency-Key': 'POS_PAYMENT_' + created.orderId });
+            paid = true;
             pendingCounterOrder = null;
-            creationKey = null; creationFingerprint = null;
-            await MilkTeaReceipts.open(created.orderId);
-            MilkTeaApi.showToast(`Tạo đơn #${created.orderId} thành công!`, 'success');
+            creationKey = null; creationFingerprint = null; lastPaymentMethod = null;
+            setPendingOrderControls(false);
+            const success = document.getElementById('posPaymentSuccessModal');
+            document.getElementById('posSuccessOrderCode').textContent = MilkTeaReceipts.code(created.orderId);
+            document.getElementById('posSuccessAmount').textContent = MilkTeaApi.formatVND(created.totalAmount);
+            document.getElementById('posSuccessMethod').textContent = method === 'CASH' ? 'Tiền mặt' : 'Chuyển khoản';
+            const shop = activeBranches.find(s => String(s.id) === shopId);
+            document.getElementById('posSuccessBranch').textContent = created.pickupShopName || shop?.name || 'Quầy bán hàng';
+            document.getElementById('posSuccessReceiptBtn').dataset.orderId = String(created.orderId);
+            document.getElementById('posSuccessMessage').textContent = 'Đã ghi nhận thanh toán và gửi đơn mang đi cho bếp. Hướng dẫn khách nhận món tại chi nhánh đã chọn.';
             counterCart = [];
+            document.getElementById('counterCashReceived').value = '';
+            document.getElementById('counterTransferConfirmed').checked = false;
+            document.getElementById('counterPayMethod').value = 'CASH';
+            updatePaymentFields();
+            clearTimeout(quoteTimer);
+            quoteRequest++;
+            latestQuote = null; quotedItems = null;
             exitToppingMode();
             renderCounterCart();
-            submitBtn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Thanh toán';
-            await loadTables();
+            bootstrap.Modal.getOrCreateInstance(success).show();
+            MilkTeaApi.showToast(`Đã thanh toán thành công đơn ${MilkTeaReceipts.code(created.orderId)}!`, 'success');
+            // Refresh is not part of the payment transaction; failure must not lead to retry.
+            void loadPickupOrders();
         } catch (e) {
-            MilkTeaApi.showToast(e.message || 'Lỗi tạo đơn / ghi thu', 'error');
-            if (pendingCounterOrder) submitBtn.textContent = 'Thử lại thanh toán đơn #' + pendingCounterOrder.orderId;
-        } finally { submitting = false; submitBtn.disabled = false; }
+            MilkTeaApi.showToast(e.message || 'Không thể tạo đơn / ghi nhận thanh toán', 'error');
+            if (pendingCounterOrder) {
+                submitBtn.textContent = 'Thử lại thanh toán đơn #' + pendingCounterOrder.orderId;
+            }
+        } finally {
+            submitting = false;
+            submitBtn.disabled = false;
+            refreshSubmitState();
+        }
     }
-
 
     function setupProducts() {
         products = [...document.querySelectorAll('#posProductsData [data-id]')].map(el => {
@@ -509,25 +699,8 @@ const CashierApp = (() => {
     }
     function clearCart() { if (submitting || pendingCounterOrder) return; counterCart = []; exitToppingMode(); renderCounterCart(); }
     function removeItem(idx) { if (submitting || pendingCounterOrder) return; counterCart.splice(idx, 1); renderCounterCart(); }
-    async function showSessionBlockers(sessionId, tableName) {
-        try {
-            const orders = await MilkTeaApi.get('/api/v1/cashier/orders');
-            const sessionOrders = (orders || []).filter(o => String(o.sessionId) === String(sessionId));
-            const unpaid = sessionOrders.filter(o => o.status !== 'DA_HUY' && !o.paid && Number(o.totalAmount) > 0);
-            const unfinished = sessionOrders.filter(o => !['DA_HUY', 'HOAN_THANH'].includes(o.status));
-            if (!unpaid.length && !unfinished.length) return false;
-            const esc = MilkTeaReceipts.esc;
-            const section = (title, list) => list.length ? `<h6 class="mt-3">${title}</h6><div class="table-responsive"><table class="table"><thead><tr><th>Đơn hàng</th><th>Tổng tiền</th><th>Kiểm tra</th></tr></thead><tbody>${list.map(o => `<tr><td>${MilkTeaReceipts.code(o.orderId)}</td><td>${MilkTeaApi.formatVND(o.totalAmount)}</td><td><a class="btn btn-sm btn-outline-primary" href="/orders?order=${o.orderId}">Xem đơn</a></td></tr>`).join('')}</tbody></table></div>` : '';
-            document.getElementById('tableBlockersTitle').textContent = 'Chưa thể đóng phiên ' + tableName;
-            document.getElementById('tableBlockersBody').innerHTML = '<p class="text-muted">Kiểm tra các đơn dưới đây trước khi đóng phiên.</p>' + section('Đơn chưa thanh toán', unpaid) + section('Đơn chưa hoàn thành', unfinished);
-            bootstrap.Modal.getOrCreateInstance(document.getElementById('tableBlockersModal')).show(); return true;
-        } catch (e) { return false; }
-    }
     return {
         init,
-        refreshTables: loadTables,
-        openSession,
-        closeSession,
         addCounterCart,
         adjustCounterCart,
         submitCounterOrder,

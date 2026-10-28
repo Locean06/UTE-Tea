@@ -861,6 +861,16 @@
             <strong>Thực đơn đang tạm thời gián đoạn.</strong>
             Trang UTE Tea vẫn hoạt động, nhưng một số sản phẩm chưa tải được. Vui lòng thử lại hoặc liên hệ quản trị viên kiểm tra bản cập nhật database.
         </div>
+        <section th:if="${promoDiscountPercent != null}" class="ute-promo-before-menu px-3 px-lg-4 my-4" aria-label="Mã ưu đãi UTE Tea">
+          <div class="alert alert-warning border-0 shadow-sm rounded-4 d-flex flex-column flex-sm-row align-items-sm-center gap-3 py-3 px-4 mx-auto mb-0" style="max-width:1250px">
+            <i class="bi bi-tag-fill fs-3" aria-hidden="true"></i>
+            <div class="flex-grow-1">
+              <strong class="d-block">Giảm <span th:text="${#numbers.formatDecimal(promoDiscountPercent, 0, 0) + '%'}">10%</span> tổng hóa đơn bằng mã GIAMGIA10!</strong>
+              <span class="small">Nhập mã <strong class="user-select-all">GIAMGIA10</strong> ở giỏ hàng để giảm trên tổng tiền món và phí giao hàng. Áp dụng khi mã còn lượt và còn hạn.</span>
+            </div>
+            <a th:href="@{/cart(promo='GIAMGIA10')}" class="btn btn-primary-custom text-nowrap">Dùng mã ngay</a>
+          </div>
+        </section>
         <section id="uteCatalog" class="ute-catalog-section" aria-label="Thực đơn UTE Tea">
         <div class="ute-section-label">HƯƠNG VỊ TỪ UTE TEA</div>
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
@@ -948,23 +958,7 @@
                 </div>
                 <img th:src="@{/images/ute-tea-bright-hero.webp}" src="/images/ute-tea-bright-hero.webp" loading="lazy" width="450" height="270" alt="Những món trà tại UTE Tea">
             </div>
-        <div th:if="${settings != null and ((settings.discountType == 'FIXED_AMOUNT' and settings.discountValue != null and settings.discountValue > 0) or (settings.discountType != 'FIXED_AMOUNT' and settings.discountPercent != null and settings.discountPercent > 0))}"
-             class="alert alert-warning border-0 shadow-sm rounded-4 d-flex align-items-center mb-4 py-3 px-4">
-            <i class="bi bi-tag-fill fs-3 text-danger me-3"></i>
-            <div>
-                <strong class="d-block text-dark">Ưu Đãi Đặc Biệt Hôm Nay!</strong>
-                <span class="text-muted small">
-                    Quán đang áp dụng giảm giá
-                    <span th:if="${settings.discountType == 'FIXED_AMOUNT'}"
-                          class="badge bg-danger rounded-pill fs-6"
-                          th:text="${#numbers.formatDecimal(settings.discountValue, 0, 'COMMA', 0, 'POINT') + ' ₫'}">20,000 ₫</span>
-                    <span th:if="${settings.discountType != 'FIXED_AMOUNT'}"
-                          class="badge bg-danger rounded-pill fs-6"
-                          th:text="${#numbers.formatDecimal(settings.discountPercent, 0, 0) + '%'}">10%</span>
-                    trên mọi đơn hàng!
-                </span>
-            </div>
-        </div>
+
 
         </section>
 
