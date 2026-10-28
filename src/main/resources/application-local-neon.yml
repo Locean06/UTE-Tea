@@ -1,0 +1,24 @@
+# Activated WITH local: SPRING_PROFILES_ACTIVE=local,local-neon
+# Never use prod profile locally just to connect to Neon.
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 3
+      minimum-idle: 0
+      connection-timeout: 30000
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  thymeleaf:
+    cache: false
+app:
+  jwt:
+    cookie-secure: false
