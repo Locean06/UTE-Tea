@@ -422,6 +422,13 @@ public class AdminService {
     public void deleteProduct(Long id) {
         Product p = productRepository.findById(id)
                 .orElseThrow(() -> BusinessException.notFound(ErrorCode.PRODUCT_UNAVAILABLE, "Không tìm thấy món uống"));
+        if (p.getShop() != null) {
+            throw BusinessException.badRequest(ErrorCode.VALIDATION_FAILED,
+                    "Món của chi nhánh cần được quản lý trong phần chi nhánh");
+        }
+        // Xóa mềm: các đơn hàng, công thức và khóa ngoại vẫn còn nguyên.
+        // Chỉ danh sách món đang bán mặc định loại bỏ món này; admin có thể khôi phục.
+        if (Boolean.FALSE.equals(p.getActive())) return;
         p.setActive(false);
         productRepository.save(p);
         realtimeEventPublisher.publishAfterCommit("/topic/admin", "CATALOG_CHANGED", p.getId().toString(), null, "1",
