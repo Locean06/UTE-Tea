@@ -13,6 +13,8 @@ import vn.edu.ute.milktea.entity.payment.Payment;
 import vn.edu.ute.milktea.repository.cancellation.RefundRequestRepository;
 import vn.edu.ute.milktea.repository.order.InvoiceRepository;
 import vn.edu.ute.milktea.repository.order.OrderRepository;
+import vn.edu.ute.milktea.repository.market.DeliveryOrderRepository;
+import vn.edu.ute.milktea.entity.market.DeliveryOrder;
 import vn.edu.ute.milktea.repository.payment.PaymentRepository;
 
 import java.math.BigDecimal;
@@ -44,6 +46,7 @@ import java.time.LocalDateTime;
 public class ReportService {
 
     private final OrderRepository orderRepository;
+    private final DeliveryOrderRepository deliveryOrderRepository;
     private final InvoiceRepository invoiceRepository;
     private final PaymentRepository paymentRepository;
     private final RefundRequestRepository refundRepository;
@@ -192,11 +195,28 @@ public class ReportService {
             counts.put(stName, counts.getOrDefault(stName, 0L) + 1L);
         }
 
+        for (DeliveryOrder d : deliveryOrderRepository.findAll())
+            if (within(d.getCreatedAt(), startInstant, endInstant))
+                counts.merge("DELIVERY_" + d.getStatus().name(), 1L, Long::sum);
         return ReportDto.OrderReportView.builder()
                 .counts(counts)
                 .build();
     }
     
+    private boolean within(Instant date, Instant start, Instant end) {
+        return date != null && (start == null || !date.isBefore(start))
+                && (end == null || date.isBefore(end));
+    }
+
+    private BigDecimal deliveredRevenue(Instant start, Instant end) {
+        return deliveryOrderRepository.findAll().stream()
+                .filter(d -> d.getStatus() == DeliveryOrder.Status.DELIVERED && d.isPaid())
+                .filter(d -> within(d.getDeliveredAt(), start, end))
+                .map(DeliveryOrder::getTotalAmount)
+                .filter(java.util.Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
     @Transactional(readOnly = true)
     public ReportDto.DashboardSummary getDashboardSummary(
             LocalDate fromDate,
@@ -235,6 +255,7 @@ public class ReportService {
         BigDecimal received = revenue.getReceived();
         BigDecimal refunded = revenue.getRefunded();
 
+        received = received.add(deliveredRevenue(startInstant, endInstant));
         BigDecimal netRevenue = received.subtract(refunded);
 
         // 3. Tổng số đơn hàng trong khoảng ngày
@@ -366,6 +387,13 @@ public class ReportService {
             refundedByDay.merge(day, refund.getAmount(), BigDecimal::add);
         }
 
+        for (DeliveryOrder d : deliveryOrderRepository.findAll()) {
+            if (d.getStatus() != DeliveryOrder.Status.DELIVERED || !d.isPaid()
+                    || !within(d.getDeliveredAt(), start, end) || d.getTotalAmount() == null) continue;
+            LocalDate day = d.getDeliveredAt().atZone(VIETNAM_ZONE).toLocalDate();
+            if (receivedByDay.containsKey(day))
+                receivedByDay.merge(day, d.getTotalAmount(), BigDecimal::add);
+        }
         List<ReportDto.RevenueByDay> result = new ArrayList<>();
 
         for (LocalDate day : receivedByDay.keySet()) {
@@ -423,6 +451,16 @@ public class ReportService {
                     .build());
         }
 
+        Map<DeliveryOrder.Status, Long> ds = new LinkedHashMap<>();
+        for (DeliveryOrder.Status st : DeliveryOrder.Status.values()) ds.put(st, 0L);
+        for (DeliveryOrder d : deliveryOrderRepository.findAll())
+            if (within(d.getCreatedAt(), start, end))
+                ds.merge(d.getStatus(), 1L, Long::sum);
+        for (var entry : ds.entrySet())
+            result.add(ReportDto.OrderStatusStatistic.builder()
+                .status("DELIVERY_" + entry.getKey().name())
+                .statusLabel("Giao hàng: " + entry.getKey().name())
+                .count(entry.getValue()).build());
         return result;
     }
 //top 5 món bán chạy 
