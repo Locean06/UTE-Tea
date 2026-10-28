@@ -286,7 +286,7 @@ public class AdminService {
     }
 
     @Transactional
-    public void deleteCategory(Long id) {
+    public boolean deleteCategory(Long id) {
         Category c = categoryRepository.findById(id)
                 .orElseThrow(() -> BusinessException.notFound(ErrorCode.VALIDATION_FAILED, "Không tìm thấy danh mục"));
         if (c.getShop() != null) {
@@ -310,6 +310,7 @@ public class AdminService {
                 java.util.Map.of("type", "CATEGORY", "action", action, "id", id));
         realtimeEventPublisher.publishAfterCommit("/topic/cashier", "CATALOG_CHANGED", id.toString(), null, "1",
                 java.util.Map.of("type", "CATEGORY", "action", action, "id", id));
+        return !hasProducts;
     }
 
     // ==========================================
