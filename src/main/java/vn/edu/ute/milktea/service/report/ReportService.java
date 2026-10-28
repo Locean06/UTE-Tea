@@ -135,6 +135,9 @@ public class ReportService {
                 .map(RefundRequest::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        // Delivery is recognized on successful fulfillment, separately from POS payments.
+        BigDecimal deliveryReceived = deliveredRevenue(startInstant, endInstant);
+        received = received.add(deliveryReceived);
         // 3. Thu ròng = Thực thu - Thực hoàn
         BigDecimal netReceived = received.subtract(refunded);
 
@@ -162,6 +165,8 @@ public class ReportService {
                 }
             }
         }
+
+        completedOrderValue = completedOrderValue.add(deliveryReceived);
 
         return ReportDto.RevenueReportView.builder()
                 .fromDate(fromDate)
@@ -255,7 +260,6 @@ public class ReportService {
         BigDecimal received = revenue.getReceived();
         BigDecimal refunded = revenue.getRefunded();
 
-        received = received.add(deliveredRevenue(startInstant, endInstant));
         BigDecimal netRevenue = received.subtract(refunded);
 
         // 3. Tổng số đơn hàng trong khoảng ngày
