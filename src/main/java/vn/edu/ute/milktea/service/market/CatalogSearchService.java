@@ -82,7 +82,9 @@ public class CatalogSearchService {
                         || Product.normalizeSearch(p.getName()).contains(normalizedTerm)
                         || Product.normalizeSearch(p.getCategory().getName()).contains(normalizedTerm))
                 .filter(p -> category == null || Objects.equals(p.getCategory().getId(), category))
-                .filter(p -> shop == null || (p.getShop() != null && Objects.equals(p.getShop().getId(), shop)))
+                // The unscoped storefront uses only the canonical global menu.
+                // Shop variants exist for inventory, pricing and fulfillment, not extra public cards.
+                .filter(p -> belongsToCatalogScope(p, shop))
                 .toList();
 
         List<Product> displayProducts = new ArrayList<>(MenuCatalogSupport.toDisplayProducts(matched));
@@ -100,6 +102,12 @@ public class CatalogSearchService {
         int toIndex = Math.min(fromIndex + size, displayProducts.size());
         var items = displayProducts.subList(fromIndex, toIndex).stream().map(market::productView).toList();
         return new CatalogPage(items, total, page, size);
+    }
+
+    static boolean belongsToCatalogScope(Product product, Long shopId) {
+        if (product == null) return false;
+        if (shopId == null) return product.getShop() == null;
+        return product.getShop() != null && Objects.equals(product.getShop().getId(), shopId);
     }
 
     private Comparator<Product> comparator(String sort, List<Product> variants) {
