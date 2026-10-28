@@ -15,3 +15,9 @@ logging:
   level:
     vn.edu.ute.milktea: DEBUG
     org.springframework.security: INFO
+
+# In local/demo, SMTP credentials are optional: do not mark health DOWN.
+management:
+  health:
+    mail:
+      enabled: false
