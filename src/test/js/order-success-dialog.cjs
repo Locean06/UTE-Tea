@@ -5,6 +5,12 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const html = fs.readFileSync('src/main/resources/templates/customer/cart.html','utf8');
 const js = fs.readFileSync('src/main/resources/static/js/customer/order-success.js','utf8');
+const checkoutFragment = fs.readFileSync('src/main/resources/templates/fragments/delivery-checkout.html','utf8');
+assert.equal((checkoutFragment.match(/id="uteOrderPlacedDialog"/g)||[]).length,0,
+  'Success dialog inside hidden checkout panel would freeze the whole page');
+assert.equal((html.match(/id="uteOrderPlacedDialog"/g)||[]).length,1,
+  'Cart must render precisely one success dialog');
+
 const ids = [
   'uteOrderPlacedDialog', 'uteOrderPlacedHeading', 'uteOrderPlacedId',
   'uteOrderPlacedType', 'uteOrderPlacedBranch', 'uteOrderPlacedTotal',
@@ -46,6 +52,16 @@ assert.equal(popup.show({orderId:456,type:'DELIVERY',branch:'Thủ Đức',total
 assert.equal(elements.get('uteOrderPlacedType').textContent,'Giao tận nơi');
 assert.equal(elements.get('uteOrderPlacedDetails').href,'/my-orders?tab=delivery&order=456');
 assert.equal(elements.get('uteOrderPlacedDialog').openCalls,2);
+// Regression: if stale HTML ever contains an extra dialog inside the checkout
+// panel, the popup handler must choose the independent outer dialog.
+const outerDialog = elements.get('uteOrderPlacedDialog');
+outerDialog.closest = () => null;
+document.querySelectorAll = () => [{closest: () => ({}),showModal(){throw Error('Hidden dialog used!');}},outerDialog];
+popup.close();
+assert.equal(popup.show({orderId:789,type:'COUNTER',total:20000}),true);
+assert.equal(outerDialog.open,true);
+assert.equal(outerDialog.openCalls,3);
+
 popup.close();
 assert.equal(popup.show({orderId:0}),false);
 console.log('Cart success popup regression passed: pickup and COD delivery');
