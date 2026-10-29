@@ -18,7 +18,7 @@ import vn.edu.ute.milktea.service.account.CustomerDataService;
 import java.math.BigDecimal;
 import java.util.*;
 
-/** A menu selection is resolved to branch inventory only when quoting/placing an order. */
+/** All branches serve the single canonical menu and share one delivery-stock pool. */
 @Service @RequiredArgsConstructor @Transactional
 public class BranchSelectionService {
     private final ShopRepository shops;
@@ -79,8 +79,8 @@ public class BranchSelectionService {
         var shop=shops.findById(shopId).filter(Shop::isActive)
                 .orElseThrow(()->BusinessException.badRequest(ErrorCode.VALIDATION_FAILED,"Cơ sở đã ngừng phục vụ"));
         if(items==null||items.isEmpty()||items.size()>100)throw invalid("Giỏ cần từ 1 đến 100 dòng món");
-        var available=products.findByShopId(shopId).stream()
-                .filter(p->Boolean.TRUE.equals(p.getActive())&&Boolean.TRUE.equals(p.getCategory().getActive())).toList();
+        var available=products.findAllByActiveTrue().stream()
+                .filter(p->p.getShop()==null).toList();
         Map<String,List<Product>> byCode=new HashMap<>();
         available.forEach(p->byCode.computeIfAbsent(p.menuVariantIdentity(),k->new ArrayList<>()).add(p));
         List<String> issues=new ArrayList<>();List<Selection> selections=new ArrayList<>();Map<Long,Integer> quantities=new TreeMap<>();
@@ -109,7 +109,7 @@ public class BranchSelectionService {
         Map<Long,Product> fresh=new HashMap<>();
         for(var entry:quantities.entrySet()) {
             var p=available.stream().filter(x->x.getId().equals(entry.getKey())).findFirst().orElseThrow();
-            // Candidates were read before locking; refresh so a concurrent checkout cannot reuse stale stock/price.
+            // Lock the canonical product row: every branch shares its menu price and available units.
             if(lockStock)em.refresh(p,LockModeType.PESSIMISTIC_WRITE);
             fresh.put(p.getId(),p);
             if(!Boolean.TRUE.equals(p.getActive())||!Boolean.TRUE.equals(p.getCategory().getActive())||p.getDeliveryStock()==null||p.getDeliveryStock()<entry.getValue())
@@ -121,7 +121,7 @@ public class BranchSelectionService {
     private Product source(Long id) {if(id==null)throw invalid("Thiếu mã món");return products.findById(id).orElseThrow(()->invalid("Món đã chọn không tồn tại"));}
     private Product match(Product source,Map<String,List<Product>> products,List<String> issues) {
         var matches=products.getOrDefault(source.menuVariantIdentity(),List.of());
-        if(matches.size()!=1) {issues.add(source.getName()+" · "+source.getSize()+(matches.isEmpty()?": cơ sở không phục vụ món/size này":": mã món bị trùng trong menu cơ sở"));return null;}
+        if(matches.size()!=1) {issues.add(source.getName()+" · "+source.getSize()+(matches.isEmpty()?": món không còn trong thực đơn chung":": mã món bị trùng trong thực đơn chung"));return null;}
         return matches.getFirst();
     }
     private boolean isTopping(Product p){return Product.normalizeSearch(p.getCategory().getName()).contains("topping");}
