@@ -383,6 +383,11 @@ const CustomerApp = (() => {
 
         const btn = document.getElementById('checkoutBtn');
         if (btn) btn.disabled = true;
+        const checkoutMessage = document.getElementById('checkoutMessage');
+        if (checkoutMessage) {
+            checkoutMessage.className = 'alert d-none';
+            checkoutMessage.textContent = '';
+        }
 
         try {
             const items = currentItems.map(it => ({
@@ -448,8 +453,14 @@ const CustomerApp = (() => {
             }
 
         } catch (e) {
-            // Giữ giỏ hàng và hiển thị lỗi, không xóa giỏ hay chuyển trang
-            MilkTeaApi.showToast(e.message || 'Không thể tạo đơn hàng', 'error');
+            // Keep cart intact; show the API's business error near checkout (not toast only).
+            const message = e?.message || 'Không thể tạo đơn hàng. Vui lòng kiểm tra lại giỏ.';
+            if (checkoutMessage) {
+                checkoutMessage.className = 'alert alert-danger';
+                checkoutMessage.textContent = message;
+                checkoutMessage.scrollIntoView({behavior:'smooth', block:'nearest'});
+            }
+            MilkTeaApi.showToast(message, 'error');
             if (btn) btn.disabled = false;
         }
     }
