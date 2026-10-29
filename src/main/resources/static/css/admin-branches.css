@@ -1,0 +1,245 @@
+/* Branch administration – consistent with Catalog, Inventory and Staff Admin pages.
+   Scoped to this page: promotions still use the original takeaway-admin workspace. */
+.takeaway-admin-page.admin-branches-page{
+  --branch-ink:#303a2d;
+  --branch-muted:#777a6f;
+  --branch-primary:#565c45;
+  --branch-primary-hover:#3e4837;
+  --branch-light:#f0f0e8;
+  --branch-border:#e4e4d9;
+  font-family:'Be Vietnam Pro',sans-serif;
+  color:var(--branch-ink);
+  background:#faf9f5;
+  padding:24px 24px 54px!important;
+  min-height:calc(100vh - 76px);
+}
+.admin-branches-page *,.admin-branches-page *::before,.admin-branches-page *::after{box-sizing:border-box}
+.admin-branches-page .ute-page-banner{margin-bottom:25px}
+.admin-branches-page .admin-sidebar-column{width:246px;flex:0 0 246px}
+.admin-branches-page .admin-sidebar{
+  border:1px solid var(--branch-border)!important;
+  border-radius:18px!important;
+  background:#fff;
+  box-shadow:0 4px 18px rgba(23,77,70,.045)!important;
+}
+.admin-branches-page .admin-sidebar h6{font-size:11px;letter-spacing:.07em;color:var(--branch-muted)!important}
+.admin-branches-page .admin-nav-link{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;border-radius:10px;
+  color:#717763;font-size:13px;font-weight:500;text-decoration:none;line-height:1.5;
+}
+.admin-branches-page .admin-nav-link i{color:var(--branch-primary);font-size:16px;flex:none}
+.admin-branches-page .admin-nav-link:hover,.admin-branches-page .admin-nav-link.active{
+  background:var(--branch-light);color:var(--branch-primary)
+}
+.admin-branches-page .admin-nav-link.active{font-weight:700}
+.admin-branches-page .admin-content-column{min-width:0}
+.admin-branches-page .brand-font{
+  font-family:'Be Vietnam Pro',sans-serif;
+  font-weight:700;color:#3c4735
+}
+.admin-branches-page .branches-heading h2{font-size:25px;line-height:1.4}
+.admin-branches-page .branches-card-header h3{font-size:17px}
+.admin-branches-page .text-muted{color:var(--branch-muted)!important}
+.admin-branches-page .btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  font-family:inherit;font-size:12px;font-weight:600;
+  border-radius:10px;box-shadow:none!important;
+  white-space:normal;transition:background-color .17s,border-color .17s,color .17s;
+}
+.admin-branches-page .btn-primary-custom{
+  background:var(--branch-primary)!important;
+  border:1px solid var(--branch-primary)!important;
+  color:#fff!important;
+}
+.admin-branches-page .btn-primary-custom:hover,.admin-branches-page .btn-primary-custom:focus-visible{
+  background:var(--branch-primary-hover)!important;
+  border-color:var(--branch-primary-hover)!important;
+}
+.admin-branches-page .btn-outline-secondary{
+  color:#606a59;background:#fff;border:1px solid #d9dfd2;
+}
+.admin-branches-page .btn-outline-secondary:hover{
+  color:#3e4837;border-color:#a7b29a;background:#f3f4ed;
+}
+.admin-branches-page .branches-main-action{padding:12px 18px;min-height:43px}
+.admin-branches-page .branches-overview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.admin-branches-page .branches-overview-card{
+  min-width:0;display:flex;gap:15px;align-items:center;
+  background:#fff;border:1px solid var(--branch-border);
+  border-radius:18px;padding:18px 19px;
+  box-shadow:0 4px 18px rgba(23,77,70,.045)
+}
+.admin-branches-page .branches-overview-icon{
+  display:grid;place-items:center;flex:none;width:46px;height:46px;
+  background:#f0f0e8;border-radius:13px;color:#59674e;font-size:19px
+}
+.admin-branches-page .branches-overview-icon.is-active{background:#e8f5ee;color:#27865b}
+.admin-branches-page .branches-overview-icon.is-paused{background:#fff3e3;color:#a67a34}
+.admin-branches-page .branches-overview-card span,.admin-branches-page .branches-overview-card small{
+  display:block;color:var(--branch-muted);font-size:11px;line-height:1.45
+}
+.admin-branches-page .branches-overview-card strong{
+  display:block;font-size:27px;font-weight:800;line-height:1.25;color:#3c4735;
+  font-variant-numeric:tabular-nums;margin:2px 0
+}
+.admin-branches-page .branches-list-card{
+  border:1px solid var(--branch-border)!important;
+  border-radius:18px!important;
+  box-shadow:0 4px 18px rgba(23,77,70,.05)!important;
+  background:#fff
+}
+.admin-branches-page .branches-card-header{
+  background:#fff!important;
+  border-bottom:1px solid var(--branch-border)!important;
+  padding:19px 21px!important
+}
+.admin-branches-page .branches-filters{padding:18px 21px 17px}
+.admin-branches-page .branches-search-wrap{position:relative;min-width:210px;flex:1 1 300px}
+.admin-branches-page .branches-search-wrap i{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  color:#8b9483;pointer-events:none;font-size:15px
+}
+.admin-branches-page .branches-search-wrap input{padding-left:40px!important}
+.admin-branches-page #branchStatusFilter{width:auto;flex:0 1 205px;min-width:170px}
+.admin-branches-page .form-control,.admin-branches-page .form-select{
+  min-height:43px;font-size:13px;border:1px solid #dfe2d5;
+  border-radius:10px;color:var(--branch-ink);background-color:#fff;
+  box-shadow:none
+}
+.admin-branches-page .form-control:focus,.admin-branches-page .form-select:focus{
+  border-color:#8e9a80;box-shadow:0 0 0 .2rem rgba(86,92,69,.12)
+}
+.admin-branches-page .branches-table{min-width:700px}
+.admin-branches-page .branches-table th{
+  background:#f8f7f2!important;color:#424d3b;font-size:11px;
+  font-weight:750;padding:16px 18px;white-space:nowrap;
+  border-bottom:1px solid var(--branch-border)
+}
+.admin-branches-page .branches-table td{
+  padding:16px 18px;font-size:12px;
+  color:#566050;border-bottom:1px solid #eeeee7;vertical-align:middle
+}
+.admin-branches-page .branches-table tbody tr:last-child td{border-bottom:0}
+.admin-branches-page .branches-table tbody tr:hover{background:#fafaf7}
+.admin-branches-page .ta-primary-cell{font-size:13px;font-weight:750;color:#3c4735}
+.admin-branches-page .ta-sub-cell{font-size:11px;color:#858d7d;margin-top:4px}
+.admin-branches-page .ta-entity-icon{background:#f0f0e8;color:#59674e}
+.admin-branches-page .ta-status{font-size:11px}
+.admin-branches-page .ta-action-group{gap:7px}
+.admin-branches-page .ta-action-group .btn{
+  min-height:35px;white-space:nowrap;font-size:11px;padding:7px 11px;
+  border:1px solid #d9dfd2;color:#526348;background:#fff
+}
+.admin-branches-page .ta-action-group .btn:hover{background:#f0f0e8;border-color:#bbc5ae}
+.admin-branches-page .ta-action-group .btn.ta-danger{color:#ac594e;border-color:#eed4cf}
+.admin-branches-page .ta-action-group .btn.ta-danger:hover{background:#fff2ee}
+.admin-branches-page .ta-action-group .btn.ta-restore{color:#42795c;border-color:#cce4d1}
+.admin-branches-page .ta-action-group .btn.ta-restore:hover{background:#e9f6ec}
+.admin-branches-page .branches-list-footer{
+  padding:15px 20px;border-top:1px solid var(--branch-border);
+  font-size:11px;color:#858d7d;background:#fff
+}
+.admin-branches-page .branches-info-note{
+  border:1px solid #e1e4d8;background:#f2f3ec;border-radius:12px;
+  padding:15px 17px;color:#616e57;font-size:12px;line-height:1.7
+}
+.admin-branches-page .branches-info-note>i{color:#677955;font-size:17px;flex:none}
+.admin-branches-page .branches-info-note strong{color:#455740}
+.admin-branches-page .branches-info-note a{color:#4a6345;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.admin-branches-page .ta-alert{
+  font-size:12px;border-radius:12px;border:1px solid #cddfc9;
+  background:#eef5ea;color:#3f6346;margin-bottom:20px
+}
+.admin-branches-page .ta-alert.error{background:#fff3f0;color:#a35147;border-color:#f0d1ca}
+
+/* Centered modal. Uses existing ta-drawer state so CRUD logic is unchanged. */
+.admin-branches-page .ta-overlay{z-index:1098;background:rgba(25,36,26,.47);backdrop-filter:blur(2px)}
+.admin-branches-page .branches-editor-modal{
+  z-index:1099;left:50%;right:auto;top:50%;bottom:auto;
+  width:min(680px,calc(100vw - 24px));max-height:min(90vh,800px);
+  background:#fff;border:1px solid #e5e7df;border-radius:20px;
+  box-shadow:0 25px 90px rgba(24,35,22,.22);
+  opacity:0;visibility:hidden;
+  transform:translate(-50%,-47%) scale(.98);
+  transition:transform .2s ease,opacity .2s ease,visibility .2s;
+}
+.admin-branches-page .branches-editor-modal.is-open{
+  visibility:visible;opacity:1;transform:translate(-50%,-50%) scale(1)
+}
+.admin-branches-page .branches-editor-modal .ta-drawer-head{
+  padding:22px 26px 19px;border-bottom:1px solid var(--branch-border);
+  background:#fff
+}
+.admin-branches-page .branches-modal-kicker{
+  display:block;color:#78856f;font-size:10px;font-weight:750;letter-spacing:.12em;margin-bottom:5px
+}
+.admin-branches-page .branches-editor-modal .ta-drawer-head h2{
+  font-family:'Be Vietnam Pro',sans-serif;font-size:23px;
+  font-weight:750;color:#394635;margin:0 0 6px
+}
+.admin-branches-page .branches-editor-modal .ta-drawer-head p{font-size:12px;color:#818b7a}
+.admin-branches-page .branches-editor-modal .ta-icon-button{
+  width:36px;height:36px;color:#66745d;border:1px solid var(--branch-border);
+  background:#f8f8f4;border-radius:10px;flex:none
+}
+.admin-branches-page .branches-editor-modal .ta-drawer-form{
+  flex:1;min-height:0;display:flex;flex-direction:column;overflow-y:auto
+}
+.admin-branches-page .branches-form-content{padding:7px 26px 22px}
+.admin-branches-page .branches-form-group{padding:20px 0;border-bottom:1px solid #eceee8}
+.admin-branches-page .branches-form-group:last-of-type{border-bottom:0}
+.admin-branches-page .branches-form-group h3{
+  font-size:14px;color:#3c4735;font-weight:750;
+  display:flex;gap:9px;align-items:center;margin:0 0 17px
+}
+.admin-branches-page .branches-form-group h3 i{color:#647557;font-size:17px}
+.admin-branches-page .branches-form-group h3 small{font-size:11px;font-weight:400;color:#8a9383}
+.admin-branches-page .branches-form-group .form-label{
+  font-size:12px;font-weight:650;color:#58634f;margin-bottom:7px
+}
+.admin-branches-page .branches-form-group textarea{resize:vertical}
+.admin-branches-page .branches-coordinate-help{font-size:11px;color:#899382;margin:10px 0 0}
+.admin-branches-page .branches-form-note{
+  display:flex;align-items:start;gap:9px;color:#687760;font-size:11px;
+  background:#f3f5ed;border-radius:10px;padding:12px 13px;margin-top:19px
+}
+.admin-branches-page .branches-form-note i{flex:none;color:#71815f;font-size:15px}
+.admin-branches-page .branches-editor-modal .ta-drawer-actions{
+  display:flex;justify-content:flex-end;gap:10px;margin:0;
+  padding:15px 26px 19px;background:#fff;border-top:1px solid var(--branch-border)
+}
+.admin-branches-page .branches-editor-modal .ta-drawer-actions .btn{min-height:40px;padding:9px 16px}
+.admin-branches-page .branches-editor-modal .ta-drawer-actions .btn-primary-custom{min-width:138px}
+@media(max-width:1100px){
+  .admin-branches-page .admin-sidebar-column{width:220px;flex-basis:220px}
+  .admin-branches-page .branches-overview{gap:10px}
+  .admin-branches-page .branches-overview-card{padding:14px 12px;gap:10px}
+}
+@media(max-width:991.98px){
+  .admin-branches-page .admin-sidebar-column{width:100%;flex:0 0 100%}
+  .admin-branches-page .admin-sidebar{display:flex;flex-wrap:wrap;gap:4px}
+  .admin-branches-page .admin-sidebar h6{width:100%;margin-bottom:8px!important}
+  .admin-branches-page .admin-nav-link{padding:8px 10px;font-size:12px}
+}
+@media(max-width:767.98px){
+  .takeaway-admin-page.admin-branches-page{padding:16px 13px 35px!important}
+  .admin-branches-page .branches-heading h2{font-size:21px}
+  .admin-branches-page .branches-overview{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .admin-branches-page .branches-overview-card:last-child{grid-column:span 2}
+  .admin-branches-page .branches-card-header,.admin-branches-page .branches-filters{padding:16px!important}
+  .admin-branches-page #branchStatusFilter{flex:1 1 180px}
+  .admin-branches-page .branches-editor-modal .ta-drawer-head{padding:19px 18px 16px}
+  .admin-branches-page .branches-form-content{padding:4px 18px 17px}
+  .admin-branches-page .branches-editor-modal .ta-drawer-actions{padding:13px 18px 15px}
+}
+@media(max-width:420px){
+  .admin-branches-page .branches-overview-card{padding:12px}
+  .admin-branches-page .branches-overview-card strong{font-size:22px}
+  .admin-branches-page .branches-overview-icon{width:36px;height:36px;font-size:16px}
+  .admin-branches-page .branches-main-action{width:100%}
+  .admin-branches-page .branches-editor-modal{max-height:calc(100dvh - 22px)}
+}
+@media(prefers-reduced-motion:reduce){
+  .admin-branches-page .branches-editor-modal{transition:none}
+}
