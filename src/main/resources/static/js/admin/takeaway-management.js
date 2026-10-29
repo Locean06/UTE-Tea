@@ -31,7 +31,17 @@
   }
   function handleError(error) {
     const suffix = error && error.traceId ? ' (Mã lỗi: ' + error.traceId + ')' : '';
-    alertMessage((error && error.message ? error.message : 'Không thể kết nối máy chủ.') + suffix, true);
+    const text = (error && error.message ? error.message : 'Không thể kết nối máy chủ.') + suffix;
+    // Errors from an open editor should be shown in front of the overlay, not
+    // scrolled to a banner hidden behind the dialog.
+    const formFeedback = $('branchFormFeedback');
+    if (isBranchPage && formFeedback && $('branchEditor')?.classList.contains('is-open')) {
+      formFeedback.textContent = text;
+      formFeedback.classList.remove('d-none');
+      formFeedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      return;
+    }
+    alertMessage(text, true);
   }
   function busy(button, fn) {
     return async () => {
@@ -102,6 +112,11 @@
   function branchReset() {
     $('branchForm').reset();
     $('branchId').value = '';
+    const feedback = $('branchFormFeedback');
+    if (feedback) {
+      feedback.textContent = '';
+      feedback.classList.add('d-none');
+    }
     setText('branchFormTitle', 'Thêm chi nhánh');
   }
   function branchEdit(s) {
@@ -181,7 +196,7 @@
         if (!payload.name || !payload.address) throw Error('Vui lòng điền tên và địa chỉ chi nhánh.');
         await MilkTeaApi[id ? 'put' : 'post']('/api/v1/market/shops' + (id ? '/' + id : ''), payload);
         await reloadBranches(); closeDrawer(); branchReset();
-        alertMessage(id ? 'Đã cập nhật thông tin chi nhánh.' : 'Đã thêm chi nhánh. Hãy cấu hình menu và tồn kho để nhận đơn giao hàng.');
+        alertMessage(id ? 'Đã cập nhật thông tin chi nhánh.' : 'Đã thêm chi nhánh. Chi nhánh mới sẽ dùng chung menu và tồn bán của hệ thống.');
       })();
     });
     reloadBranches().catch(handleError);
