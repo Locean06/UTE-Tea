@@ -1,65 +1,172 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main :: html(~{::content}, ~{::scripts})}" lang="vi">
-<head><title>Cập nhật chi nhánh – UTE Tea</title></head>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/main :: html(~{::content}, ~{::scripts})}" lang="vi">
+<head><title>Quản lý chi nhánh - UTE Tea Admin</title></head>
 <body>
-<div th:fragment="content" class="container-fluid takeaway-admin-page">
+<div th:fragment="content" class="container-fluid py-4 px-lg-4 takeaway-admin-page admin-branches-page">
   <link rel="stylesheet" th:href="@{/css/takeaway-admin.css}" href="/css/takeaway-admin.css">
-  <div class="ta-page-shell">
-  <div class="ta-breadcrumb"><a th:href="@{/admin/reports}" href="/admin/reports">Quản trị</a><i class="bi bi-chevron-right"></i><span>Cập nhật chi nhánh</span></div>
-  <div class="ta-layout">
-    <aside class="ta-sidebar" aria-label="Điều hướng quản trị">
-  <div class="ta-sidebar-brand"><div class="ta-brand-mark"><i class="bi bi-cup-hot-fill"></i></div><div><strong>UTE Tea</strong><small>ADMIN WORKSPACE</small></div></div>
-  <div class="ta-nav-label">QUẢN TRỊ HỆ THỐNG</div>
-  <nav class="ta-navigation"><a th:href="@{/admin/reports}" class="ta-nav-link"><i class="bi bi-graph-up-arrow" aria-hidden="true"></i><span>Báo cáo doanh thu</span></a>
-<a th:href="@{/admin/catalog}" class="ta-nav-link"><i class="bi bi-cup-straw" aria-hidden="true"></i><span>Món & danh mục</span></a>
-<a th:href="@{/admin/orders}" class="ta-nav-link"><i class="bi bi-receipt-cutoff" aria-hidden="true"></i><span>Quản lý đơn hàng</span></a>
-<a th:href="@{/admin/staff}" class="ta-nav-link"><i class="bi bi-people" aria-hidden="true"></i><span>Tài khoản nhân viên</span></a>
-<a th:href="@{/admin/inventory}" class="ta-nav-link"><i class="bi bi-box-seam" aria-hidden="true"></i><span>Kho hàng</span></a>
-<a th:href="@{/admin/documents}" class="ta-nav-link"><i class="bi bi-files" aria-hidden="true"></i><span>Chứng từ</span></a>
-<a th:href="@{/admin/promotions}" class="ta-nav-link"><i class="bi bi-ticket-perforated" aria-hidden="true"></i><span>Mã khuyến mãi</span></a>
-<a th:href="@{/admin/branches}" class="ta-nav-link is-active" aria-current="page"><i class="bi bi-shop-window" aria-hidden="true"></i><span>Cập nhật chi nhánh</span><i class="bi bi-chevron-right ta-nav-arrow"></i></a>
-<a th:href="@{/admin/settings}" class="ta-nav-link"><i class="bi bi-sliders2" aria-hidden="true"></i><span>Cài đặt hệ thống</span></a></nav>
-  <div class="ta-sidebar-foot"><i class="bi bi-shield-check"></i><span>Không gian quản trị<br><b>Take Away</b></span></div>
-</aside>
-    <main class="ta-body" id="taMain">
-       <header class="ta-page-heading">
-    <div><div class="ta-kicker"><i class="bi bi-geo-alt"></i> HỆ THỐNG CHI NHÁNH</div><h1>Cập nhật chi nhánh</h1><p>Quản lý các cơ sở UTE Tea đang phục vụ bán mang đi và giao hàng.</p></div>
-    <button type="button" id="branchNew" class="btn ta-btn-primary"><i class="bi bi-plus-lg"></i> Thêm chi nhánh</button>
-  </header>
-  <div id="taAlert" class="ta-alert d-none" role="status" aria-live="polite"></div>
-  <section class="ta-stats ta-branch-stats" aria-label="Tổng quan chi nhánh">
-    <div class="ta-stat"><div class="ta-stat-icon olive"><i class="bi bi-shop"></i></div><div class="ta-stat-label">Tổng số chi nhánh</div><strong id="branchTotalCount" class="ta-stat-value">—</strong><span class="ta-stat-caption">Đã được đăng ký</span></div>
-    <div class="ta-stat"><div class="ta-stat-icon emerald"><i class="bi bi-check-circle"></i></div><div class="ta-stat-label">Đang hoạt động</div><strong id="branchActiveCount" class="ta-stat-value">—</strong><span class="ta-stat-caption">Hiển thị trên kênh bán</span></div>
-    <div class="ta-stat"><div class="ta-stat-icon amber"><i class="bi bi-pause-circle"></i></div><div class="ta-stat-label">Ngừng hoạt động</div><strong id="branchInactiveCount" class="ta-stat-value">—</strong><span class="ta-stat-caption">Có thể khôi phục</span></div>
+  <link rel="stylesheet" th:href="@{/css/admin-branches.css}" href="/css/admin-branches.css">
+
+  <section class="ute-page-banner" aria-label="Quản trị chi nhánh">
+    <div>
+      <div class="ute-kicker">UTE TEA / QUẢN TRỊ / CHI NHÁNH</div>
+      <h1>Quản lý chi nhánh</h1>
+      <p>Thêm, cập nhật và quản lý trạng thái các cơ sở UTE Tea trên cùng một hệ thống.</p>
+    </div>
+    <span class="ute-page-icon" aria-hidden="true"><i class="bi bi-shop-window"></i></span>
   </section>
-  <section class="ta-card" aria-labelledby="branchListTitle">
-    <div class="ta-card-heading"><div><h2 id="branchListTitle">Danh sách cơ sở</h2><p>Cập nhật thông tin hoặc tạm ngừng một cơ sở mà không xóa lịch sử đơn.</p></div><button id="branchReload" type="button" class="btn ta-btn-light"><i class="bi bi-arrow-clockwise"></i> Làm mới</button></div>
-    <div class="ta-toolbar"><div class="ta-search-wrap"><i class="bi bi-search" aria-hidden="true"></i><input type="search" id="branchFilter" class="form-control" placeholder="Tìm tên, địa chỉ, khu vực..." aria-label="Tìm chi nhánh"></div><select id="branchStatusFilter" class="form-select" aria-label="Lọc trạng thái"><option value="active">Đang hoạt động</option><option value="archived">Đã ngừng hoạt động</option><option value="all">Tất cả chi nhánh</option></select></div>
-    <div class="table-responsive ta-table-wrap"><table class="table ta-table align-middle"><thead><tr><th>CHI NHÁNH</th><th>ĐỊA CHỈ VÀ KHU VỰC</th><th>TRẠNG THÁI</th><th class="text-end">THAO TÁC</th></tr></thead><tbody id="branchRows"><tr><td colspan="4" class="ta-empty"><i class="bi bi-arrow-repeat"></i><p>Đang tải chi nhánh...</p></td></tr></tbody></table></div>
-    <div class="ta-table-foot"><span id="branchResultCount">Đang tải dữ liệu</span><span><i class="bi bi-shield-check"></i> Xóa mềm, không mất lịch sử đơn</span></div>
-  </section>
-  <div class="ta-hint"><i class="bi bi-info-circle"></i><span><strong>Chi nhánh mới:</strong> sau khi tạo, hãy cấu hình thực đơn và tồn kho để cơ sở sẵn sàng nhận đơn giao hàng.</span><a th:href="@{/admin/catalog}" href="/admin/catalog">Quản lý thực đơn <i class="bi bi-arrow-right"></i></a></div>
-  <aside id="branchEditor" class="ta-drawer" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="branchFormTitle" tabindex="-1">
-    <div class="ta-drawer-head"><div><span class="ta-drawer-eyebrow">QUẢN LÝ CƠ SỞ</span><h2 id="branchFormTitle">Thêm chi nhánh</h2><p>Cập nhật thông tin cửa hàng của bạn.</p></div><button type="button" class="ta-icon-button" id="branchClose" aria-label="Đóng biểu mẫu"><i class="bi bi-x-lg"></i></button></div>
-    <form id="branchForm" class="ta-drawer-form"><input id="branchId" type="hidden">
-      <div class="ta-form-section"><h3><span>01</span> Thông tin cơ sở</h3><div class="row g-3">
-        <div class="col-12"><label class="form-label" for="branchName">Tên chi nhánh <em>*</em></label><input id="branchName" class="form-control" required maxlength="120" placeholder="VD: UTE Tea - Thủ Đức"></div>
-        <div class="col-12"><label class="form-label" for="branchArea">Khu vực hoạt động</label><input id="branchArea" class="form-control" maxlength="120" placeholder="VD: Thủ Đức, TP. Hồ Chí Minh"></div>
-        <div class="col-12"><label class="form-label" for="branchAddress">Địa chỉ chi tiết <em>*</em></label><textarea id="branchAddress" class="form-control" rows="3" maxlength="500" required placeholder="Số nhà, đường, phường, quận, tỉnh/thành phố"></textarea></div>
-      </div></div>
-      <div class="ta-form-section"><h3><span>02</span> Vị trí trên bản đồ <small>(tùy chọn)</small></h3><div class="row g-3">
-        <div class="col-6"><label class="form-label" for="branchLat">Vĩ độ</label><input id="branchLat" type="number" step="any" min="-90" max="90" class="form-control" placeholder="10.8506"></div>
-        <div class="col-6"><label class="form-label" for="branchLong">Kinh độ</label><input id="branchLong" type="number" step="any" min="-180" max="180" class="form-control" placeholder="106.7718"></div>
-        <div class="col-12"><div class="ta-location-help"><i class="bi bi-pin-map"></i> Nếu nhập vị trí, cần điền đủ cả hai tọa độ để hiển thị chính xác.</div></div>
-      </div></div>
-      <div class="ta-hint ta-form-hint"><i class="bi bi-shield-check"></i><span>Tạm ngừng hoạt động chỉ ẩn chi nhánh khỏi kênh bán mới và giữ nguyên đơn hàng trước đây.</span></div>
-      <div class="ta-drawer-actions"><button type="button" id="branchCancel" class="btn ta-btn-light">Hủy</button><button type="submit" id="branchSave" class="btn ta-btn-primary"><i class="bi bi-check-lg"></i> Lưu chi nhánh</button></div>
-    </form>
-  </aside>
+
+  <div class="row g-lg-4">
+    <div class="col-lg-auto mb-4 admin-sidebar-column">
+      <nav class="card border-0 shadow-sm rounded-4 p-3 admin-sidebar" aria-label="Quản trị hệ thống">
+        <h6 class="text-muted small fw-bold px-3 mb-3 text-uppercase">Quản Trị Hệ Thống</h6>
+        <a th:href="@{/admin/reports}" class="admin-nav-link"><i class="bi bi-graph-up-arrow"></i> Báo Cáo Doanh Thu</a>
+        <a th:href="@{/admin/catalog}" class="admin-nav-link"><i class="bi bi-cup-hot-fill"></i> Món &amp; Danh Mục</a>
+        <a th:href="@{/admin/orders}" class="admin-nav-link"><i class="bi bi-receipt"></i> Quản Lý Đơn Hàng</a>
+        <a th:href="@{/admin/staff}" class="admin-nav-link"><i class="bi bi-people-fill"></i> Tài Khoản Nhân Viên</a>
+        <a th:href="@{/admin/inventory}" class="admin-nav-link"><i class="bi bi-box-seam-fill"></i> Kho Hàng</a>
+        <a th:href="@{/admin/documents}" class="admin-nav-link"><i class="bi bi-files"></i> Chứng Từ</a>
+        <a th:href="@{/admin/promotions}" class="admin-nav-link"><i class="bi bi-ticket-perforated-fill"></i> Mã Khuyến Mãi</a>
+        <a th:href="@{/admin/branches}" class="admin-nav-link active" aria-current="page"><i class="bi bi-shop-window"></i> Cập Nhật Chi Nhánh</a>
+        <a th:href="@{/admin/settings}" class="admin-nav-link"><i class="bi bi-gear-fill"></i> Cài Đặt Hệ Thống</a>
+      </nav>
+    </div>
+
+    <main class="col admin-content-column">
+      <header class="branches-heading d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+          <h2 class="brand-font mb-1">Danh Sách Chi Nhánh</h2>
+          <p class="text-muted small mb-0">Quản lý địa chỉ, khu vực và trạng thái hoạt động của từng cơ sở.</p>
+        </div>
+        <button id="branchNew" type="button" class="btn btn-primary-custom branches-main-action">
+          <i class="bi bi-plus-circle"></i><span>Thêm chi nhánh</span>
+        </button>
+      </header>
+      <div id="taAlert" class="ta-alert d-none" role="status" aria-live="polite"></div>
+
+      <section class="branches-overview mb-4" aria-label="Tổng quan chi nhánh">
+        <div class="branches-overview-card">
+          <div class="branches-overview-icon"><i class="bi bi-shop" aria-hidden="true"></i></div>
+          <div><span>Tổng chi nhánh</span><strong id="branchTotalCount">—</strong><small>Toàn hệ thống</small></div>
+        </div>
+        <div class="branches-overview-card">
+          <div class="branches-overview-icon is-active"><i class="bi bi-check-circle" aria-hidden="true"></i></div>
+          <div><span>Đang hoạt động</span><strong id="branchActiveCount">—</strong><small>Đang nhận đơn</small></div>
+        </div>
+        <div class="branches-overview-card">
+          <div class="branches-overview-icon is-paused"><i class="bi bi-pause-circle" aria-hidden="true"></i></div>
+          <div><span>Ngừng hoạt động</span><strong id="branchInactiveCount">—</strong><small>Có thể khôi phục</small></div>
+        </div>
+      </section>
+
+      <section class="card border-0 shadow-sm rounded-4 overflow-hidden branches-list-card" aria-labelledby="branchListTitle">
+        <div class="card-header bg-white branches-card-header d-flex align-items-center justify-content-between gap-3 flex-wrap">
+          <div>
+            <h3 class="brand-font mb-1" id="branchListTitle">Các cơ sở UTE Tea</h3>
+            <p class="text-muted small mb-0">Thông tin và thao tác trên từng chi nhánh.</p>
+          </div>
+          <button id="branchReload" type="button" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-clockwise"></i> Làm mới
+          </button>
+        </div>
+        <div class="branches-filters d-flex align-items-center gap-2 flex-wrap">
+          <div class="branches-search-wrap">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <input id="branchFilter" type="search" class="form-control" placeholder="Tìm tên chi nhánh, địa chỉ, khu vực..." aria-label="Tìm kiếm chi nhánh">
+          </div>
+          <select id="branchStatusFilter" class="form-select" aria-label="Lọc chi nhánh theo trạng thái">
+            <option value="active">Đang hoạt động</option>
+            <option value="archived">Đã ngừng hoạt động</option>
+            <option value="all">Tất cả chi nhánh</option>
+          </select>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0 branches-table">
+            <thead class="table-light">
+              <tr><th>Chi Nhánh</th><th>Địa Chỉ / Khu Vực</th><th>Trạng Thái</th><th class="text-end">Thao Tác</th></tr>
+            </thead>
+            <tbody id="branchRows">
+              <tr><td colspan="4" class="ta-empty"><i class="bi bi-arrow-repeat"></i><p>Đang tải chi nhánh...</p></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="branches-list-footer d-flex justify-content-between align-items-center gap-2 flex-wrap">
+          <span id="branchResultCount">Đang tải dữ liệu</span>
+          <span><i class="bi bi-shield-check me-1"></i> Ngừng hoạt động không xóa lịch sử đơn hàng</span>
+        </div>
+      </section>
+
+      <div class="branches-info-note d-flex align-items-start gap-2 mt-3">
+        <i class="bi bi-info-circle" aria-hidden="true"></i>
+        <div><strong>Thực đơn và tồn bán dùng chung:</strong> mọi chi nhánh sử dụng một menu tổng, không cần tạo danh mục hoặc món riêng.
+          <a th:href="@{/admin/catalog}" href="/admin/catalog">Quản lý thực đơn</a>
+        </div>
+      </div>
     </main>
   </div>
-  </div>
+
+  <!-- Reuse existing CRUD IDs and APIs. Styled as the same centered dialog family as other Admin pages. -->
   <div id="taOverlay" class="ta-overlay" aria-hidden="true"></div>
+  <aside id="branchEditor" class="ta-drawer branches-editor-modal" role="dialog" aria-modal="true"
+         aria-hidden="true" aria-labelledby="branchFormTitle" tabindex="-1">
+    <div class="ta-drawer-head">
+      <div>
+        <span class="branches-modal-kicker">UTE TEA · QUẢN TRỊ CHI NHÁNH</span>
+        <h2 id="branchFormTitle">Thêm chi nhánh</h2>
+        <p class="mb-0">Cập nhật thông tin cơ sở phục vụ khách hàng.</p>
+      </div>
+      <button type="button" id="branchClose" class="ta-icon-button" aria-label="Đóng biểu mẫu">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <form id="branchForm" class="ta-drawer-form">
+      <input type="hidden" id="branchId">
+      <div class="branches-form-content">
+        <div class="branches-form-group">
+          <h3><i class="bi bi-shop-window" aria-hidden="true"></i> Thông tin chi nhánh</h3>
+          <div class="row g-3">
+            <div class="col-md-7">
+              <label class="form-label" for="branchName">Tên chi nhánh <span class="text-danger">*</span></label>
+              <input id="branchName" class="form-control" maxlength="120" required placeholder="Ví dụ: UTE Tea Thủ Đức">
+            </div>
+            <div class="col-md-5">
+              <label class="form-label" for="branchArea">Khu vực</label>
+              <input id="branchArea" class="form-control" maxlength="120" placeholder="Ví dụ: Thủ Đức">
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="branchAddress">Địa chỉ chi tiết <span class="text-danger">*</span></label>
+              <textarea id="branchAddress" class="form-control" rows="2" maxlength="500" required placeholder="Số nhà, đường, phường/xã, tỉnh/thành phố"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="branches-form-group">
+          <h3><i class="bi bi-geo-alt" aria-hidden="true"></i> Vị trí trên bản đồ <small>(không bắt buộc)</small></h3>
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <label class="form-label" for="branchLat">Vĩ độ</label>
+              <input id="branchLat" type="number" step="any" min="-90" max="90" class="form-control" placeholder="10.8506">
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label" for="branchLong">Kinh độ</label>
+              <input id="branchLong" type="number" step="any" min="-180" max="180" class="form-control" placeholder="106.7718">
+            </div>
+          </div>
+          <p class="branches-coordinate-help"><i class="bi bi-info-circle me-1"></i> Nếu nhập tọa độ, vui lòng điền cả vĩ độ và kinh độ.</p>
+        </div>
+        <div class="branches-form-note">
+          <i class="bi bi-shield-check" aria-hidden="true"></i>
+          Thay đổi thông tin chi nhánh không ảnh hưởng thực đơn chung và các đơn hàng đã tạo.
+        </div>
+      </div>
+      <div class="ta-drawer-actions">
+        <button id="branchCancel" type="button" class="btn btn-outline-secondary">Hủy</button>
+        <button id="branchSave" type="submit" class="btn btn-primary-custom"><i class="bi bi-check-circle"></i> Lưu chi nhánh</button>
+      </div>
+    </form>
+  </aside>
 </div>
-<th:block th:fragment="scripts"><script th:src="@{/js/admin/takeaway-management.js}" src="/js/admin/takeaway-management.js"></script></th:block>
-</body></html>
+<th:block th:fragment="scripts">
+  <script th:src="@{/js/admin/takeaway-management.js}" src="/js/admin/takeaway-management.js"></script>
+</th:block>
+</body>
+</html>
