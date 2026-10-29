@@ -417,7 +417,7 @@ const CustomerApp = (() => {
             }
             if (order.guestCounterToken) {
                 window.MilkTeaContext.counterToken = order.guestCounterToken;
-                sessionStorage.setItem('milktea.counterToken', order.guestCounterToken);
+                try { sessionStorage.setItem('milktea.counterToken', order.guestCounterToken); } catch (_) { /* Browsers may restrict storage. */ }
             }
 
             // Xóa giỏ hàng chỉ khi tạo đơn thành công
@@ -431,11 +431,16 @@ const CustomerApp = (() => {
 
             // Mỗi lần đặt chỉ được xem đúng đơn vừa tạo bằng per-order token.
             // Không gửi QR/token ở URL và không chuyển khách ẩn danh tới lịch sử bàn.
-            sessionStorage.setItem('uteTea.recentOrderId', String(order.orderId));
-            if (order.guestCounterToken) {
-                sessionStorage.setItem('uteTea.recentOrderToken', order.guestCounterToken);
-            } else {
-                sessionStorage.removeItem('uteTea.recentOrderToken');
+            try {
+                sessionStorage.setItem('uteTea.recentOrderId', String(order.orderId));
+                if (order.guestCounterToken) {
+                    sessionStorage.setItem('uteTea.recentOrderToken', order.guestCounterToken);
+                } else {
+                    sessionStorage.removeItem('uteTea.recentOrderToken');
+                }
+            } catch (_) {
+                // Successful orders must still show confirmation if sessionStorage is blocked.
+                console.warn('Không lưu được thông tin đơn gần nhất trong bộ nhớ trình duyệt.');
             }
             // Chỉ thông báo thành công sau khi API đã tạo đơn; không tự chuyển trang.
             const chosenBranch = pickupSelect?.selectedOptions?.[0]?.textContent?.trim() || order.shopName || 'UTE Tea';
