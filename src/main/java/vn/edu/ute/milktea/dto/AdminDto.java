@@ -109,6 +109,9 @@ public class AdminDto {
         private BigDecimal price;
 
         private String imageUrl;
+        @jakarta.validation.constraints.Min(0)
+        @jakarta.validation.constraints.Max(1000000)
+        private Integer stock;
         private Boolean active;
     }
 
@@ -125,6 +128,7 @@ public class AdminDto {
         private String description;
         private BigDecimal price;
         private String imageUrl;
+        private Integer stock;
         private Boolean active;
     }
 
