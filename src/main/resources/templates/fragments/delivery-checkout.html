@@ -86,7 +86,7 @@
                                    type="tel"
                                    class="form-control"
                                    autocomplete="tel"
-                                   pattern="[+0-9 .()\-]{8,20}"
+                                   pattern="[+0-9 ()-]{8,20}"
                                    maxlength="20"
                                    required>
                         </div>
@@ -138,7 +138,8 @@
                                 Lưu địa chỉ
                             </button>
                         </div>
-
+                        <p id="checkoutAddressFeedback" class="small d-none mt-2 mb-0"
+                           role="status" aria-live="polite"></p>
                     </form>
                 </details>
             </div>
