@@ -412,62 +412,6 @@
     </style>
 
 
-    <!-- Chỉ hiển thị sau khi API xác nhận tạo đơn thành công. -->
-    <dialog id="uteOrderPlacedDialog" class="ute-order-placed-dialog"
-            aria-labelledby="uteOrderPlacedTitle" aria-describedby="uteOrderPlacedDescription">
-        <div class="ute-order-placed-content">
-            <div class="ute-order-placed-icon" aria-hidden="true"><i class="bi bi-check-lg"></i></div>
-            <p class="ute-order-placed-overline">UTE TEA · ĐẶT MÓN</p>
-            <h3 id="uteOrderPlacedTitle">Đã tiếp nhận đơn hàng!</h3>
-            <p id="uteOrderPlacedDescription" class="ute-order-placed-muted">
-                UTE Tea đã nhận đơn. Bạn có thể xem trạng thái xử lý trong chi tiết đơn hàng.
-            </p>
-            <div class="ute-order-placed-summary">
-                <div><span>Mã đơn</span><strong id="uteOrderPlacedId">—</strong></div>
-                <div><span>Hình thức</span><strong id="uteOrderPlacedType">—</strong></div>
-                <div><span>Chi nhánh</span><strong id="uteOrderPlacedBranch">—</strong></div>
-                <div><span>Tổng tiền</span><strong id="uteOrderPlacedTotal">—</strong></div>
-            </div>
-            <p class="ute-order-placed-note" id="uteOrderPlacedNote">Thanh toán theo hướng dẫn của đơn hàng.</p>
-            <div class="ute-order-placed-actions">
-                <a href="/my-orders" id="uteOrderPlacedDetails" class="btn btn-primary-custom">Xem đơn hàng</a>
-                <a href="/" class="btn btn-outline-secondary">Tiếp tục mua</a>
-            </div>
-            <button id="uteOrderPlacedClose" type="button" class="ute-order-placed-close"
-                    aria-label="Đóng thông báo"><i class="bi bi-x-lg"></i></button>
-        </div>
-    </dialog>
-    <style>
-        .ute-order-placed-dialog {
-            border: 0; padding: 0; margin: auto;
-            width: min(92vw, 490px); max-height: 90dvh;
-            overflow-y: auto; border-radius: 22px;
-            box-shadow: 0 25px 80px rgba(17, 44, 26, .26);
-            color: #314b36; background: #fff;
-        }
-        .ute-order-placed-dialog::backdrop { background: rgba(20, 34, 24, .62); }
-        .ute-order-placed-content { position: relative; padding: clamp(22px, 5vw, 36px); text-align: center; }
-        .ute-order-placed-icon { display: inline-grid; place-items: center; width: 72px; height: 72px;
-            border-radius: 50%; background: #eaf5e8; color: #3c7c4f; font-size: 34px; margin-bottom: 12px; }
-        .ute-order-placed-overline { color: #6b846d; font: 750 11px/1.5 'Be Vietnam Pro', sans-serif;
-            letter-spacing: .16em; margin-bottom: 6px; }
-        .ute-order-placed-content h3 { font: 700 clamp(23px, 5vw, 30px)/1.25 'Playfair Display', Georgia, serif;
-            margin-bottom: 10px; color: #2e4b36; }
-        .ute-order-placed-muted { color: #6a756b; font-size: 13px; line-height: 1.7; margin-bottom: 22px; }
-        .ute-order-placed-summary { border: 1px solid #e0e9dc; border-radius: 15px;
-            background: #f8faf6; padding: 13px 17px; display: grid; gap: 10px; text-align: left; }
-        .ute-order-placed-summary > div { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-        .ute-order-placed-summary span { color: #738072; font-size: 12px; }
-        .ute-order-placed-summary strong { color: #314e38; font-size: 13px; text-align: right;
-            max-width: 68%; overflow-wrap: anywhere; }
-        .ute-order-placed-note { margin: 14px 0 21px; font-size: 12px; color: #637365; }
-        .ute-order-placed-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .ute-order-placed-actions .btn { display: flex; align-items: center; justify-content: center;
-            min-height: 45px; font-weight: 700; border-radius: 11px; font-size: 12px; }
-        .ute-order-placed-close { position: absolute; top: 15px; right: 15px; border: 0;
-            background: #f1f4ef; border-radius: 50%; width: 34px; height: 34px; color: #56715c; }
-        @media(max-width: 420px) { .ute-order-placed-actions { grid-template-columns: 1fr; } }
-    </style>
 
 </section>
 
