@@ -15,7 +15,8 @@ const DeliveryCheckout = (() => {
     }
     function syncCounterButton(){
         const button=$('checkoutBtn');
-        if(button) button.disabled=!$('counterShop')?.value||!items().length;
+        const branch=$('counterShop');
+        if(button) button.disabled=Boolean(completedOrder)||!branch?.value||branch.disabled||!items().length;
     }
     async function loadPickupBranches(){
         const select=$('counterShop');
@@ -214,31 +215,65 @@ const DeliveryCheckout = (() => {
         }finally{busy=false;$('deliveryPaymentConfirm').disabled=false;$('deliveryPaymentBack').disabled=false;$('deliverySubmit').disabled=Boolean(completedOrder)||!quote;}
     }
     async function init(){
-        if(!$('branchCheckout'))return;await CustomerApp.initContext();
-        $('fulfillmentMode').onchange=mode;$('checkoutAddress').onchange=()=>loadBranches(false);$('checkoutShop').onchange=()=>chooseBranch().catch(e=>message(e.message,true));
+        if(!$('branchCheckout'))return;
+
+        // Always initialize the pickup controls, even if address or carrier APIs fail.
+        // Previously a delivery API error aborted init before the pickup branches loaded.
+        $('fulfillmentMode').onchange=mode;
+        $('checkoutAddress').onchange=()=>loadBranches(false);
+        $('checkoutShop').onchange=()=>chooseBranch().catch(e=>message(errorText(e),true));
         $('counterShop').onchange=()=>{clearMessage();syncCounterButton();};
-        $('applyCheckoutVoucher').onclick=refreshQuote;$('deliveryCheckout').onsubmit=showPayment;
+        $('applyCheckoutVoucher').onclick=refreshQuote;
+        $('deliveryCheckout').onsubmit=showPayment;
         $('deliveryPaymentForm').onsubmit=submit;
         $('deliveryPaymentBack').onclick=()=>{if(!busy&&$('deliveryPaymentDialog').open)$('deliveryPaymentDialog').close();};
         $('deliveryPaymentDialog').addEventListener('cancel',event=>{if(busy)event.preventDefault();});
-        $('checkoutVoucher').oninput=()=>{invalidate();clearMessage();$('branchQuote').textContent='Bấm Áp dụng để cập nhật tổng tiền.';$('checkoutVoucherNotice').className='small text-muted mt-1 mb-0';$('checkoutVoucherNotice').textContent='';};
+        $('checkoutVoucher').oninput=()=>{
+            invalidate();clearMessage();
+            $('branchQuote').textContent='Bấm Áp dụng để cập nhật tổng tiền.';
+            $('checkoutVoucherNotice').className='small text-muted mt-1 mb-0';
+            $('checkoutVoucherNotice').textContent='';
+        };
         $('checkoutVoucher').onkeydown=event=>{if(event.key==='Enter'){event.preventDefault();refreshQuote();}};
         const promo=new URLSearchParams(location.search).get('promo');
         if(promo && /^[A-Z0-9_-]{3,32}$/.test(promo.toUpperCase())) $('checkoutVoucher').value=promo.toUpperCase();
-        $('deliveryLogin').classList.toggle('d-none',signedIn);$('newAddressDetails').hidden=!signedIn;
-        if(signedIn){carriers=await MilkTeaApi.get('/api/v1/public/market/carriers');await loadAddresses();}
-        else {$('checkoutAddress').disabled=true;}
-        $('checkoutAddressForm').onsubmit=async event=>{
-            event.preventDefault();const form=event.target,button=event.submitter;button.disabled=true;
-            try{
-                const data=Object.fromEntries(new FormData(form));for(const key of ['latitude','longitude'])data[key]=data[key]===''?null:Number(data[key]);data.defaultAddress=form.elements.defaultAddress.checked;
-                const saved=await MilkTeaApi.post('/api/v1/account/addresses',data);form.reset();$('newAddressDetails').open=false;await loadAddresses(saved.id);
-            }catch(e){message(e.message,true);}finally{button.disabled=false;}
-        };
+        $('deliveryLogin').classList.toggle('d-none',signedIn);
+        $('newAddressDetails').hidden=!signedIn;
+        if(!signedIn) $('checkoutAddress').disabled=true;
+        mode();
+
+        try {
+            await CustomerApp.initContext();
+        } catch (error) {
+            // Cart page displays its own load/retry error; keep pickup UI responsive.
+            message('Chưa đồng bộ được giỏ hàng: '+errorText(error),true);
+        }
+
         await loadPickupBranches();
-        ready=true;mode();
+
+        if(signedIn) {
+            try {
+                const result=await MilkTeaApi.get('/api/v1/public/market/carriers');
+                carriers=Array.isArray(result)?result:[];
+                await loadAddresses();
+            } catch (error) {
+                $('branchQuote').textContent='Chưa tải được thông tin giao hàng. Bạn vẫn có thể chọn nhận tại quầy.';
+                if($('fulfillmentMode').value==='DELIVERY') message('Không thể tải thông tin giao hàng: '+errorText(error),true);
+            }
+        }
+        ready=true;
+        syncCounterButton();
+        mode();
     }
     document.addEventListener('DOMContentLoaded',()=>init().catch(e=>message(e.message,true)));
-    document.addEventListener('ute:cart-changed',event=>{if(ready){mode();if(event.detail?.pending){++request;invalidate();}else if(signedIn)loadBranches();}});
+    document.addEventListener('ute:cart-changed',event=>{
+        if(!ready)return;
+        mode();
+        if(event.detail?.pending) {
+            ++request;invalidate();
+        } else if(signedIn && $('fulfillmentMode').value==='DELIVERY') {
+            loadBranches().catch(error=>message(errorText(error),true));
+        }
+    });
     return {refresh:()=>loadBranches()};
 })();
