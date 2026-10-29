@@ -478,6 +478,24 @@
                     transform: none !important;
                 }
             }
+            /* Keep cart and checkout on the same visual grid; avoid narrow overflowing controls. */
+            .ute-cart-page .ute-cart-section-head { min-height: 42px; }
+            .ute-cart-page .ute-cart-back-link {
+                display: inline-flex; align-items: center; gap: 7px;
+                color: #53664a; font-size: .85rem; font-weight: 650;
+                text-decoration: none; white-space: nowrap;
+            }
+            .ute-cart-page .ute-cart-back-link:hover { text-decoration: underline; }
+            .ute-cart-page #cartList > .d-flex { min-width: 0; }
+            .ute-cart-page #cartList > .d-flex > .flex-grow-1 { flex-basis: 210px; }
+            .ute-cart-page #cartList .input-group { flex-wrap: nowrap; }
+            .ute-cart-page #cartSummary { margin-bottom: 22px; }
+            .ute-cart-page #branchCheckout { width: 100%; }
+            @media (max-width: 575.98px) {
+                .ute-cart-page .ute-cart-section-head { align-items: flex-start !important; flex-wrap: wrap; }
+                .ute-cart-page #cartList > .d-flex > .flex-grow-1 { flex-basis: 100%; margin-right: 0 !important; }
+                .ute-cart-page #cartList .product-price { min-width: 70px !important; }
+            }
         </style>
         <section class="ute-page-banner" aria-label="Giới thiệu khu vực làm việc">
           <div><div class="ute-kicker">UTE TEA / THANH TOÁN</div>
@@ -488,17 +506,25 @@
 
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <div class="d-flex align-items-center gap-2">
-                        <a th:href="@{/}" class="btn btn-outline-secondary btn-sm rounded-circle p-2">
-                            <i class="bi bi-arrow-left"></i>
-                        </a>
-                        <h3 class="brand-font mb-0">Giỏ Hàng Của Bạn</h3>
-                    </div>
+                <div class="ute-cart-section-head d-flex align-items-center justify-content-between gap-3 mb-3">
+                    <h2 class="h5 fw-bold mb-0">Món đã chọn</h2>
+                    <a th:href="@{/}" class="ute-cart-back-link">
+                        <i class="bi bi-arrow-left" aria-hidden="true"></i> Tiếp tục chọn món
+                    </a>
+                </div>
+
+                <aside class="ute-pickup-notice" role="note">
+                    <i class="bi bi-bag-check" aria-hidden="true"></i>
+                    <span>Kiểm tra món và số lượng trong giỏ, sau đó chọn <strong>nhận tại quầy</strong> hoặc <strong>giao hàng</strong> ở bước thanh toán.</span>
+                </aside>
 
                 <div class="card border-0 shadow-sm rounded-4 mb-4 cart-zoom-fade">
                     <div class="card-body p-4" id="cartContainer">
-                        <div id="cartLoading" class="text-center py-5">
+                        <div id="cartLoadError" class="alert alert-danger d-none" role="alert" aria-live="assertive">
+                            <span id="cartLoadErrorText">Không thể tải giỏ hàng. Vui lòng thử lại.</span>
+                            <button id="retryCartLoad" type="button" class="btn btn-sm btn-outline-danger ms-2">Tải lại</button>
+                        </div>
+                        <div id="cartLoading" class="text-center py-5" role="status" aria-live="polite">
                             <div class="spinner-border spinner-custom mb-2"></div>
                             <p class="text-muted small">Đang nạp giỏ hàng...</p>
                         </div>
@@ -553,18 +579,40 @@
             let cartEntranceShown = false;
             let previousCartQuantities = null;
 
-            document.addEventListener('ute:cart-changed',event=>{
-                const items=event.detail.items;
-                const total=items.reduce((sum,item)=>sum+Number(item.lineTotal||0),0);
-                renderCartItems(items,total);
+            function cartItemAmount(item) {
+                const recorded = item.lineTotal == null ? NaN : Number(item.lineTotal);
+                if (Number.isFinite(recorded) && recorded >= 0) return recorded;
+                const base = Number(item.price ?? item.unitPrice ?? 0) || 0;
+                const extras = (item.toppings || []).reduce((sum, topping) => sum + (Number(topping.price) || 0), 0);
+                return (base + extras) * (Number(item.quantity) || 0);
+            }
+
+            document.addEventListener('ute:cart-changed', event => {
+                const items = Array.isArray(event.detail?.items) ? event.detail.items : [];
+                renderCartItems(items);
             });
 
-            document.addEventListener('DOMContentLoaded', async () => {
-                await CustomerApp.initContext();
+            async function loadCartPage() {
+                const errorBox = document.getElementById('cartLoadError');
+                const loading = document.getElementById('cartLoading');
+                errorBox.classList.add('d-none');
+                loading.classList.remove('d-none');
+                try {
+                    await CustomerApp.initContext();
+                    const items = window.MilkTeaContext.sessionId
+                        ? CustomerApp.getServerCart() : CustomerApp.getLocalCart();
+                    renderCartItems(items);
+                } catch (error) {
+                    loading.classList.add('d-none');
+                    document.getElementById('cartLoadErrorText').textContent =
+                        'Không thể tải giỏ hàng: ' + (error?.message || 'Mất kết nối. Vui lòng thử lại.');
+                    errorBox.classList.remove('d-none');
+                }
+            }
 
-                const items = window.MilkTeaContext.sessionId ? CustomerApp.getServerCart() : CustomerApp.getLocalCart();
-                const total = items.reduce((acc, it) => acc + (it.lineTotal || ((it.price || it.unitPrice || 0) + (it.toppings ? it.toppings.reduce((s,t)=>s+(t.price||0),0) : 0)) * it.quantity), 0);
-                renderCartItems(items, total);
+            document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('retryCartLoad').addEventListener('click', loadCartPage);
+                loadCartPage();
             });
 
             function renderCartItems(items, subtotal) {
@@ -574,6 +622,9 @@
                 const summary = document.getElementById('cartSummary');
 
                 if (loading) loading.classList.add('d-none');
+                document.getElementById('cartLoadError')?.classList.add('d-none');
+                const checkout = document.getElementById('branchCheckout');
+                if (checkout) checkout.classList.toggle('d-none', !items || items.length === 0);
 
                 if (!items || items.length === 0) {
                     if (empty) empty.classList.remove('d-none');
@@ -586,9 +637,6 @@
                 if (empty) empty.classList.add('d-none');
                 if (list) list.classList.remove('d-none');
                 if (summary) summary.style.display = 'block';
-                const checkoutButton = document.getElementById('checkoutBtn');
-                if (checkoutButton) checkoutButton.textContent = 'Xác nhận đặt nhận tại quầy';
-
                 const playEntrance = !cartEntranceShown;
                 const currentQuantities = items.map(it => ({
                     productName: it.productName,
@@ -598,11 +646,11 @@
 
                 let html = '';
                 items.forEach((it, idx) => {
-                    const price = it.price || it.unitPrice || 0;
+                    const price = Number(it.price ?? it.unitPrice ?? 0) || 0;
                     const toppings = it.toppings || [];
-                    const toppingSum = toppings.reduce((acc, t) => acc + (t.price || 0), 0);
+                    const toppingSum = toppings.reduce((acc, t) => acc + (Number(t.price) || 0), 0);
                     const unitPriceWithTopping = price + toppingSum;
-                    const lineTotal = it.lineTotal || (unitPriceWithTopping * it.quantity);
+                    const lineTotal = cartItemAmount(it);
                     const toppingText = toppings.length
                         ? `<div class="small text-muted mb-1">
                             ${toppings.map(t => `
@@ -654,7 +702,9 @@
 
                 previousCartQuantities = currentQuantities;
 
-                const sub = parseFloat(subtotal) || 0;
+                const calculatedSubtotal = items.reduce((sum, item) => sum + cartItemAmount(item), 0);
+                const sub = Number.isFinite(Number(subtotal)) && subtotal != null
+                    ? Number(subtotal) : calculatedSubtotal;
                 let discountAmount = 0;
                 if (discountType === 'FIXED_AMOUNT') {
                     discountAmount = Math.min(sub, parseFloat(discountValue) || 0);
