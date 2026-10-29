@@ -51,6 +51,73 @@ const DeliveryCheckout = (() => {
     function renderDeliveryInfo(branch,carrier){
         $('checkoutDeliveryInfo').textContent='Nhân viên UTE Tea giao · Phí giao hàng: '+MilkTeaApi.formatVND(carrier.fee);
     }
+    let addressSaving=false;
+    async function saveAddress(event){
+        event.preventDefault();
+        if(addressSaving)return;
+
+        const form=event.currentTarget;
+        const feedback=$('checkoutAddressFeedback');
+        const button=event.submitter||form.querySelector('button[type="submit"]');
+        if(!signedIn){
+            message('Vui lòng đăng nhập để lưu địa chỉ giao hàng.',true);
+            return;
+        }
+        if(!form.reportValidity())return;
+
+        const data=Object.fromEntries(new FormData(form).entries());
+        data.recipient=String(data.recipient||'').trim();
+        data.phone=String(data.phone||'').trim();
+        data.addressLine=String(data.addressLine||'').trim();
+        data.area=String(data.area||'').trim()||null;
+        data.defaultAddress=Boolean(form.elements.namedItem('defaultAddress')?.checked);
+        for(const key of ['latitude','longitude']){
+            const raw=String(data[key]||'').trim();
+            data[key]=raw===''?null:Number(raw);
+        }
+        if((data.latitude===null)!==(data.longitude===null)||
+           (data.latitude!==null&&!Number.isFinite(data.latitude))||
+           (data.longitude!==null&&!Number.isFinite(data.longitude))){
+            feedback.className='small text-danger mt-2';
+            feedback.textContent='Tọa độ địa chỉ không hợp lệ. Vui lòng nhập lại.';
+            return;
+        }
+
+        addressSaving=true;
+        if(button){button.disabled=true;button.textContent='Đang lưu...';}
+        feedback.className='small text-muted mt-2';
+        feedback.textContent='Đang lưu địa chỉ...';
+        clearMessage();
+        let saved;
+        try{
+            saved=await MilkTeaApi.post('/api/v1/account/addresses',data);
+            if(!saved?.id)throw Error('Máy chủ chưa trả về mã địa chỉ vừa lưu.');
+        }catch(error){
+            feedback.className='small text-danger mt-2';
+            feedback.textContent='Không lưu được địa chỉ: '+errorText(error);
+            message('Không lưu được địa chỉ: '+errorText(error),true);
+            return;
+        }finally{
+            addressSaving=false;
+            if(button){button.disabled=false;button.textContent='Lưu địa chỉ';}
+        }
+
+        // Saving has already succeeded: subsequent quote/list errors must
+        // not encourage the customer to create duplicate address records.
+        form.reset();
+        $('newAddressDetails').open=false;
+        try{
+            await loadAddresses(saved.id);
+            feedback.className='small text-success mt-2';
+            feedback.textContent='Đã lưu địa chỉ thành công.';
+            message('Đã lưu địa chỉ giao hàng. Bạn có thể chọn chi nhánh để đặt món.');
+        }catch(error){
+            feedback.className='small text-warning mt-2';
+            feedback.textContent='Địa chỉ đã lưu, nhưng chưa làm mới được danh sách.';
+            message('Đã lưu địa chỉ. Không tải được danh sách mới: '+errorText(error)+'. Vui lòng tải lại trang.',true);
+        }
+    }
+
     async function loadAddresses(selected){
         const addresses=await MilkTeaApi.get('/api/v1/account/addresses');$('checkoutAddress').replaceChildren();option($('checkoutAddress'),'','Chọn địa chỉ nhận hàng');
         addresses.sort((a,b)=>Number(b.defaultAddress)-Number(a.defaultAddress)).forEach(a=>option($('checkoutAddress'),a.id,a.recipient+' · '+a.addressLine));
@@ -219,6 +286,9 @@ const DeliveryCheckout = (() => {
 
         // Always initialize the pickup controls, even if address or carrier APIs fail.
         // Previously a delivery API error aborted init before the pickup branches loaded.
+        // Bind the form immediately, before any network calls, so a failed
+        // carrier/address request never disables saving a new address.
+        $('checkoutAddressForm').addEventListener('submit',saveAddress);
         $('fulfillmentMode').onchange=mode;
         $('checkoutAddress').onchange=()=>loadBranches(false);
         $('checkoutShop').onchange=()=>chooseBranch().catch(e=>message(errorText(e),true));
