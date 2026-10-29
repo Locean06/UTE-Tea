@@ -386,6 +386,8 @@ public class AdminService {
                 .description(request.getDescription())
                 .price(request.getPrice())
                 .imageUrl(request.getImageUrl())
+                // Demo starter quantity for the ONE shared delivery pool, not per-branch stock.
+                .deliveryStock(request.getStock() != null ? request.getStock() : 100)
                 .active(request.getActive() != null ? request.getActive() : true)
                 .build();
         Product saved = productRepository.save(p);
@@ -410,6 +412,7 @@ public class AdminService {
         if (request.getSize() != null) p.setSize(request.getSize().trim().toUpperCase());
         if (request.getDescription() != null) p.setDescription(request.getDescription());
         if (request.getPrice() != null) p.setPrice(request.getPrice());
+        if (request.getStock() != null) p.setDeliveryStock(request.getStock());
         if (request.getImageUrl() != null) p.setImageUrl(request.getImageUrl());
         if (request.getActive() != null) p.setActive(request.getActive());
 
@@ -503,6 +506,7 @@ public class AdminService {
                 .description(p.getDescription())
                 .price(p.getPrice())
                 .imageUrl(p.getImageUrl())
+                .stock(p.getDeliveryStock())
                 .active(p.getActive())
                 .build();
     }
