@@ -5,7 +5,7 @@
 <body>
 
 <section th:fragment="panel" id="branchCheckout"
-         class="card border-0 shadow-sm rounded-4 p-3 p-sm-4 my-4">
+         class="card border-0 shadow-sm rounded-4 p-3 p-sm-4 my-4 d-none">
 
     <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
         <h2 class="h5 mb-0">Thông tin nhận hàng</h2>
@@ -176,11 +176,11 @@
                 <div id="branchAvailability"
                      role="status"
                      aria-live="polite"
-                     class="visually-hidden"></div>
+                     class="small text-muted mt-2"></div>
 
                 <div id="checkoutDeliveryInfo"
                      aria-live="polite"
-                     class="visually-hidden"></div>
+                     class="small text-success mt-2"></div>
 
             </div>
 
@@ -384,11 +384,10 @@
             margin-top: 10px !important;
         }
 
-        /* AN THONG TIN PHU DUOI CHI NHANH */
-        #branchCheckout #branchAvailability,
-        #branchCheckout #checkoutDeliveryInfo {
-            display: none !important;
-        }
+        /* Keep service availability and delivery fee visible so blocked orders are explainable. */
+        #branchCheckout #branchAvailability:empty,
+        #branchCheckout #checkoutDeliveryInfo:empty { display: none; }
+        #branchCheckout #branchAvailability p { margin: 0 0 4px; }
 
         /* TONG TIEN */
         #branchCheckout .ute-delivery-quote {
