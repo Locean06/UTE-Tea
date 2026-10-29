@@ -20,6 +20,20 @@ jobs:
         run: |
           chmod +x mvnw
           ./mvnw -B -ntp -DskipTests package
+      - name: Validate cart JavaScript and template structure
+        run: |
+          node --check src/main/resources/static/js/customer/customer.js
+          node --check src/main/resources/static/js/customer/delivery-checkout.js
+          python3 - <<'PY'
+          from pathlib import Path
+          page = Path('src/main/resources/templates/customer/cart.html').read_text(encoding='utf-8')
+          markup = page.split('<th:block th:fragment="scripts">', 1)[0]
+          assert markup.count('<div') == markup.count('</div>'), 'Cart HTML div tags are unbalanced'
+          for element in ('cartContainer', 'cartEmpty', 'cartLoadError', 'retryCartLoad', 'branchCheckout'):
+              source = page if element != 'branchCheckout' else Path('src/main/resources/templates/fragments/delivery-checkout.html').read_text(encoding='utf-8')
+              assert f'id="{element}"' in source, f'Missing cart UI element: {element}'
+          print('Cart template structural checks passed')
+          PY
       - name: Smoke test H2 demo profile (no external credentials)
         shell: bash
         run: |
@@ -29,6 +43,10 @@ jobs:
           for i in {1..60}; do
             if curl -f -s http://localhost:18080/actuator/health | grep -q '"status":"UP"'; then
               echo "UTE Tea demo health UP"
+              curl -fsS http://localhost:18080/cart > /tmp/ute-tea-cart.html
+              grep -q 'id="cartContainer"' /tmp/ute-tea-cart.html
+              grep -q 'id="branchCheckout"' /tmp/ute-tea-cart.html
+              echo "Cart page rendered successfully"
               exit 0
             fi
             if ! kill -0 "$app_pid" 2>/dev/null; then
