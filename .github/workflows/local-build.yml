@@ -25,6 +25,8 @@ jobs:
           node --check src/main/resources/static/js/customer/customer.js
           node --check src/main/resources/static/js/customer/delivery-checkout.js
           node src/test/js/cart-address-save.cjs
+          node --check src/main/resources/static/js/admin/takeaway-management.js
+          node src/test/js/admin-branches-ui.cjs
           node --check src/main/resources/static/js/customer/order-success.js
           node src/test/js/order-success-dialog.cjs
           python3 - <<'PY'
