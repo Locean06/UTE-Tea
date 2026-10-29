@@ -87,29 +87,27 @@ public class MarketService {
  }
  private ShopView shopView(Shop s){return new ShopView(s.getId(),s.getName(),s.getAddress(),s.isActive(),s.getCommissionPercent(),s.getOwner().getId(),s.isManagerCommissionEnabled(),s.getArea(),s.getLatitude(),s.getLongitude());}
  public CategoryView saveCategory(CurrentActor a,Long shopId,Long categoryId,CategoryInput input){
-  var shop=scope(a,shopId);Category c=categoryId==null?new Category():categories.findById(categoryId).orElseThrow(this::denied);
-  if(categoryId!=null&&(c.getShop()==null||!shopId.equals(c.getShop().getId())))throw denied();
-  c.setShop(shop);c.setName(input.name().trim());c.setActive(input.active());if(input.allowTopping()!=null)c.setAllowTopping(input.allowTopping());categories.save(c);
-  return new CategoryView(c.getId(),c.getName(),shopId,c.getActive(),Boolean.TRUE.equals(c.getAllowTopping()));
+  scope(a,shopId);
+  throw invalid("Các chi nhánh dùng chung danh mục. Vui lòng chỉnh sửa tại Quản trị > Thực đơn.");
  }
  @Transactional(readOnly=true) public List<CategoryView> shopCategories(CurrentActor a,Long shopId){
-  scope(a,shopId);return categories.findAll().stream().filter(c->c.getShop()!=null&&shopId.equals(c.getShop().getId())).map(c->new CategoryView(c.getId(),c.getName(),shopId,c.getActive(),Boolean.TRUE.equals(c.getAllowTopping()))).toList();
+  scope(a,shopId);return categories.findAllByActiveTrue().stream()
+      .filter(c->c.getShop()==null)
+      .map(c->new CategoryView(c.getId(),c.getName(),null,c.getActive(),Boolean.TRUE.equals(c.getAllowTopping())))
+      .toList();
  }
  public ProductView saveProduct(CurrentActor a,Long shopId,Long productId,ProductInput input){
-  var shop=scope(a,shopId);Product p=productId==null?new Product():products.findByIdWithLock(productId).orElseThrow(this::denied);
-  if(productId!=null&&(p.getShop()==null||!shopId.equals(p.getShop().getId())))throw denied();
-  if(productId!=null&&!Objects.equals(p.getCatalogVersion(),input.catalogVersion()))throw BusinessException.conflict(ErrorCode.ORDER_STATE_CONFLICT,"Món hoặc tồn bán đã thay đổi; tải lại trước khi lưu");
-  var cat=categories.findById(input.categoryId()).orElseThrow(()->invalid("Danh mục không tồn tại"));
-  if(cat.getShop()==null||!shopId.equals(cat.getShop().getId()))throw denied();
-  p.setShop(shop);p.setCategory(cat);p.setName(input.name().trim());p.setSize(input.size().trim());p.setDescription(input.description());p.setPrice(input.price());p.setDeliveryStock(input.stock());p.setActive(input.active());
-  if(input.menuCode()!=null&&!input.menuCode().isBlank()) {
-   if(!admin(a)&&!Product.normalizeSearch(input.menuCode()).equals(p.menuIdentity())&&!Product.normalizeSearch(input.menuCode()).equals(Product.normalizeSearch(p.getName())+"|"+Product.normalizeSearch(p.getSize())))throw denied();
-   p.setMenuCode(Product.normalizeSearch(input.menuCode()));
-  }
-  return productView(products.saveAndFlush(p));
+  scope(a,shopId);
+  throw invalid("Các chi nhánh dùng chung món và tồn bán. Vui lòng chỉnh tại Quản trị > Thực đơn.");
  }
- public vn.edu.ute.milktea.dto.AdminDto.ProductImageView productImage(CurrentActor a,Long shopId,Long productId,org.springframework.web.multipart.MultipartFile file){scope(a,shopId);var p=products.findByIdWithLock(productId).orElseThrow(this::denied);if(p.getShop()==null||!shopId.equals(p.getShop().getId()))throw denied();return images.uploadProductImage(productId,file);}
- @Transactional(readOnly=true) public List<ProductView> shopProducts(CurrentActor a,Long shopId){scope(a,shopId);return products.findByShopId(shopId).stream().map(this::productView).toList();}
+ public vn.edu.ute.milktea.dto.AdminDto.ProductImageView productImage(CurrentActor a,Long shopId,Long productId,org.springframework.web.multipart.MultipartFile file){
+  scope(a,shopId);
+  throw invalid("Ảnh món được dùng chung. Vui lòng chỉnh tại Quản trị > Thực đơn.");
+ }
+ @Transactional(readOnly=true) public List<ProductView> shopProducts(CurrentActor a,Long shopId){
+  scope(a,shopId);
+  return products.findAllByActiveTrue().stream().filter(p->p.getShop()==null).map(this::productView).toList();
+ }
  public CarrierView saveCarrier(CurrentActor a,Long shopId,Long carrierId,CarrierInput input){
   Shop shop=shopId==null?null:scope(a,shopId);if(shopId==null&&!admin(a))throw denied();
   Carrier c=carrierId==null?new Carrier():carriers.findById(carrierId).orElseThrow(this::denied);
@@ -343,6 +341,6 @@ public class MarketService {
  public ProductView productView(Product p){
   double rating=em.createQuery("select coalesce(avg(r.stars),0) from ProductReview r where r.product.id=:id",Double.class).setParameter("id",p.getId()).getSingleResult();
   long favorite=em.createQuery("select count(i) from ProductInterest i where i.product.id=:id and i.favorite=true",Long.class).setParameter("id",p.getId()).getSingleResult();
-  return new ProductView(p.getId(),p.getName(),p.getSize(),p.getDescription(),p.getPrice(),MenuCatalogSupport.resolveIllustration(p),p.getCategory().getId(),p.getCategory().getName(),p.getShop()==null?null:p.getShop().getId(),p.getShop()==null?"UTE Tea tại quầy":p.getShop().getName(),p.getDeliveryStock(),Boolean.TRUE.equals(p.getActive()),p.getCatalogVersion(),rating,favorite,p.menuIdentity());
+  return new ProductView(p.getId(),p.getName(),p.getSize(),p.getDescription(),p.getPrice(),MenuCatalogSupport.resolveIllustration(p),p.getCategory().getId(),p.getCategory().getName(),p.getShop()==null?null:p.getShop().getId(),p.getShop()==null?"UTE Tea · Thực đơn chung":p.getShop().getName(),p.getDeliveryStock(),Boolean.TRUE.equals(p.getActive()),p.getCatalogVersion(),rating,favorite,p.menuIdentity());
  }
 }
