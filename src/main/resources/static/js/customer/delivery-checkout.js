@@ -265,14 +265,19 @@ const DeliveryCheckout = (() => {
                 try{const result=await MilkTeaApi.post('/api/v1/market/orders/'+placed.id+'/payment-url');location.href=result.url;}
                 catch(err){message('Đơn #'+placed.id+' đã tạo nhưng chưa mở được VNPAY: '+err.message+'. Vào Đơn hàng đã đặt để thanh toán lại.',true);$('checkoutMessage').append(link);}
             } else {
-                window.UTEOrderSuccess?.show({
+                const orderDetailsUrl='/my-orders?tab=delivery&order='+encodeURIComponent(placed.id);
+                if(!window.UTEOrderSuccess?.show({
                     orderId: placed.id,
                     type: 'DELIVERY',
                     branch: placed.shopName || branches.find(b=>String(b.id)===String(input.shopId))?.name,
                     total: placed.totalAmount,
-                    detailsUrl: '/my-orders?tab=delivery&order=' + encodeURIComponent(placed.id),
+                    detailsUrl: orderDetailsUrl,
                     note: 'Đơn COD đã được tiếp nhận. Bạn thanh toán khi nhận hàng.' + cartWarning
-                });
+                })){
+                    // If the dialog is unavailable, never leave a completed order
+                    // behind an invisible modal/backdrop with disabled controls.
+                    location.href=orderDetailsUrl;
+                }
             }
         }catch(e){
             message((placed?'Đơn #'+placed.id+' đã tạo. ':'')+e.message,true);
