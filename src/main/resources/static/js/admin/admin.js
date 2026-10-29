@@ -587,7 +587,7 @@ const AdminApp = (() => {
 
         const items = data?.items || [];
         if (items.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-5">Không có món uống nào phù hợp.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-5">Không có món uống nào phù hợp.</td></tr>';
             if (pagContainer) pagContainer.innerHTML = '';
             return;
         }
@@ -614,6 +614,7 @@ const AdminApp = (() => {
                 <td><span class="badge bg-light text-dark border">${p.categoryName || 'Chưa phân loại'}</span></td>
                 <td><span class="badge bg-secondary">${p.size || 'M'}</span></td>
                 <td class="fw-bold product-price">${priceFormatted}</td>
+                <td class="fw-semibold">${Number(p.stock ?? 0).toLocaleString('vi-VN')}</td>
                 <td>${statusBadge}</td>
                 <td>
                     <div class="d-flex align-items-center gap-2">
@@ -692,6 +693,7 @@ const AdminApp = (() => {
             document.getElementById('cfgProdDesc').value = product.description || '';
             document.getElementById('cfgProdSize').value = product.size || 'M';
             document.getElementById('cfgProdPrice').value = product.price || '';
+            document.getElementById('cfgProdStock').value = product.stock ?? 0;
 
             const defaultImg = 'https://images.unsplash.com/photo-1558857563-b37cf5efee6a?w=100&q=80';
             document.getElementById('cfgProdImgPreview').src = product.imageUrl || defaultImg;
@@ -810,6 +812,7 @@ const AdminApp = (() => {
         const desc = document.getElementById('cfgProdDesc').value.trim();
         const size = document.getElementById('cfgProdSize').value.trim().toUpperCase();
         const price = parseFloat(document.getElementById('cfgProdPrice').value);
+        const stock = Number(document.getElementById('cfgProdStock').value);
         const oldImg = document.getElementById('cfgProductOldImageUrl').value;
         const fileInput = document.getElementById('cfgProdFileInput');
 
@@ -827,6 +830,10 @@ const AdminApp = (() => {
         }
         if (!price || price <= 0) {
             MilkTeaApi.showToast('Giá bán phải lớn hơn 0', 'warning');
+            return;
+        }
+        if (!Number.isSafeInteger(stock) || stock < 0 || stock > 1000000) {
+            MilkTeaApi.showToast('Tồn bán chung phải là số nguyên từ 0 đến 1.000.000', 'warning');
             return;
         }
 
@@ -852,6 +859,7 @@ const AdminApp = (() => {
                 name,
                 size,
                 price: String(price),
+                stock,
                 description: desc || null,
                 imageUrl: finalImageUrl || null,
                 active
