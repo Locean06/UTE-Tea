@@ -24,6 +24,7 @@ jobs:
         run: |
           node --check src/main/resources/static/js/customer/customer.js
           node --check src/main/resources/static/js/customer/delivery-checkout.js
+          node src/test/js/cart-address-save.cjs
           python3 - <<'PY'
           from pathlib import Path
           page = Path('src/main/resources/templates/customer/cart.html').read_text(encoding='utf-8')
